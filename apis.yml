@@ -1,0 +1,127 @@
+aid: liveblocks
+name: Liveblocks
+description: >-
+  Liveblocks is a real-time collaboration platform that provides ready-made
+  building blocks for multiplayer experiences, including presence, broadcast
+  events, shared storage (LiveObject/LiveList/LiveMap), comments and threads,
+  notifications, and Yjs-based collaborative documents. It exposes a public
+  authorization endpoint, a server-side private REST API, and SDKs for React,
+  JavaScript, Node.js, Python, Redux, Zustand, and Yjs.
+type: Index
+image: https://kinlane-productions.s3.amazonaws.com/apis-json/apis-json-logo.jpg
+url: >-
+  https://raw.githubusercontent.com/api-evangelist/liveblocks/refs/heads/main/apis.yml
+created: '2026-05-23'
+modified: '2026-05-23'
+specificationVersion: '0.19'
+tags:
+  - Real-Time
+  - Collaboration
+  - Multiplayer
+  - Presence
+  - CRDT
+  - Yjs
+  - Comments
+  - Threads
+  - Notifications
+  - WebSockets
+apis:
+  - aid: liveblocks:rest-api
+    name: Liveblocks REST API
+    description: >-
+      Server-side REST API for managing rooms, room access, storage, active
+      users, broadcast events, comments and threads, notifications, Yjs
+      documents, and version history. Authenticated with a secret key via
+      Bearer authorization.
+    humanURL: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+    baseURL: https://api.liveblocks.io/v2
+    tags:
+      - REST
+      - Rooms
+      - Storage
+      - Comments
+      - Threads
+      - Notifications
+      - Yjs
+      - Webhooks
+    properties:
+      - type: Documentation
+        url: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+      - type: Authentication
+        url: https://liveblocks.io/docs/authentication
+      - type: Webhooks
+        url: https://liveblocks.io/docs/platform/webhooks
+  - aid: liveblocks:authorization-api
+    name: Liveblocks Authorization API
+    description: >-
+      Public-facing authorization endpoint used by client SDKs to exchange a
+      server-issued token for a Liveblocks session. Supports access token and
+      ID token authorization patterns.
+    humanURL: https://liveblocks.io/docs/authentication
+    baseURL: https://api.liveblocks.io/v2
+    tags:
+      - Auth
+      - Tokens
+      - Sessions
+    properties:
+      - type: Documentation
+        url: https://liveblocks.io/docs/authentication
+  - aid: liveblocks:realtime-client-api
+    name: Liveblocks Realtime Client API
+    description: >-
+      WebSocket-based client API exposed through Liveblocks client SDKs for
+      React, JavaScript, Redux, Zustand, Vue (community), and Yjs. Provides
+      presence, broadcast events, Live storage data structures, and threads.
+    humanURL: https://liveblocks.io/docs
+    baseURL: https://api.liveblocks.io/v7
+    tags:
+      - WebSocket
+      - Client SDK
+      - Presence
+      - Storage
+      - Yjs
+    properties:
+      - type: Documentation
+        url: https://liveblocks.io/docs
+      - type: SDK
+        url: https://www.npmjs.com/package/@liveblocks/client
+      - type: SDK
+        url: https://www.npmjs.com/package/@liveblocks/react
+      - type: SDK
+        url: https://www.npmjs.com/package/@liveblocks/node
+      - type: SDK
+        url: https://www.npmjs.com/package/@liveblocks/yjs
+common:
+  - type: Website
+    url: https://liveblocks.io
+  - type: Portal
+    url: https://liveblocks.io/docs
+  - type: Documentation
+    url: https://liveblocks.io/docs
+  - type: SignUp
+    url: https://liveblocks.io/signup
+  - type: Login
+    url: https://liveblocks.io/dashboard
+  - type: Pricing
+    url: https://liveblocks.io/pricing
+  - type: Blog
+    url: https://liveblocks.io/blog
+  - type: GitHub
+    url: https://github.com/liveblocks/liveblocks
+  - type: Examples
+    url: https://liveblocks.io/examples
+  - type: ChangeLog
+    url: https://liveblocks.io/changelog
+  - type: StatusPage
+    url: https://status.liveblocks.io
+  - type: TermsOfService
+    url: https://liveblocks.io/terms
+  - type: PrivacyPolicy
+    url: https://liveblocks.io/privacy
+  - type: Support
+    url: https://liveblocks.io/support
+  - type: Community
+    url: https://liveblocks.io/discord
+maintainers:
+  - FN: Kin Lane
+    email: kinlane@gmail.com
