@@ -122,6 +122,8 @@ common:
     url: https://liveblocks.io/support
   - type: Community
     url: https://liveblocks.io/discord
+  - type: LLMsTxt
+    url: https://liveblocks.io/llms.txt
 maintainers:
   - FN: Kin Lane
     email: kinlane@gmail.com
