@@ -1,0 +1,96 @@
+aid: liveblocks:asyncapi-review
+name: Liveblocks WebSocket Protocol — AsyncAPI Review
+description: >-
+  Review of whether the Liveblocks realtime WebSocket protocol can be modeled
+  as a documented AsyncAPI specification. Conclusion: the wire-level protocol
+  is private/undocumented. Only the high-level @liveblocks/client SDK surface
+  (room subscribe topics and methods) is publicly documented. Operation codes,
+  message envelopes, frame types, the actual WebSocket endpoint URL,
+  storage op formats (LiveObject/LiveList/LiveMap), and presence/broadcast
+  wire shapes are NOT published.
+created: '2026-05-29'
+modified: '2026-05-29'
+status: not-publishable
+reason: >-
+  Per the API Evangelist "no fabrication" rule, an AsyncAPI specification was
+  not produced. Liveblocks documents the SDK abstraction (the client library
+  built on top of WebSockets), not the underlying wire protocol. Without an
+  official protocol reference (op codes, message envelopes, channel
+  parameters), any AsyncAPI document would require fabricating message
+  schemas and is therefore out of scope.
+findings:
+  - heading: Documented (SDK surface only)
+    items:
+      - >-
+        Connection status values exposed by the SDK: "initial", "connecting",
+        "connected", "reconnecting", "disconnected"
+      - >-
+        Storage sync status values: "not-loaded", "loading", "synchronizing",
+        "synchronized"
+      - >-
+        room.subscribe topics: "my-presence", "others", "event", "status",
+        "storage-status", "lost-connection", "error", "history"
+      - >-
+        Lost-connection event values: "lost", "restored", "failed"
+      - >-
+        Others event types: "enter", "leave", "update", "reset"
+      - >-
+        Core methods: room.updatePresence(patch, options),
+        room.broadcastEvent(event, options), room.getStorage()
+      - >-
+        Storage primitives: LiveObject, LiveList, LiveMap
+      - >-
+        Default presence update throttle is 100ms (configurable 16-1000ms)
+      - >-
+        Default lostConnectionTimeout is 5000ms
+      - >-
+        Liveblocks edge runs on Cloudflare Workers; reconnection,
+        offline handling, and edge cases are managed by the SDK
+  - heading: NOT documented (required for an AsyncAPI spec)
+    items:
+      - WebSocket endpoint URL (host, path, version segment)
+      - URL parameters or headers used to attach the auth token
+      - Room identifier parameter on the WebSocket URL
+      - Message envelope structure (frame type, op code field, payload shape)
+      - Op codes for presence updates (UpdatePresence / UpdatePresenceAck)
+      - Op codes and payload format for storage operations on LiveObject,
+        LiveList, and LiveMap (CreateObject, UpdateObject, DeleteObject,
+        SetParentKey, etc.)
+      - Op codes for broadcast events
+      - History / acknowledgement frames
+      - joinRoom / leaveRoom control frames
+      - Heartbeat / keep-alive behaviour over the wire
+      - Server-to-client initial state payload (InitialState / RoomState)
+      - Error codes returned over the socket
+sources:
+  - type: Documentation
+    name: Liveblocks Docs (index)
+    url: https://liveblocks.io/docs
+  - type: Documentation
+    name: WebSocket infrastructure overview
+    url: https://liveblocks.io/docs/platform/websocket-infrastructure
+  - type: Documentation
+    name: Authentication
+    url: https://liveblocks.io/docs/authentication
+  - type: Documentation
+    name: '@liveblocks/client API reference'
+    url: https://liveblocks.io/docs/api-reference/liveblocks-client
+  - type: Documentation
+    name: Sync engine overview
+    url: https://liveblocks.io/docs/collaboration-features/multiplayer/sync-engine
+  - type: Documentation
+    name: Liveblocks Storage (LiveObject / LiveList / LiveMap)
+    url: >-
+      https://liveblocks.io/docs/collaboration-features/multiplayer/sync-engine/liveblocks-storage
+  - type: Blog
+    name: Open-sourcing the Liveblocks sync engine and dev server
+    url: >-
+      https://liveblocks.io/blog/open-sourcing-the-liveblocks-sync-engine-and-dev-server
+  - type: LLMsTxt
+    name: Liveblocks llms.txt index
+    url: https://liveblocks.io/llms.txt
+recommendation: >-
+  If a protocol model is required, source it from the open-sourced sync engine
+  on GitHub (the wire format is implementation-defined there) and treat the
+  resulting document as derived from source code rather than from official
+  documentation. That work is out of scope for this docs-only pass.
