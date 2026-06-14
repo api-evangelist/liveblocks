@@ -1,0 +1,700 @@
+"""
+Liveblocks GraphQL Schema
+Conceptual schema derived from the Liveblocks REST API and platform documentation.
+Source: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+"""
+
+# ─── Scalars ────────────────────────────────────────────────────────────────
+
+scalar DateTime
+scalar JSON
+scalar Upload
+
+# ─── Enums ──────────────────────────────────────────────────────────────────
+
+enum RoomType {
+  REGULAR
+  CUSTOM
+}
+
+enum RoomStatus {
+  OPEN
+  CLOSED
+}
+
+enum RoomAccess {
+  PUBLIC
+  PRIVATE
+  UNLISTED
+}
+
+enum SessionStatus {
+  ACTIVE
+  EXPIRED
+  REVOKED
+}
+
+enum ConnectionStatus {
+  CONNECTED
+  DISCONNECTED
+  RECONNECTING
+}
+
+enum ThreadStatus {
+  OPEN
+  CLOSED
+}
+
+enum ThreadResolved {
+  RESOLVED
+  UNRESOLVED
+}
+
+enum NotificationKind {
+  THREAD
+  COMMENT
+  MENTION
+  REACTION
+  TEXT_MENTION
+}
+
+# ─── Room types ─────────────────────────────────────────────────────────────
+
+"""A Liveblocks room — the primary container for collaborative sessions."""
+type Room {
+  id: ID!
+  type: RoomType!
+  status: RoomStatus!
+  access: RoomAccess!
+  metadata: RoomMetadata
+  permissions: RoomPermissions
+  details: RoomDetails
+  createdAt: DateTime!
+  lastConnectionAt: DateTime
+  activeUsers: [User!]
+  threads: [Thread!]
+  storage: Storage
+}
+
+"""Detailed view of a room including computed fields."""
+type RoomDetails {
+  id: ID!
+  roomId: String!
+  type: RoomType!
+  status: RoomStatus!
+  connectionCount: ConnectionCount
+  maxConnections: Int
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""Arbitrary key-value metadata attached to a room."""
+type RoomMetadata {
+  roomId: String!
+  entries: JSON
+}
+
+"""Access-control permissions for a room."""
+type RoomPermissions {
+  roomId: String!
+  defaultAccess: RoomAccess!
+  groupAccess: JSON
+  userAccess: JSON
+}
+
+# ─── User / Presence ─────────────────────────────────────────────────────────
+
+"""A Liveblocks user identity."""
+type User {
+  id: ID!
+  info: UserInfo
+  presence: UserPresence
+  details: UserDetails
+}
+
+"""Extended profile information for a user."""
+type UserDetails {
+  userId: String!
+  name: String
+  avatar: String
+  email: String
+  metadata: JSON
+  createdAt: DateTime
+}
+
+"""Real-time presence data for a connected user."""
+type UserPresence {
+  userId: String!
+  connectionId: Int
+  data: JSON
+  cursor: Cursor
+  updatedAt: DateTime
+}
+
+"""Static info fields surfaced from the user's auth token or user-info endpoint."""
+type UserInfo {
+  userId: String!
+  name: String
+  avatar: String
+  color: String
+  metadata: JSON
+}
+
+# ─── Session ─────────────────────────────────────────────────────────────────
+
+"""A Liveblocks session issued after authorization."""
+type Session {
+  token: String!
+  status: SessionStatus!
+  details: SessionDetails
+}
+
+"""Metadata describing a session token."""
+type SessionDetails {
+  sessionId: String!
+  userId: String
+  roomId: String
+  permissions: JSON
+  issuedAt: DateTime!
+  expiresAt: DateTime!
+  status: SessionStatus!
+}
+
+# ─── Connection ──────────────────────────────────────────────────────────────
+
+"""A single WebSocket connection to a room."""
+type Connection {
+  id: ID!
+  roomId: String!
+  userId: String
+  details: ConnectionDetails
+  status: ConnectionStatus!
+  connectedAt: DateTime
+}
+
+"""Full details of a WebSocket connection."""
+type ConnectionDetails {
+  connectionId: Int!
+  roomId: String!
+  userId: String
+  userAgent: String
+  ipAddress: String
+  status: ConnectionStatus!
+  connectedAt: DateTime!
+  disconnectedAt: DateTime
+}
+
+"""Aggregate connection count for a room."""
+type ConnectionCount {
+  roomId: String!
+  total: Int!
+  anonymous: Int!
+  authenticated: Int!
+}
+
+# ─── Document / Yjs ──────────────────────────────────────────────────────────
+
+"""A collaborative document stored in a room."""
+type Document {
+  id: ID!
+  roomId: String!
+  type: String
+  state: DocumentState
+  details: DocumentDetails
+  versions: [DocumentVersion!]
+  yDoc: YDoc
+}
+
+"""Extended metadata about a document."""
+type DocumentDetails {
+  documentId: String!
+  roomId: String!
+  type: String
+  size: Int
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""A point-in-time snapshot of a document."""
+type DocumentVersion {
+  versionId: String!
+  documentId: String!
+  roomId: String!
+  createdAt: DateTime!
+  createdBy: String
+  size: Int
+}
+
+"""Current content state of a document."""
+type DocumentState {
+  documentId: String!
+  data: JSON
+  encoding: String
+  updatedAt: DateTime!
+}
+
+# ─── Yjs ─────────────────────────────────────────────────────────────────────
+
+"""A Yjs-based shared document backed by Liveblocks."""
+type YDoc {
+  roomId: String!
+  details: YDocDetails
+  updates: [YjsUpdate!]
+}
+
+"""Metadata for a Yjs document."""
+type YDocDetails {
+  roomId: String!
+  size: Int
+  vectorClock: JSON
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""A single incremental Yjs update payload."""
+type YjsUpdate {
+  updateId: String!
+  roomId: String!
+  origin: String
+  data: String
+  encoding: String
+  appliedAt: DateTime!
+  appliedBy: String
+}
+
+# ─── Storage ─────────────────────────────────────────────────────────────────
+
+"""Liveblocks shared storage for a room (LiveObject/LiveList/LiveMap)."""
+type Storage {
+  roomId: String!
+  details: StorageDetails
+  objects: [StorageObject!]
+}
+
+"""Metadata describing the storage layer for a room."""
+type StorageDetails {
+  roomId: String!
+  size: Int
+  version: Int
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""A single node in the Liveblocks storage tree."""
+type StorageObject {
+  id: ID!
+  roomId: String!
+  type: String!
+  parentId: String
+  parentKey: String
+  data: JSON
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+# ─── Comments & Threads ───────────────────────────────────────────────────────
+
+"""A comment posted within a thread."""
+type Comment {
+  id: ID!
+  threadId: String!
+  roomId: String!
+  userId: String!
+  body: JSON
+  reactions: [CommentReaction!]
+  attachments: [CommentAttachment!]
+  details: CommentDetails
+  createdAt: DateTime!
+  editedAt: DateTime
+  deletedAt: DateTime
+}
+
+"""Extended metadata for a comment."""
+type CommentDetails {
+  commentId: String!
+  threadId: String!
+  roomId: String!
+  userId: String!
+  bodyText: String
+  reactionCount: Int
+  attachmentCount: Int
+  createdAt: DateTime!
+  editedAt: DateTime
+  deletedAt: DateTime
+}
+
+"""An emoji reaction on a comment."""
+type CommentReaction {
+  emoji: String!
+  commentId: String!
+  userId: String!
+  createdAt: DateTime!
+}
+
+"""A file or media attachment on a comment."""
+type CommentAttachment {
+  attachmentId: String!
+  commentId: String!
+  name: String!
+  mimeType: String
+  size: Int
+  url: String
+  createdAt: DateTime!
+}
+
+"""A thread grouping one or more comments."""
+type Thread {
+  id: ID!
+  roomId: String!
+  comments: [Comment!]
+  details: ThreadDetails
+  status: ThreadStatus!
+  resolved: ThreadResolved!
+  metadata: JSON
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  resolvedAt: DateTime
+  resolvedBy: String
+}
+
+"""Extended metadata for a thread."""
+type ThreadDetails {
+  threadId: String!
+  roomId: String!
+  commentCount: Int!
+  participantCount: Int!
+  status: ThreadStatus!
+  resolved: ThreadResolved!
+  metadata: JSON
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+# ─── Notifications ────────────────────────────────────────────────────────────
+
+"""A notification sent to a user about collaborative activity."""
+type Notification {
+  id: ID!
+  userId: String!
+  roomId: String
+  kind: NotificationKind!
+  read: Boolean!
+  details: NotificationDetails
+  createdAt: DateTime!
+  readAt: DateTime
+}
+
+"""Full details for a notification."""
+type NotificationDetails {
+  notificationId: String!
+  userId: String!
+  roomId: String
+  kind: NotificationKind!
+  threadId: String
+  commentId: String
+  mentionId: String
+  read: Boolean!
+  createdAt: DateTime!
+  readAt: DateTime
+}
+
+# ─── Mentions ─────────────────────────────────────────────────────────────────
+
+"""A @mention of a user inside a comment body."""
+type Mention {
+  id: ID!
+  commentId: String!
+  threadId: String!
+  roomId: String!
+  mentionedUserId: String!
+  details: MentionDetails
+  createdAt: DateTime!
+}
+
+"""Extended metadata for a mention."""
+type MentionDetails {
+  mentionId: String!
+  commentId: String!
+  threadId: String!
+  roomId: String!
+  mentionedUserId: String!
+  mentionedBy: String!
+  createdAt: DateTime!
+}
+
+# ─── Collaboration ────────────────────────────────────────────────────────────
+
+"""Aggregate view of all collaborative activity within a room."""
+type Collaboration {
+  roomId: String!
+  details: CollaborationDetails
+  activeUsers: [User!]
+  cursors: [Cursor!]
+  presences: [Presence!]
+}
+
+"""Summary statistics for collaboration in a room."""
+type CollaborationDetails {
+  roomId: String!
+  activeUserCount: Int!
+  cursorCount: Int!
+  presenceEntryCount: Int!
+  lastActivityAt: DateTime
+}
+
+# ─── Cursor / Presence ────────────────────────────────────────────────────────
+
+"""A user's cursor position within a collaborative document."""
+type Cursor {
+  userId: String!
+  connectionId: Int
+  details: CursorDetails
+  updatedAt: DateTime
+}
+
+"""Detailed cursor position data."""
+type CursorDetails {
+  userId: String!
+  connectionId: Int!
+  x: Float
+  y: Float
+  data: JSON
+  updatedAt: DateTime!
+}
+
+"""The real-time presence entry for a connected user."""
+type Presence {
+  userId: String!
+  connectionId: Int!
+  roomId: String!
+  details: PresenceDetails
+}
+
+"""Full presence payload for a user."""
+type PresenceDetails {
+  userId: String!
+  connectionId: Int!
+  roomId: String!
+  data: JSON
+  cursor: CursorDetails
+  updatedAt: DateTime!
+}
+
+# ─── Broadcast ────────────────────────────────────────────────────────────────
+
+"""A broadcast event dispatched to all users in a room."""
+type Broadcast {
+  roomId: String!
+  message: BroadcastMessage!
+  sentAt: DateTime!
+}
+
+"""The payload of a broadcast event."""
+type BroadcastMessage {
+  type: String!
+  data: JSON
+}
+
+# ─── Webhooks ─────────────────────────────────────────────────────────────────
+
+"""A configured webhook endpoint for Liveblocks events."""
+type Webhook {
+  id: ID!
+  url: String!
+  secret: String
+  events: [WebhookEvent!]
+  headers: WebhookHeaders
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""A webhook delivery event record."""
+type WebhookEvent {
+  eventId: String!
+  webhookId: String!
+  type: String!
+  payload: JSON
+  deliveredAt: DateTime
+  statusCode: Int
+  error: String
+}
+
+"""Custom HTTP headers attached to webhook requests."""
+type WebhookHeaders {
+  webhookId: String!
+  headers: JSON
+}
+
+# ─── Auth / Keys ──────────────────────────────────────────────────────────────
+
+"""A Liveblocks authentication token."""
+type AuthToken {
+  token: String!
+  type: String!
+  expiresAt: DateTime!
+  permissions: JSON
+}
+
+"""A public API key used in client-side SDK initialization."""
+type PublicApiKey {
+  keyId: String!
+  prefix: String!
+  createdAt: DateTime!
+  lastUsedAt: DateTime
+}
+
+"""A secret API key used for server-side REST API calls."""
+type SecretApiKey {
+  keyId: String!
+  prefix: String!
+  createdAt: DateTime!
+  lastUsedAt: DateTime
+}
+
+# ─── Pagination ───────────────────────────────────────────────────────────────
+
+"""Cursor-based pagination info."""
+type PageInfo {
+  nextCursor: String
+  hasNextPage: Boolean!
+}
+
+"""Paginated list of rooms."""
+type RoomConnection {
+  rooms: [Room!]!
+  pageInfo: PageInfo!
+}
+
+"""Paginated list of threads."""
+type ThreadConnection {
+  threads: [Thread!]!
+  pageInfo: PageInfo!
+}
+
+"""Paginated list of notifications."""
+type NotificationConnection {
+  notifications: [Notification!]!
+  pageInfo: PageInfo!
+}
+
+# ─── Root Types ───────────────────────────────────────────────────────────────
+
+type Query {
+  """Retrieve a single room by ID."""
+  room(roomId: ID!): Room
+
+  """List all rooms, with optional cursor pagination."""
+  rooms(cursor: String, limit: Int): RoomConnection!
+
+  """Retrieve room metadata."""
+  roomMetadata(roomId: ID!): RoomMetadata
+
+  """Retrieve room access permissions."""
+  roomPermissions(roomId: ID!): RoomPermissions
+
+  """List active users in a room."""
+  activeUsers(roomId: ID!): [User!]!
+
+  """Retrieve the connection count for a room."""
+  connectionCount(roomId: ID!): ConnectionCount
+
+  """Retrieve a specific connection."""
+  connection(roomId: ID!, connectionId: ID!): Connection
+
+  """Retrieve storage for a room."""
+  storage(roomId: ID!): Storage
+
+  """Retrieve a specific thread."""
+  thread(roomId: ID!, threadId: ID!): Thread
+
+  """List threads in a room."""
+  threads(roomId: ID!, cursor: String, limit: Int): ThreadConnection!
+
+  """Retrieve a specific comment."""
+  comment(roomId: ID!, threadId: ID!, commentId: ID!): Comment
+
+  """Retrieve the Yjs document for a room."""
+  yDoc(roomId: ID!): YDoc
+
+  """List document versions for a room."""
+  documentVersions(roomId: ID!): [DocumentVersion!]!
+
+  """Retrieve notifications for a user."""
+  notifications(userId: ID!, cursor: String, limit: Int): NotificationConnection!
+
+  """Retrieve collaboration stats for a room."""
+  collaboration(roomId: ID!): Collaboration
+}
+
+type Mutation {
+  """Create a new room."""
+  createRoom(id: String!, type: RoomType, access: RoomAccess, metadata: JSON): Room!
+
+  """Update room metadata."""
+  updateRoomMetadata(roomId: ID!, metadata: JSON!): RoomMetadata!
+
+  """Update room permissions."""
+  updateRoomPermissions(roomId: ID!, defaultAccess: RoomAccess, groupAccess: JSON, userAccess: JSON): RoomPermissions!
+
+  """Delete a room."""
+  deleteRoom(roomId: ID!): Boolean!
+
+  """Broadcast an event to all users in a room."""
+  broadcastEvent(roomId: ID!, type: String!, data: JSON): Broadcast!
+
+  """Create a thread in a room."""
+  createThread(roomId: ID!, body: JSON!, metadata: JSON): Thread!
+
+  """Create a comment in a thread."""
+  createComment(roomId: ID!, threadId: ID!, body: JSON!): Comment!
+
+  """Edit a comment."""
+  editComment(roomId: ID!, threadId: ID!, commentId: ID!, body: JSON!): Comment!
+
+  """Delete a comment."""
+  deleteComment(roomId: ID!, threadId: ID!, commentId: ID!): Boolean!
+
+  """Add a reaction to a comment."""
+  addCommentReaction(roomId: ID!, threadId: ID!, commentId: ID!, emoji: String!): CommentReaction!
+
+  """Remove a reaction from a comment."""
+  removeCommentReaction(roomId: ID!, threadId: ID!, commentId: ID!, emoji: String!): Boolean!
+
+  """Resolve a thread."""
+  resolveThread(roomId: ID!, threadId: ID!): Thread!
+
+  """Reopen a resolved thread."""
+  reopenThread(roomId: ID!, threadId: ID!): Thread!
+
+  """Mark a notification as read."""
+  markNotificationRead(userId: ID!, notificationId: ID!): Notification!
+
+  """Mark all notifications as read for a user."""
+  markAllNotificationsRead(userId: ID!): Boolean!
+
+  """Initialize or overwrite the Yjs document for a room."""
+  initYDoc(roomId: ID!, data: String!): YDoc!
+
+  """Delete the Yjs document for a room."""
+  deleteYDoc(roomId: ID!): Boolean!
+}
+
+type Subscription {
+  """Subscribe to presence changes in a room."""
+  presenceUpdated(roomId: ID!): Presence!
+
+  """Subscribe to new comments in a room."""
+  commentAdded(roomId: ID!): Comment!
+
+  """Subscribe to thread status changes in a room."""
+  threadUpdated(roomId: ID!): Thread!
+
+  """Subscribe to storage changes in a room."""
+  storageUpdated(roomId: ID!): Storage!
+
+  """Subscribe to broadcast events in a room."""
+  eventBroadcast(roomId: ID!): Broadcast!
+
+  """Subscribe to new notifications for a user."""
+  notificationReceived(userId: ID!): Notification!
+}
