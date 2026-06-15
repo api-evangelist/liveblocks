@@ -1,0 +1,938 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Liveblocks REST API",
+    "version": "v2"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Rooms",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List rooms",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.liveblocks.io/v2/rooms"
+          },
+          "docs": "Retrieve list of rooms with filtering and pagination."
+        },
+        {
+          "info": {
+            "name": "Create a room",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.liveblocks.io/v2/rooms"
+          },
+          "docs": "Create a room"
+        },
+        {
+          "info": {
+            "name": "Get room",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.liveblocks.io/v2/rooms/:roomId",
+            "params": [
+              {
+                "name": "roomId",
+                "value": "",
+                "type": "path",
+                "description": "The room identifier."
+              }
+            ]
+          },
+          "docs": "Get room"
+        },
+        {
+          "info": {
+            "name": "Update room",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.liveblocks.io/v2/rooms/:roomId",
+            "params": [
+              {
+                "name": "roomId",
+                "value": "",
+                "type": "path",
+                "description": "The room identifier."
+              }
+            ]
+          },
+          "docs": "Update room"
+        },
+        {
+          "info": {
+            "name": "Delete room",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://api.liveblocks.io/v2/rooms/:roomId",
+            "params": [
+              {
+                "name": "roomId",
+                "value": "",
+                "type": "path",
+                "description": "The room identifier."
+              }
+            ]
+          },
+          "docs": "Delete room"
+        },
+        {
+          "info": {
+            "name": "Prewarm room",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.liveblocks.io/v2/rooms/:roomId/prewarm",
+            "params": [
+              {
+                "name": "roomId",
+                "value": "",
+                "type": "path",
+                "description": "The room identifier."
+              }
+            ]
+          },
+          "docs": "Accelerate room connection readiness."
+        },
+        {
+          "info": {
+            "name": "Upsert room",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.liveblocks.io/v2/rooms/:roomId/upsert",
+            "params": [
+              {
+                "name": "roomId",
+                "value": "",
+                "type": "path",
+                "description": "The room identifier."
+              }
+            ]
+          },
+          "docs": "Upsert room"
+        },
+        {
+          "info": {
+            "name": "Change room identifier",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.liveblocks.io/v2/rooms/:roomId/update-room-id",
+            "params": [
+              {
+                "name": "roomId",
+                "value": "",
+                "type": "path",
+                "description": "The room identifier."
+              }
+            ]
+          },
+          "docs": "Change room identifier"
+        },
+        {
+          "info": {
+            "name": "Change room organization association",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.liveblocks.io/v2/rooms/:roomId/update-organization-id",
+            "params": [
+              {
+                "name": "roomId",
+                "value": "",
+                "type": "path",
+                "description": "The room identifier."
+              }
+            ]
+          },
+          "docs": "Change room organization association"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Active Users",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List active users",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.liveblocks.io/v2/rooms/:roomId/active_users",
+            "params": [
+              {
+                "name": "roomId",
+                "value": "",
+                "type": "path",
+                "description": "The room identifier."
+              }
+            ]
+          },
+          "docs": "List currently connected users in a room."
+        },
+        {
+          "info": {
+            "name": "Set presence",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.liveblocks.io/v2/rooms/:roomId/presence",
+            "params": [
+              {
+                "name": "roomId",
+                "value": "",
+                "type": "path",
+                "description": "The room identifier."
+              }
+            ]
+          },
+          "docs": "Set temporary user presence data."
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Events",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Broadcast event",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.liveblocks.io/v2/rooms/:roomId/broadcast_event",
+            "params": [
+              {
+                "name": "roomId",
+                "value": "",
+                "type": "path",
+                "description": "The room identifier."
+              }
+            ]
+          },
+          "docs": "Send a message to all participants in a room."
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Storage",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Get storage",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.liveblocks.io/v2/rooms/:roomId/storage",
+            "params": [
+              {
+                "name": "roomId",
+                "value": "",
+                "type": "path",
+                "description": "The room identifier."
+              }
+            ]
+          },
+          "docs": "Retrieve a room's storage document."
+        },
+        {
+          "info": {
+            "name": "Initialize storage",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.liveblocks.io/v2/rooms/:roomId/storage",
+            "params": [
+              {
+                "name": "roomId",
+                "value": "",
+                "type": "path",
+                "description": "The room identifier."
+              }
+            ]
+          },
+          "docs": "Initialize storage"
+        },
+        {
+          "info": {
+            "name": "Clear storage",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://api.liveblocks.io/v2/rooms/:roomId/storage",
+            "params": [
+              {
+                "name": "roomId",
+                "value": "",
+                "type": "path",
+                "description": "The room identifier."
+              }
+            ]
+          },
+          "docs": "Clear storage"
+        },
+        {
+          "info": {
+            "name": "Patch storage with JSON Patch",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://api.liveblocks.io/v2/rooms/:roomId/storage/json-patch",
+            "params": [
+              {
+                "name": "roomId",
+                "value": "",
+                "type": "path",
+                "description": "The room identifier."
+              }
+            ]
+          },
+          "docs": "Patch storage with JSON Patch"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Yjs",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Get Yjs document as JSON",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.liveblocks.io/v2/rooms/:roomId/ydoc",
+            "params": [
+              {
+                "name": "roomId",
+                "value": "",
+                "type": "path",
+                "description": "The room identifier."
+              }
+            ]
+          },
+          "docs": "Get Yjs document as JSON"
+        },
+        {
+          "info": {
+            "name": "Apply Yjs binary update",
+            "type": "http"
+          },
+          "http": {
+            "method": "PUT",
+            "url": "https://api.liveblocks.io/v2/rooms/:roomId/ydoc",
+            "params": [
+              {
+                "name": "roomId",
+                "value": "",
+                "type": "path",
+                "description": "The room identifier."
+              }
+            ]
+          },
+          "docs": "Apply Yjs binary update"
+        },
+        {
+          "info": {
+            "name": "Export Yjs document as binary",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.liveblocks.io/v2/rooms/:roomId/ydoc-binary",
+            "params": [
+              {
+                "name": "roomId",
+                "value": "",
+                "type": "path",
+                "description": "The room identifier."
+              }
+            ]
+          },
+          "docs": "Export Yjs document as binary"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Versions",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List versions",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.liveblocks.io/v2/rooms/:roomId/versions",
+            "params": [
+              {
+                "name": "roomId",
+                "value": "",
+                "type": "path",
+                "description": "The room identifier."
+              }
+            ]
+          },
+          "docs": "List document version snapshots."
+        },
+        {
+          "info": {
+            "name": "Get version",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.liveblocks.io/v2/rooms/:roomId/version/:versionId",
+            "params": [
+              {
+                "name": "roomId",
+                "value": "",
+                "type": "path",
+                "description": "The room identifier."
+              },
+              {
+                "name": "versionId",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Get version"
+        },
+        {
+          "info": {
+            "name": "Create version checkpoint",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.liveblocks.io/v2/rooms/:roomId/version",
+            "params": [
+              {
+                "name": "roomId",
+                "value": "",
+                "type": "path",
+                "description": "The room identifier."
+              }
+            ]
+          },
+          "docs": "Create version checkpoint"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Threads",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List threads",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.liveblocks.io/v2/rooms/:roomId/threads",
+            "params": [
+              {
+                "name": "roomId",
+                "value": "",
+                "type": "path",
+                "description": "The room identifier."
+              }
+            ]
+          },
+          "docs": "List threads"
+        },
+        {
+          "info": {
+            "name": "Create thread",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.liveblocks.io/v2/rooms/:roomId/threads",
+            "params": [
+              {
+                "name": "roomId",
+                "value": "",
+                "type": "path",
+                "description": "The room identifier."
+              }
+            ]
+          },
+          "docs": "Create a thread with an initial comment."
+        },
+        {
+          "info": {
+            "name": "Get thread",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.liveblocks.io/v2/rooms/:roomId/threads/:threadId",
+            "params": [
+              {
+                "name": "roomId",
+                "value": "",
+                "type": "path",
+                "description": "The room identifier."
+              },
+              {
+                "name": "threadId",
+                "value": "",
+                "type": "path",
+                "description": "The thread identifier."
+              }
+            ]
+          },
+          "docs": "Get thread"
+        },
+        {
+          "info": {
+            "name": "Delete thread",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://api.liveblocks.io/v2/rooms/:roomId/threads/:threadId",
+            "params": [
+              {
+                "name": "roomId",
+                "value": "",
+                "type": "path",
+                "description": "The room identifier."
+              },
+              {
+                "name": "threadId",
+                "value": "",
+                "type": "path",
+                "description": "The thread identifier."
+              }
+            ]
+          },
+          "docs": "Delete thread"
+        },
+        {
+          "info": {
+            "name": "Update thread metadata",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.liveblocks.io/v2/rooms/:roomId/threads/:threadId/metadata",
+            "params": [
+              {
+                "name": "roomId",
+                "value": "",
+                "type": "path",
+                "description": "The room identifier."
+              },
+              {
+                "name": "threadId",
+                "value": "",
+                "type": "path",
+                "description": "The thread identifier."
+              }
+            ]
+          },
+          "docs": "Update thread metadata"
+        },
+        {
+          "info": {
+            "name": "Mark thread resolved",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.liveblocks.io/v2/rooms/:roomId/threads/:threadId/mark-as-resolved",
+            "params": [
+              {
+                "name": "roomId",
+                "value": "",
+                "type": "path",
+                "description": "The room identifier."
+              },
+              {
+                "name": "threadId",
+                "value": "",
+                "type": "path",
+                "description": "The thread identifier."
+              }
+            ]
+          },
+          "docs": "Mark thread resolved"
+        },
+        {
+          "info": {
+            "name": "Mark thread unresolved",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.liveblocks.io/v2/rooms/:roomId/threads/:threadId/mark-as-unresolved",
+            "params": [
+              {
+                "name": "roomId",
+                "value": "",
+                "type": "path",
+                "description": "The room identifier."
+              },
+              {
+                "name": "threadId",
+                "value": "",
+                "type": "path",
+                "description": "The thread identifier."
+              }
+            ]
+          },
+          "docs": "Mark thread unresolved"
+        },
+        {
+          "info": {
+            "name": "Subscribe to thread",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.liveblocks.io/v2/rooms/:roomId/threads/:threadId/subscribe",
+            "params": [
+              {
+                "name": "roomId",
+                "value": "",
+                "type": "path",
+                "description": "The room identifier."
+              },
+              {
+                "name": "threadId",
+                "value": "",
+                "type": "path",
+                "description": "The thread identifier."
+              }
+            ]
+          },
+          "docs": "Subscribe to thread"
+        },
+        {
+          "info": {
+            "name": "Unsubscribe from thread",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.liveblocks.io/v2/rooms/:roomId/threads/:threadId/unsubscribe",
+            "params": [
+              {
+                "name": "roomId",
+                "value": "",
+                "type": "path",
+                "description": "The room identifier."
+              },
+              {
+                "name": "threadId",
+                "value": "",
+                "type": "path",
+                "description": "The thread identifier."
+              }
+            ]
+          },
+          "docs": "Unsubscribe from thread"
+        },
+        {
+          "info": {
+            "name": "List thread subscriptions",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.liveblocks.io/v2/rooms/:roomId/threads/:threadId/subscriptions",
+            "params": [
+              {
+                "name": "roomId",
+                "value": "",
+                "type": "path",
+                "description": "The room identifier."
+              },
+              {
+                "name": "threadId",
+                "value": "",
+                "type": "path",
+                "description": "The thread identifier."
+              }
+            ]
+          },
+          "docs": "List thread subscriptions"
+        },
+        {
+          "info": {
+            "name": "List thread participants (deprecated)",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.liveblocks.io/v2/rooms/:roomId/threads/:threadId/participants",
+            "params": [
+              {
+                "name": "roomId",
+                "value": "",
+                "type": "path",
+                "description": "The room identifier."
+              },
+              {
+                "name": "threadId",
+                "value": "",
+                "type": "path",
+                "description": "The thread identifier."
+              }
+            ]
+          },
+          "docs": "List thread participants (deprecated)"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Comments",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Add comment",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.liveblocks.io/v2/rooms/:roomId/threads/:threadId/comments",
+            "params": [
+              {
+                "name": "roomId",
+                "value": "",
+                "type": "path",
+                "description": "The room identifier."
+              },
+              {
+                "name": "threadId",
+                "value": "",
+                "type": "path",
+                "description": "The thread identifier."
+              }
+            ]
+          },
+          "docs": "Add comment"
+        },
+        {
+          "info": {
+            "name": "Get comment",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.liveblocks.io/v2/rooms/:roomId/threads/:threadId/comments/:commentId",
+            "params": [
+              {
+                "name": "roomId",
+                "value": "",
+                "type": "path",
+                "description": "The room identifier."
+              },
+              {
+                "name": "threadId",
+                "value": "",
+                "type": "path",
+                "description": "The thread identifier."
+              },
+              {
+                "name": "commentId",
+                "value": "",
+                "type": "path",
+                "description": "The comment identifier."
+              }
+            ]
+          },
+          "docs": "Get comment"
+        },
+        {
+          "info": {
+            "name": "Update comment",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.liveblocks.io/v2/rooms/:roomId/threads/:threadId/comments/:commentId",
+            "params": [
+              {
+                "name": "roomId",
+                "value": "",
+                "type": "path",
+                "description": "The room identifier."
+              },
+              {
+                "name": "threadId",
+                "value": "",
+                "type": "path",
+                "description": "The thread identifier."
+              },
+              {
+                "name": "commentId",
+                "value": "",
+                "type": "path",
+                "description": "The comment identifier."
+              }
+            ]
+          },
+          "docs": "Update comment"
+        },
+        {
+          "info": {
+            "name": "Delete comment",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://api.liveblocks.io/v2/rooms/:roomId/threads/:threadId/comments/:commentId",
+            "params": [
+              {
+                "name": "roomId",
+                "value": "",
+                "type": "path",
+                "description": "The room identifier."
+              },
+              {
+                "name": "threadId",
+                "value": "",
+                "type": "path",
+                "description": "The thread identifier."
+              },
+              {
+                "name": "commentId",
+                "value": "",
+                "type": "path",
+                "description": "The comment identifier."
+              }
+            ]
+          },
+          "docs": "Delete comment"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Reactions",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Add reaction",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.liveblocks.io/v2/rooms/:roomId/threads/:threadId/comments/:commentId/add-reaction",
+            "params": [
+              {
+                "name": "roomId",
+                "value": "",
+                "type": "path",
+                "description": "The room identifier."
+              },
+              {
+                "name": "threadId",
+                "value": "",
+                "type": "path",
+                "description": "The thread identifier."
+              },
+              {
+                "name": "commentId",
+                "value": "",
+                "type": "path",
+                "description": "The comment identifier."
+              }
+            ]
+          },
+          "docs": "Add reaction"
+        },
+        {
+          "info": {
+            "name": "Remove reaction",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://api.liveblocks.io/v2/rooms/:roomId/threads/:threadId/comments/:commentId/remove-reaction",
+            "params": [
+              {
+                "name": "roomId",
+                "value": "",
+                "type": "path",
+                "description": "The room identifier."
+              },
+              {
+                "name": "threadId",
+                "value": "",
+                "type": "path",
+                "description": "The thread identifier."
+              },
+              {
+                "name": "commentId",
+                "value": "",
+                "type": "path",
+                "description": "The comment identifier."
+              }
+            ]
+          },
+          "docs": "Remove reaction"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}
