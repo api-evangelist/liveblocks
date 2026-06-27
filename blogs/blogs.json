@@ -3,19 +3,12 @@
   "feeds": [
     {
       "source": "https://liveblocks.io/blog",
-      "feed_url": "https://liveblocks.io/blog",
-      "title": "",
+      "feed_url": "",
       "saved": 0,
-      "method": "none"
-    },
-    {
-      "source": "https://liveblocks.io/pricing",
-      "feed_url": "https://liveblocks.io/pricing",
-      "title": "",
-      "saved": 0,
-      "method": "none"
+      "method": "agent-scrape"
     }
   ],
   "post_count": 2,
-  "fetched": "2026-06-14T20:42:17Z"
+  "fetched": "2026-06-27T12:52:09Z",
+  "agent_pulled": "2026-06-27"
 }

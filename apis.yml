@@ -79,13 +79,13 @@ apis:
   properties:
   - type: Documentation
     url: https://liveblocks.io/docs
-  - type: SDK
+  - type: SDKs
     url: https://www.npmjs.com/package/@liveblocks/client
-  - type: SDK
+  - type: SDKs
     url: https://www.npmjs.com/package/@liveblocks/react
-  - type: SDK
+  - type: SDKs
     url: https://www.npmjs.com/package/@liveblocks/node
-  - type: SDK
+  - type: SDKs
     url: https://www.npmjs.com/package/@liveblocks/yjs
 common:
 - type: Website
@@ -94,7 +94,7 @@ common:
   url: https://liveblocks.io/docs
 - type: Documentation
   url: https://liveblocks.io/docs
-- type: SignUp
+- type: Signup
   url: https://liveblocks.io/signup
 - type: Login
   url: https://liveblocks.io/dashboard
@@ -118,7 +118,7 @@ common:
   url: https://liveblocks.io/support
 - type: Community
   url: https://liveblocks.io/discord
-- type: LLMsTxt
+- type: LlmsText
   url: https://liveblocks.io/llms.txt
 maintainers:
 - FN: Kin Lane
