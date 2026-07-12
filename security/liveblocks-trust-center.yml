@@ -1,0 +1,14 @@
+generated: '2026-07-11'
+method: searched
+probe: true
+source: https://liveblocks.safebase.us/
+url: https://liveblocks.safebase.us/
+certifications:
+- SOC 2
+- HIPAA
+evidence:
+- source: https://liveblocks.safebase.us/
+  keywords:
+  - soc 2
+  - hipaa
+  - trust center

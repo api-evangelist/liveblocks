@@ -88,6 +88,14 @@ apis:
   - type: SDKs
     url: https://www.npmjs.com/package/@liveblocks/yjs
 common:
+- type: TrustCenter
+  url: security/liveblocks-trust-center.yml
+- type: VulnerabilityDisclosure
+  url: security/liveblocks-vulnerability-disclosure.yml
+- type: DomainSecurity
+  url: security/liveblocks-domain-security.yml
+- type: Authentication
+  url: authentication/liveblocks-authentication.yml
 - type: Website
   url: https://liveblocks.io
 - type: Portal
