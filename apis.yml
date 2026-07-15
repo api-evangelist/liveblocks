@@ -88,6 +88,8 @@ apis:
   - type: SDKs
     url: https://www.npmjs.com/package/@liveblocks/yjs
 common:
+- type: AgenticAccess
+  url: agentic-access/liveblocks-agentic-access.yml
 - type: TrustCenter
   url: security/liveblocks-trust-center.yml
 - type: VulnerabilityDisclosure
