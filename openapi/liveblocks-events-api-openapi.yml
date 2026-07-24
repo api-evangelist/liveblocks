@@ -1,0 +1,42 @@
+openapi: 3.1.0
+info:
+  title: Liveblocks REST Active Users Events API
+  description: Server-side REST API for managing Liveblocks rooms, room storage, active users, broadcast events, comments and threads, Yjs documents, and version history. Authenticated with a secret key via HTTP Bearer authorization.
+  version: v2
+  contact:
+    name: Liveblocks
+    url: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+servers:
+- url: https://api.liveblocks.io/v2
+  description: Liveblocks REST API
+security:
+- bearerAuth: []
+tags:
+- name: Events
+paths:
+  /rooms/{roomId}/broadcast_event:
+    parameters:
+    - $ref: '#/components/parameters/RoomId'
+    post:
+      tags:
+      - Events
+      summary: Broadcast event
+      description: Send a message to all participants in a room.
+      operationId: broadcastEvent
+      responses:
+        '200':
+          description: Event broadcast.
+components:
+  parameters:
+    RoomId:
+      name: roomId
+      in: path
+      required: true
+      description: The room identifier.
+      schema:
+        type: string
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: Authenticate with a Liveblocks secret key as a Bearer token.

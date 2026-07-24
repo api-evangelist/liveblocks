@@ -1,0 +1,120 @@
+openapi: 3.1.0
+info:
+  title: Liveblocks REST Active Users Rooms API
+  description: Server-side REST API for managing Liveblocks rooms, room storage, active users, broadcast events, comments and threads, Yjs documents, and version history. Authenticated with a secret key via HTTP Bearer authorization.
+  version: v2
+  contact:
+    name: Liveblocks
+    url: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+servers:
+- url: https://api.liveblocks.io/v2
+  description: Liveblocks REST API
+security:
+- bearerAuth: []
+tags:
+- name: Rooms
+paths:
+  /rooms:
+    get:
+      tags:
+      - Rooms
+      summary: List rooms
+      description: Retrieve list of rooms with filtering and pagination.
+      operationId: listRooms
+      responses:
+        '200':
+          description: A list of rooms.
+    post:
+      tags:
+      - Rooms
+      summary: Create a room
+      operationId: createRoom
+      responses:
+        '200':
+          description: The created room.
+  /rooms/{roomId}:
+    parameters:
+    - $ref: '#/components/parameters/RoomId'
+    get:
+      tags:
+      - Rooms
+      summary: Get room
+      operationId: getRoom
+      responses:
+        '200':
+          description: Room details.
+    post:
+      tags:
+      - Rooms
+      summary: Update room
+      operationId: updateRoom
+      responses:
+        '200':
+          description: Updated room.
+    delete:
+      tags:
+      - Rooms
+      summary: Delete room
+      operationId: deleteRoom
+      responses:
+        '204':
+          description: Room deleted.
+  /rooms/{roomId}/prewarm:
+    parameters:
+    - $ref: '#/components/parameters/RoomId'
+    get:
+      tags:
+      - Rooms
+      summary: Prewarm room
+      description: Accelerate room connection readiness.
+      operationId: prewarmRoom
+      responses:
+        '200':
+          description: Prewarm acknowledged.
+  /rooms/{roomId}/upsert:
+    parameters:
+    - $ref: '#/components/parameters/RoomId'
+    post:
+      tags:
+      - Rooms
+      summary: Upsert room
+      operationId: upsertRoom
+      responses:
+        '200':
+          description: Room created or updated.
+  /rooms/{roomId}/update-room-id:
+    parameters:
+    - $ref: '#/components/parameters/RoomId'
+    post:
+      tags:
+      - Rooms
+      summary: Change room identifier
+      operationId: updateRoomId
+      responses:
+        '200':
+          description: Room identifier changed.
+  /rooms/{roomId}/update-organization-id:
+    parameters:
+    - $ref: '#/components/parameters/RoomId'
+    post:
+      tags:
+      - Rooms
+      summary: Change room organization association
+      operationId: updateRoomOrganizationId
+      responses:
+        '200':
+          description: Organization changed.
+components:
+  parameters:
+    RoomId:
+      name: roomId
+      in: path
+      required: true
+      description: The room identifier.
+      schema:
+        type: string
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: Authenticate with a Liveblocks secret key as a Bearer token.

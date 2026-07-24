@@ -1,0 +1,162 @@
+openapi: 3.1.0
+info:
+  title: Liveblocks REST Active Users Threads API
+  description: Server-side REST API for managing Liveblocks rooms, room storage, active users, broadcast events, comments and threads, Yjs documents, and version history. Authenticated with a secret key via HTTP Bearer authorization.
+  version: v2
+  contact:
+    name: Liveblocks
+    url: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+servers:
+- url: https://api.liveblocks.io/v2
+  description: Liveblocks REST API
+security:
+- bearerAuth: []
+tags:
+- name: Threads
+paths:
+  /rooms/{roomId}/threads:
+    parameters:
+    - $ref: '#/components/parameters/RoomId'
+    get:
+      tags:
+      - Threads
+      summary: List threads
+      operationId: listThreads
+      responses:
+        '200':
+          description: Threads list.
+    post:
+      tags:
+      - Threads
+      summary: Create thread
+      description: Create a thread with an initial comment.
+      operationId: createThread
+      responses:
+        '200':
+          description: Thread created.
+  /rooms/{roomId}/threads/{threadId}:
+    parameters:
+    - $ref: '#/components/parameters/RoomId'
+    - $ref: '#/components/parameters/ThreadId'
+    get:
+      tags:
+      - Threads
+      summary: Get thread
+      operationId: getThread
+      responses:
+        '200':
+          description: Thread details.
+    delete:
+      tags:
+      - Threads
+      summary: Delete thread
+      operationId: deleteThread
+      responses:
+        '204':
+          description: Thread deleted.
+  /rooms/{roomId}/threads/{threadId}/metadata:
+    parameters:
+    - $ref: '#/components/parameters/RoomId'
+    - $ref: '#/components/parameters/ThreadId'
+    post:
+      tags:
+      - Threads
+      summary: Update thread metadata
+      operationId: updateThreadMetadata
+      responses:
+        '200':
+          description: Metadata updated.
+  /rooms/{roomId}/threads/{threadId}/mark-as-resolved:
+    parameters:
+    - $ref: '#/components/parameters/RoomId'
+    - $ref: '#/components/parameters/ThreadId'
+    post:
+      tags:
+      - Threads
+      summary: Mark thread resolved
+      operationId: markThreadResolved
+      responses:
+        '200':
+          description: Thread resolved.
+  /rooms/{roomId}/threads/{threadId}/mark-as-unresolved:
+    parameters:
+    - $ref: '#/components/parameters/RoomId'
+    - $ref: '#/components/parameters/ThreadId'
+    post:
+      tags:
+      - Threads
+      summary: Mark thread unresolved
+      operationId: markThreadUnresolved
+      responses:
+        '200':
+          description: Thread reopened.
+  /rooms/{roomId}/threads/{threadId}/subscribe:
+    parameters:
+    - $ref: '#/components/parameters/RoomId'
+    - $ref: '#/components/parameters/ThreadId'
+    post:
+      tags:
+      - Threads
+      summary: Subscribe to thread
+      operationId: subscribeThread
+      responses:
+        '200':
+          description: Subscribed.
+  /rooms/{roomId}/threads/{threadId}/unsubscribe:
+    parameters:
+    - $ref: '#/components/parameters/RoomId'
+    - $ref: '#/components/parameters/ThreadId'
+    post:
+      tags:
+      - Threads
+      summary: Unsubscribe from thread
+      operationId: unsubscribeThread
+      responses:
+        '200':
+          description: Unsubscribed.
+  /rooms/{roomId}/threads/{threadId}/subscriptions:
+    parameters:
+    - $ref: '#/components/parameters/RoomId'
+    - $ref: '#/components/parameters/ThreadId'
+    get:
+      tags:
+      - Threads
+      summary: List thread subscriptions
+      operationId: listThreadSubscriptions
+      responses:
+        '200':
+          description: Subscription list.
+  /rooms/{roomId}/threads/{threadId}/participants:
+    parameters:
+    - $ref: '#/components/parameters/RoomId'
+    - $ref: '#/components/parameters/ThreadId'
+    get:
+      tags:
+      - Threads
+      summary: List thread participants (deprecated)
+      deprecated: true
+      operationId: listThreadParticipants
+      responses:
+        '200':
+          description: Participants list.
+components:
+  parameters:
+    ThreadId:
+      name: threadId
+      in: path
+      required: true
+      description: The thread identifier.
+      schema:
+        type: string
+    RoomId:
+      name: roomId
+      in: path
+      required: true
+      description: The room identifier.
+      schema:
+        type: string
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: Authenticate with a Liveblocks secret key as a Bearer token.

@@ -1,0 +1,69 @@
+openapi: 3.1.0
+info:
+  title: Liveblocks REST Active Users Versions API
+  description: Server-side REST API for managing Liveblocks rooms, room storage, active users, broadcast events, comments and threads, Yjs documents, and version history. Authenticated with a secret key via HTTP Bearer authorization.
+  version: v2
+  contact:
+    name: Liveblocks
+    url: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+servers:
+- url: https://api.liveblocks.io/v2
+  description: Liveblocks REST API
+security:
+- bearerAuth: []
+tags:
+- name: Versions
+paths:
+  /rooms/{roomId}/versions:
+    parameters:
+    - $ref: '#/components/parameters/RoomId'
+    get:
+      tags:
+      - Versions
+      summary: List versions
+      description: List document version snapshots.
+      operationId: listVersions
+      responses:
+        '200':
+          description: Versions list.
+  /rooms/{roomId}/version/{versionId}:
+    parameters:
+    - $ref: '#/components/parameters/RoomId'
+    - name: versionId
+      in: path
+      required: true
+      schema:
+        type: string
+    get:
+      tags:
+      - Versions
+      summary: Get version
+      operationId: getVersion
+      responses:
+        '200':
+          description: Version details.
+  /rooms/{roomId}/version:
+    parameters:
+    - $ref: '#/components/parameters/RoomId'
+    post:
+      tags:
+      - Versions
+      summary: Create version checkpoint
+      operationId: createVersion
+      responses:
+        '200':
+          description: Version created.
+components:
+  parameters:
+    RoomId:
+      name: roomId
+      in: path
+      required: true
+      description: The room identifier.
+      schema:
+        type: string
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: Authenticate with a Liveblocks secret key as a Bearer token.
