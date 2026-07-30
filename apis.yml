@@ -7,7 +7,20 @@ description: Liveblocks is a real-time collaboration platform that provides read
   a server-side private REST API, and SDKs for React, JavaScript, Node.js, Python,
   Redux, Zustand, and Yjs.
 type: Index
-image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/apis-json-logo.jpg
+accessModel:
+  pricing: free
+  onboarding: self-serve
+  trial: false
+  try_now: true
+  public: false
+  label: Free · Self-serve signup
+  confidence: high
+  source:
+  - plans
+  - authentication
+  generated: '2026-07-22'
+  method: derived
+image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/icons/liveblocks.png
 url: https://raw.githubusercontent.com/api-evangelist/liveblocks/refs/heads/main/apis.yml
 created: '2026-05-23'
 modified: '2026-05-23'
@@ -26,9 +39,10 @@ tags:
 apis:
 - aid: liveblocks:rest-api
   name: Liveblocks REST API
-  description: Server-side REST API for managing rooms, room access, storage, active
-    users, broadcast events, comments and threads, notifications, Yjs documents, and
-    version history. Authenticated with a secret key via Bearer authorization.
+  description: >-
+    Server-side REST API for managing rooms, room access, storage, active users, broadcast events, comments
+    and threads, notifications, Yjs documents, and version history. Authenticated with a secret key via
+    Bearer authorization.
   humanURL: https://liveblocks.io/docs/api-reference/rest-api-endpoints
   baseURL: https://api.liveblocks.io/v2
   tags:
@@ -51,9 +65,9 @@ apis:
     type: GraphQL
 - aid: liveblocks:authorization-api
   name: Liveblocks Authorization API
-  description: Public-facing authorization endpoint used by client SDKs to exchange
-    a server-issued token for a Liveblocks session. Supports access token and ID token
-    authorization patterns.
+  description: >-
+    Public-facing authorization endpoint used by client SDKs to exchange a server-issued token for a Liveblocks
+    session. Supports access token and ID token authorization patterns.
   humanURL: https://liveblocks.io/docs/authentication
   baseURL: https://api.liveblocks.io/v2
   tags:
@@ -65,9 +79,9 @@ apis:
     url: https://liveblocks.io/docs/authentication
 - aid: liveblocks:realtime-client-api
   name: Liveblocks Realtime Client API
-  description: WebSocket-based client API exposed through Liveblocks client SDKs for
-    React, JavaScript, Redux, Zustand, Vue (community), and Yjs. Provides presence,
-    broadcast events, Live storage data structures, and threads.
+  description: >-
+    WebSocket-based client API exposed through Liveblocks client SDKs for React, JavaScript, Redux, Zustand,
+    Vue (community), and Yjs. Provides presence, broadcast events, Live storage data structures, and threads.
   humanURL: https://liveblocks.io/docs
   baseURL: https://api.liveblocks.io/v7
   tags:
@@ -87,6 +101,96 @@ apis:
     url: https://www.npmjs.com/package/@liveblocks/node
   - type: SDKs
     url: https://www.npmjs.com/package/@liveblocks/yjs
+- aid: liveblocks:liveblocks-active-users-api
+  name: Liveblocks Active Users API
+  description: The Active Users API from Liveblocks — 2 operation(s) for active users.
+  humanURL: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+  baseURL: https://api.liveblocks.io/v2
+  tags:
+  - Active Users
+  properties:
+  - type: OpenAPI
+    url: openapi/liveblocks-active-users-api-openapi.yml
+- aid: liveblocks:liveblocks-comments-api
+  name: Liveblocks Comments API
+  description: The Comments API from Liveblocks — 2 operation(s) for comments.
+  humanURL: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+  baseURL: https://api.liveblocks.io/v2
+  tags:
+  - Comments
+  properties:
+  - type: OpenAPI
+    url: openapi/liveblocks-comments-api-openapi.yml
+- aid: liveblocks:liveblocks-events-api
+  name: Liveblocks Events API
+  description: The Events API from Liveblocks — 1 operation(s) for events.
+  humanURL: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+  baseURL: https://api.liveblocks.io/v2
+  tags:
+  - Events
+  properties:
+  - type: OpenAPI
+    url: openapi/liveblocks-events-api-openapi.yml
+- aid: liveblocks:liveblocks-reactions-api
+  name: Liveblocks Reactions API
+  description: The Reactions API from Liveblocks — 2 operation(s) for reactions.
+  humanURL: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+  baseURL: https://api.liveblocks.io/v2
+  tags:
+  - Reactions
+  properties:
+  - type: OpenAPI
+    url: openapi/liveblocks-reactions-api-openapi.yml
+- aid: liveblocks:liveblocks-rooms-api
+  name: Liveblocks Rooms API
+  description: The Rooms API from Liveblocks — 6 operation(s) for rooms.
+  humanURL: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+  baseURL: https://api.liveblocks.io/v2
+  tags:
+  - Rooms
+  properties:
+  - type: OpenAPI
+    url: openapi/liveblocks-rooms-api-openapi.yml
+- aid: liveblocks:liveblocks-storage-api
+  name: Liveblocks Storage API
+  description: The Storage API from Liveblocks — 2 operation(s) for storage.
+  humanURL: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+  baseURL: https://api.liveblocks.io/v2
+  tags:
+  - Storage
+  properties:
+  - type: OpenAPI
+    url: openapi/liveblocks-storage-api-openapi.yml
+- aid: liveblocks:liveblocks-threads-api
+  name: Liveblocks Threads API
+  description: The Threads API from Liveblocks — 9 operation(s) for threads.
+  humanURL: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+  baseURL: https://api.liveblocks.io/v2
+  tags:
+  - Threads
+  properties:
+  - type: OpenAPI
+    url: openapi/liveblocks-threads-api-openapi.yml
+- aid: liveblocks:liveblocks-versions-api
+  name: Liveblocks Versions API
+  description: The Versions API from Liveblocks — 3 operation(s) for versions.
+  humanURL: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+  baseURL: https://api.liveblocks.io/v2
+  tags:
+  - Versions
+  properties:
+  - type: OpenAPI
+    url: openapi/liveblocks-versions-api-openapi.yml
+- aid: liveblocks:liveblocks-yjs-api
+  name: Liveblocks Yjs API
+  description: The Yjs API from Liveblocks — 2 operation(s) for yjs.
+  humanURL: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+  baseURL: https://api.liveblocks.io/v2
+  tags:
+  - Yjs
+  properties:
+  - type: OpenAPI
+    url: openapi/liveblocks-yjs-api-openapi.yml
 common:
 - type: AgenticAccess
   url: agentic-access/liveblocks-agentic-access.yml
