@@ -1,0 +1,30 @@
+{
+  "provider": "liveblocks",
+  "sources": [
+    "liveblocks-active-users-api-openapi.yml",
+    "liveblocks-comments-api-openapi.yml",
+    "liveblocks-events-api-openapi.yml",
+    "liveblocks-reactions-api-openapi.yml",
+    "liveblocks-rooms-api-openapi.yml",
+    "liveblocks-storage-api-openapi.yml",
+    "liveblocks-threads-api-openapi.yml",
+    "liveblocks-versions-api-openapi.yml",
+    "liveblocks-yjs-api-openapi.yml"
+  ],
+  "outputs": [
+    "liveblocks-active-users-api-openapi.yml",
+    "liveblocks-comments-api-openapi.yml",
+    "liveblocks-events-api-openapi.yml",
+    "liveblocks-reactions-api-openapi.yml",
+    "liveblocks-rooms-api-openapi.yml",
+    "liveblocks-storage-api-openapi.yml",
+    "liveblocks-threads-api-openapi.yml",
+    "liveblocks-versions-api-openapi.yml",
+    "liveblocks-yjs-api-openapi.yml"
+  ],
+  "archived": [],
+  "errors": [],
+  "warnings": [],
+  "notes": [],
+  "skipped": []
+}

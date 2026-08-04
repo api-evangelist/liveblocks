@@ -1,0 +1,442 @@
+openapi: 3.1.0
+info:
+  title: Liveblocks REST API
+  description: >-
+    Server-side REST API for managing Liveblocks rooms, room storage, active
+    users, broadcast events, comments and threads, Yjs documents, and version
+    history. Authenticated with a secret key via HTTP Bearer authorization.
+  version: "v2"
+  contact:
+    name: Liveblocks
+    url: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+servers:
+  - url: https://api.liveblocks.io/v2
+    description: Liveblocks REST API
+security:
+  - bearerAuth: []
+tags:
+  - name: Rooms
+  - name: Active Users
+  - name: Events
+  - name: Storage
+  - name: Yjs
+  - name: Versions
+  - name: Threads
+  - name: Comments
+  - name: Reactions
+paths:
+  /rooms:
+    get:
+      tags: [Rooms]
+      summary: List rooms
+      description: Retrieve list of rooms with filtering and pagination.
+      operationId: listRooms
+      responses:
+        "200":
+          description: A list of rooms.
+    post:
+      tags: [Rooms]
+      summary: Create a room
+      operationId: createRoom
+      responses:
+        "200":
+          description: The created room.
+  /rooms/{roomId}:
+    parameters:
+      - $ref: '#/components/parameters/RoomId'
+    get:
+      tags: [Rooms]
+      summary: Get room
+      operationId: getRoom
+      responses:
+        "200":
+          description: Room details.
+    post:
+      tags: [Rooms]
+      summary: Update room
+      operationId: updateRoom
+      responses:
+        "200":
+          description: Updated room.
+    delete:
+      tags: [Rooms]
+      summary: Delete room
+      operationId: deleteRoom
+      responses:
+        "204":
+          description: Room deleted.
+  /rooms/{roomId}/prewarm:
+    parameters:
+      - $ref: '#/components/parameters/RoomId'
+    get:
+      tags: [Rooms]
+      summary: Prewarm room
+      description: Accelerate room connection readiness.
+      operationId: prewarmRoom
+      responses:
+        "200":
+          description: Prewarm acknowledged.
+  /rooms/{roomId}/upsert:
+    parameters:
+      - $ref: '#/components/parameters/RoomId'
+    post:
+      tags: [Rooms]
+      summary: Upsert room
+      operationId: upsertRoom
+      responses:
+        "200":
+          description: Room created or updated.
+  /rooms/{roomId}/update-room-id:
+    parameters:
+      - $ref: '#/components/parameters/RoomId'
+    post:
+      tags: [Rooms]
+      summary: Change room identifier
+      operationId: updateRoomId
+      responses:
+        "200":
+          description: Room identifier changed.
+  /rooms/{roomId}/update-organization-id:
+    parameters:
+      - $ref: '#/components/parameters/RoomId'
+    post:
+      tags: [Rooms]
+      summary: Change room organization association
+      operationId: updateRoomOrganizationId
+      responses:
+        "200":
+          description: Organization changed.
+  /rooms/{roomId}/active_users:
+    parameters:
+      - $ref: '#/components/parameters/RoomId'
+    get:
+      tags: [Active Users]
+      summary: List active users
+      description: List currently connected users in a room.
+      operationId: listActiveUsers
+      responses:
+        "200":
+          description: Active users list.
+  /rooms/{roomId}/presence:
+    parameters:
+      - $ref: '#/components/parameters/RoomId'
+    post:
+      tags: [Active Users]
+      summary: Set presence
+      description: Set temporary user presence data.
+      operationId: setPresence
+      responses:
+        "200":
+          description: Presence set.
+  /rooms/{roomId}/broadcast_event:
+    parameters:
+      - $ref: '#/components/parameters/RoomId'
+    post:
+      tags: [Events]
+      summary: Broadcast event
+      description: Send a message to all participants in a room.
+      operationId: broadcastEvent
+      responses:
+        "200":
+          description: Event broadcast.
+  /rooms/{roomId}/storage:
+    parameters:
+      - $ref: '#/components/parameters/RoomId'
+    get:
+      tags: [Storage]
+      summary: Get storage
+      description: Retrieve a room's storage document.
+      operationId: getStorage
+      responses:
+        "200":
+          description: Storage document.
+    post:
+      tags: [Storage]
+      summary: Initialize storage
+      operationId: initializeStorage
+      responses:
+        "200":
+          description: Storage initialized.
+    delete:
+      tags: [Storage]
+      summary: Clear storage
+      operationId: clearStorage
+      responses:
+        "204":
+          description: Storage cleared.
+  /rooms/{roomId}/storage/json-patch:
+    parameters:
+      - $ref: '#/components/parameters/RoomId'
+    patch:
+      tags: [Storage]
+      summary: Patch storage with JSON Patch
+      operationId: patchStorage
+      responses:
+        "200":
+          description: Storage patched.
+  /rooms/{roomId}/ydoc:
+    parameters:
+      - $ref: '#/components/parameters/RoomId'
+    get:
+      tags: [Yjs]
+      summary: Get Yjs document as JSON
+      operationId: getYdocJson
+      responses:
+        "200":
+          description: Yjs document.
+    put:
+      tags: [Yjs]
+      summary: Apply Yjs binary update
+      operationId: applyYdocUpdate
+      responses:
+        "204":
+          description: Update applied.
+  /rooms/{roomId}/ydoc-binary:
+    parameters:
+      - $ref: '#/components/parameters/RoomId'
+    get:
+      tags: [Yjs]
+      summary: Export Yjs document as binary
+      operationId: getYdocBinary
+      responses:
+        "200":
+          description: Binary Yjs document.
+  /rooms/{roomId}/versions:
+    parameters:
+      - $ref: '#/components/parameters/RoomId'
+    get:
+      tags: [Versions]
+      summary: List versions
+      description: List document version snapshots.
+      operationId: listVersions
+      responses:
+        "200":
+          description: Versions list.
+  /rooms/{roomId}/version/{versionId}:
+    parameters:
+      - $ref: '#/components/parameters/RoomId'
+      - name: versionId
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      tags: [Versions]
+      summary: Get version
+      operationId: getVersion
+      responses:
+        "200":
+          description: Version details.
+  /rooms/{roomId}/version:
+    parameters:
+      - $ref: '#/components/parameters/RoomId'
+    post:
+      tags: [Versions]
+      summary: Create version checkpoint
+      operationId: createVersion
+      responses:
+        "200":
+          description: Version created.
+  /rooms/{roomId}/threads:
+    parameters:
+      - $ref: '#/components/parameters/RoomId'
+    get:
+      tags: [Threads]
+      summary: List threads
+      operationId: listThreads
+      responses:
+        "200":
+          description: Threads list.
+    post:
+      tags: [Threads]
+      summary: Create thread
+      description: Create a thread with an initial comment.
+      operationId: createThread
+      responses:
+        "200":
+          description: Thread created.
+  /rooms/{roomId}/threads/{threadId}:
+    parameters:
+      - $ref: '#/components/parameters/RoomId'
+      - $ref: '#/components/parameters/ThreadId'
+    get:
+      tags: [Threads]
+      summary: Get thread
+      operationId: getThread
+      responses:
+        "200":
+          description: Thread details.
+    delete:
+      tags: [Threads]
+      summary: Delete thread
+      operationId: deleteThread
+      responses:
+        "204":
+          description: Thread deleted.
+  /rooms/{roomId}/threads/{threadId}/metadata:
+    parameters:
+      - $ref: '#/components/parameters/RoomId'
+      - $ref: '#/components/parameters/ThreadId'
+    post:
+      tags: [Threads]
+      summary: Update thread metadata
+      operationId: updateThreadMetadata
+      responses:
+        "200":
+          description: Metadata updated.
+  /rooms/{roomId}/threads/{threadId}/mark-as-resolved:
+    parameters:
+      - $ref: '#/components/parameters/RoomId'
+      - $ref: '#/components/parameters/ThreadId'
+    post:
+      tags: [Threads]
+      summary: Mark thread resolved
+      operationId: markThreadResolved
+      responses:
+        "200":
+          description: Thread resolved.
+  /rooms/{roomId}/threads/{threadId}/mark-as-unresolved:
+    parameters:
+      - $ref: '#/components/parameters/RoomId'
+      - $ref: '#/components/parameters/ThreadId'
+    post:
+      tags: [Threads]
+      summary: Mark thread unresolved
+      operationId: markThreadUnresolved
+      responses:
+        "200":
+          description: Thread reopened.
+  /rooms/{roomId}/threads/{threadId}/subscribe:
+    parameters:
+      - $ref: '#/components/parameters/RoomId'
+      - $ref: '#/components/parameters/ThreadId'
+    post:
+      tags: [Threads]
+      summary: Subscribe to thread
+      operationId: subscribeThread
+      responses:
+        "200":
+          description: Subscribed.
+  /rooms/{roomId}/threads/{threadId}/unsubscribe:
+    parameters:
+      - $ref: '#/components/parameters/RoomId'
+      - $ref: '#/components/parameters/ThreadId'
+    post:
+      tags: [Threads]
+      summary: Unsubscribe from thread
+      operationId: unsubscribeThread
+      responses:
+        "200":
+          description: Unsubscribed.
+  /rooms/{roomId}/threads/{threadId}/subscriptions:
+    parameters:
+      - $ref: '#/components/parameters/RoomId'
+      - $ref: '#/components/parameters/ThreadId'
+    get:
+      tags: [Threads]
+      summary: List thread subscriptions
+      operationId: listThreadSubscriptions
+      responses:
+        "200":
+          description: Subscription list.
+  /rooms/{roomId}/threads/{threadId}/participants:
+    parameters:
+      - $ref: '#/components/parameters/RoomId'
+      - $ref: '#/components/parameters/ThreadId'
+    get:
+      tags: [Threads]
+      summary: List thread participants (deprecated)
+      deprecated: true
+      operationId: listThreadParticipants
+      responses:
+        "200":
+          description: Participants list.
+  /rooms/{roomId}/threads/{threadId}/comments:
+    parameters:
+      - $ref: '#/components/parameters/RoomId'
+      - $ref: '#/components/parameters/ThreadId'
+    post:
+      tags: [Comments]
+      summary: Add comment
+      operationId: addComment
+      responses:
+        "200":
+          description: Comment added.
+  /rooms/{roomId}/threads/{threadId}/comments/{commentId}:
+    parameters:
+      - $ref: '#/components/parameters/RoomId'
+      - $ref: '#/components/parameters/ThreadId'
+      - $ref: '#/components/parameters/CommentId'
+    get:
+      tags: [Comments]
+      summary: Get comment
+      operationId: getComment
+      responses:
+        "200":
+          description: Comment details.
+    post:
+      tags: [Comments]
+      summary: Update comment
+      operationId: updateComment
+      responses:
+        "200":
+          description: Comment updated.
+    delete:
+      tags: [Comments]
+      summary: Delete comment
+      operationId: deleteComment
+      responses:
+        "204":
+          description: Comment deleted.
+  /rooms/{roomId}/threads/{threadId}/comments/{commentId}/add-reaction:
+    parameters:
+      - $ref: '#/components/parameters/RoomId'
+      - $ref: '#/components/parameters/ThreadId'
+      - $ref: '#/components/parameters/CommentId'
+    post:
+      tags: [Reactions]
+      summary: Add reaction
+      operationId: addReaction
+      responses:
+        "200":
+          description: Reaction added.
+  /rooms/{roomId}/threads/{threadId}/comments/{commentId}/remove-reaction:
+    parameters:
+      - $ref: '#/components/parameters/RoomId'
+      - $ref: '#/components/parameters/ThreadId'
+      - $ref: '#/components/parameters/CommentId'
+    delete:
+      tags: [Reactions]
+      summary: Remove reaction
+      operationId: removeReaction
+      responses:
+        "204":
+          description: Reaction removed.
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: Authenticate with a Liveblocks secret key as a Bearer token.
+  parameters:
+    RoomId:
+      name: roomId
+      in: path
+      required: true
+      description: The room identifier.
+      schema:
+        type: string
+    ThreadId:
+      name: threadId
+      in: path
+      required: true
+      description: The thread identifier.
+      schema:
+        type: string
+    CommentId:
+      name: commentId
+      in: path
+      required: true
+      description: The comment identifier.
+      schema:
+        type: string
