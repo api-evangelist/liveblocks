@@ -1,0 +1,142 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Liveblocks REST Active Users Comments API",
+    "version": "v2"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Comments",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Add comment",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.liveblocks.io/v2/rooms/:roomId/threads/:threadId/comments",
+            "params": [
+              {
+                "name": "roomId",
+                "value": "",
+                "type": "path",
+                "description": "The room identifier."
+              },
+              {
+                "name": "threadId",
+                "value": "",
+                "type": "path",
+                "description": "The thread identifier."
+              }
+            ]
+          },
+          "docs": "Add comment"
+        },
+        {
+          "info": {
+            "name": "Get comment",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.liveblocks.io/v2/rooms/:roomId/threads/:threadId/comments/:commentId",
+            "params": [
+              {
+                "name": "roomId",
+                "value": "",
+                "type": "path",
+                "description": "The room identifier."
+              },
+              {
+                "name": "threadId",
+                "value": "",
+                "type": "path",
+                "description": "The thread identifier."
+              },
+              {
+                "name": "commentId",
+                "value": "",
+                "type": "path",
+                "description": "The comment identifier."
+              }
+            ]
+          },
+          "docs": "Get comment"
+        },
+        {
+          "info": {
+            "name": "Update comment",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.liveblocks.io/v2/rooms/:roomId/threads/:threadId/comments/:commentId",
+            "params": [
+              {
+                "name": "roomId",
+                "value": "",
+                "type": "path",
+                "description": "The room identifier."
+              },
+              {
+                "name": "threadId",
+                "value": "",
+                "type": "path",
+                "description": "The thread identifier."
+              },
+              {
+                "name": "commentId",
+                "value": "",
+                "type": "path",
+                "description": "The comment identifier."
+              }
+            ]
+          },
+          "docs": "Update comment"
+        },
+        {
+          "info": {
+            "name": "Delete comment",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://api.liveblocks.io/v2/rooms/:roomId/threads/:threadId/comments/:commentId",
+            "params": [
+              {
+                "name": "roomId",
+                "value": "",
+                "type": "path",
+                "description": "The room identifier."
+              },
+              {
+                "name": "threadId",
+                "value": "",
+                "type": "path",
+                "description": "The thread identifier."
+              },
+              {
+                "name": "commentId",
+                "value": "",
+                "type": "path",
+                "description": "The comment identifier."
+              }
+            ]
+          },
+          "docs": "Delete comment"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

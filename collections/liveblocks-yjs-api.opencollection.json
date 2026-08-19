@@ -1,0 +1,81 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Liveblocks REST Active Users Yjs API",
+    "version": "v2"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Yjs",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Get Yjs document as JSON",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.liveblocks.io/v2/rooms/:roomId/ydoc",
+            "params": [
+              {
+                "name": "roomId",
+                "value": "",
+                "type": "path",
+                "description": "The room identifier."
+              }
+            ]
+          },
+          "docs": "Get Yjs document as JSON"
+        },
+        {
+          "info": {
+            "name": "Apply Yjs binary update",
+            "type": "http"
+          },
+          "http": {
+            "method": "PUT",
+            "url": "https://api.liveblocks.io/v2/rooms/:roomId/ydoc",
+            "params": [
+              {
+                "name": "roomId",
+                "value": "",
+                "type": "path",
+                "description": "The room identifier."
+              }
+            ]
+          },
+          "docs": "Apply Yjs binary update"
+        },
+        {
+          "info": {
+            "name": "Export Yjs document as binary",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.liveblocks.io/v2/rooms/:roomId/ydoc-binary",
+            "params": [
+              {
+                "name": "roomId",
+                "value": "",
+                "type": "path",
+                "description": "The room identifier."
+              }
+            ]
+          },
+          "docs": "Export Yjs document as binary"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

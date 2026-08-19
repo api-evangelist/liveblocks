@@ -1,0 +1,179 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Liveblocks REST Active Users Rooms API",
+    "version": "v2"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Rooms",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List rooms",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.liveblocks.io/v2/rooms"
+          },
+          "docs": "Retrieve list of rooms with filtering and pagination."
+        },
+        {
+          "info": {
+            "name": "Create a room",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.liveblocks.io/v2/rooms"
+          },
+          "docs": "Create a room"
+        },
+        {
+          "info": {
+            "name": "Get room",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.liveblocks.io/v2/rooms/:roomId",
+            "params": [
+              {
+                "name": "roomId",
+                "value": "",
+                "type": "path",
+                "description": "The room identifier."
+              }
+            ]
+          },
+          "docs": "Get room"
+        },
+        {
+          "info": {
+            "name": "Update room",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.liveblocks.io/v2/rooms/:roomId",
+            "params": [
+              {
+                "name": "roomId",
+                "value": "",
+                "type": "path",
+                "description": "The room identifier."
+              }
+            ]
+          },
+          "docs": "Update room"
+        },
+        {
+          "info": {
+            "name": "Delete room",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://api.liveblocks.io/v2/rooms/:roomId",
+            "params": [
+              {
+                "name": "roomId",
+                "value": "",
+                "type": "path",
+                "description": "The room identifier."
+              }
+            ]
+          },
+          "docs": "Delete room"
+        },
+        {
+          "info": {
+            "name": "Prewarm room",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.liveblocks.io/v2/rooms/:roomId/prewarm",
+            "params": [
+              {
+                "name": "roomId",
+                "value": "",
+                "type": "path",
+                "description": "The room identifier."
+              }
+            ]
+          },
+          "docs": "Accelerate room connection readiness."
+        },
+        {
+          "info": {
+            "name": "Upsert room",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.liveblocks.io/v2/rooms/:roomId/upsert",
+            "params": [
+              {
+                "name": "roomId",
+                "value": "",
+                "type": "path",
+                "description": "The room identifier."
+              }
+            ]
+          },
+          "docs": "Upsert room"
+        },
+        {
+          "info": {
+            "name": "Change room identifier",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.liveblocks.io/v2/rooms/:roomId/update-room-id",
+            "params": [
+              {
+                "name": "roomId",
+                "value": "",
+                "type": "path",
+                "description": "The room identifier."
+              }
+            ]
+          },
+          "docs": "Change room identifier"
+        },
+        {
+          "info": {
+            "name": "Change room organization association",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.liveblocks.io/v2/rooms/:roomId/update-organization-id",
+            "params": [
+              {
+                "name": "roomId",
+                "value": "",
+                "type": "path",
+                "description": "The room identifier."
+              }
+            ]
+          },
+          "docs": "Change room organization association"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

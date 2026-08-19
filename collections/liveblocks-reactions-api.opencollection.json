@@ -1,0 +1,86 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Liveblocks REST Active Users Reactions API",
+    "version": "v2"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Reactions",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Add reaction",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.liveblocks.io/v2/rooms/:roomId/threads/:threadId/comments/:commentId/add-reaction",
+            "params": [
+              {
+                "name": "roomId",
+                "value": "",
+                "type": "path",
+                "description": "The room identifier."
+              },
+              {
+                "name": "threadId",
+                "value": "",
+                "type": "path",
+                "description": "The thread identifier."
+              },
+              {
+                "name": "commentId",
+                "value": "",
+                "type": "path",
+                "description": "The comment identifier."
+              }
+            ]
+          },
+          "docs": "Add reaction"
+        },
+        {
+          "info": {
+            "name": "Remove reaction",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://api.liveblocks.io/v2/rooms/:roomId/threads/:threadId/comments/:commentId/remove-reaction",
+            "params": [
+              {
+                "name": "roomId",
+                "value": "",
+                "type": "path",
+                "description": "The room identifier."
+              },
+              {
+                "name": "threadId",
+                "value": "",
+                "type": "path",
+                "description": "The thread identifier."
+              },
+              {
+                "name": "commentId",
+                "value": "",
+                "type": "path",
+                "description": "The comment identifier."
+              }
+            ]
+          },
+          "docs": "Remove reaction"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

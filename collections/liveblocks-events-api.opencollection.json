@@ -1,0 +1,43 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Liveblocks REST Active Users Events API",
+    "version": "v2"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Events",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Broadcast event",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.liveblocks.io/v2/rooms/:roomId/broadcast_event",
+            "params": [
+              {
+                "name": "roomId",
+                "value": "",
+                "type": "path",
+                "description": "The room identifier."
+              }
+            ]
+          },
+          "docs": "Send a message to all participants in a room."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

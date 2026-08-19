@@ -1,0 +1,62 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Liveblocks REST Active Users API",
+    "version": "v2"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Active Users",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List active users",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.liveblocks.io/v2/rooms/:roomId/active_users",
+            "params": [
+              {
+                "name": "roomId",
+                "value": "",
+                "type": "path",
+                "description": "The room identifier."
+              }
+            ]
+          },
+          "docs": "List currently connected users in a room."
+        },
+        {
+          "info": {
+            "name": "Set presence",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.liveblocks.io/v2/rooms/:roomId/presence",
+            "params": [
+              {
+                "name": "roomId",
+                "value": "",
+                "type": "path",
+                "description": "The room identifier."
+              }
+            ]
+          },
+          "docs": "Set temporary user presence data."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

@@ -1,0 +1,287 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Liveblocks REST Active Users Threads API",
+    "version": "v2"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Threads",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List threads",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.liveblocks.io/v2/rooms/:roomId/threads",
+            "params": [
+              {
+                "name": "roomId",
+                "value": "",
+                "type": "path",
+                "description": "The room identifier."
+              }
+            ]
+          },
+          "docs": "List threads"
+        },
+        {
+          "info": {
+            "name": "Create thread",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.liveblocks.io/v2/rooms/:roomId/threads",
+            "params": [
+              {
+                "name": "roomId",
+                "value": "",
+                "type": "path",
+                "description": "The room identifier."
+              }
+            ]
+          },
+          "docs": "Create a thread with an initial comment."
+        },
+        {
+          "info": {
+            "name": "Get thread",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.liveblocks.io/v2/rooms/:roomId/threads/:threadId",
+            "params": [
+              {
+                "name": "roomId",
+                "value": "",
+                "type": "path",
+                "description": "The room identifier."
+              },
+              {
+                "name": "threadId",
+                "value": "",
+                "type": "path",
+                "description": "The thread identifier."
+              }
+            ]
+          },
+          "docs": "Get thread"
+        },
+        {
+          "info": {
+            "name": "Delete thread",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://api.liveblocks.io/v2/rooms/:roomId/threads/:threadId",
+            "params": [
+              {
+                "name": "roomId",
+                "value": "",
+                "type": "path",
+                "description": "The room identifier."
+              },
+              {
+                "name": "threadId",
+                "value": "",
+                "type": "path",
+                "description": "The thread identifier."
+              }
+            ]
+          },
+          "docs": "Delete thread"
+        },
+        {
+          "info": {
+            "name": "Update thread metadata",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.liveblocks.io/v2/rooms/:roomId/threads/:threadId/metadata",
+            "params": [
+              {
+                "name": "roomId",
+                "value": "",
+                "type": "path",
+                "description": "The room identifier."
+              },
+              {
+                "name": "threadId",
+                "value": "",
+                "type": "path",
+                "description": "The thread identifier."
+              }
+            ]
+          },
+          "docs": "Update thread metadata"
+        },
+        {
+          "info": {
+            "name": "Mark thread resolved",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.liveblocks.io/v2/rooms/:roomId/threads/:threadId/mark-as-resolved",
+            "params": [
+              {
+                "name": "roomId",
+                "value": "",
+                "type": "path",
+                "description": "The room identifier."
+              },
+              {
+                "name": "threadId",
+                "value": "",
+                "type": "path",
+                "description": "The thread identifier."
+              }
+            ]
+          },
+          "docs": "Mark thread resolved"
+        },
+        {
+          "info": {
+            "name": "Mark thread unresolved",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.liveblocks.io/v2/rooms/:roomId/threads/:threadId/mark-as-unresolved",
+            "params": [
+              {
+                "name": "roomId",
+                "value": "",
+                "type": "path",
+                "description": "The room identifier."
+              },
+              {
+                "name": "threadId",
+                "value": "",
+                "type": "path",
+                "description": "The thread identifier."
+              }
+            ]
+          },
+          "docs": "Mark thread unresolved"
+        },
+        {
+          "info": {
+            "name": "Subscribe to thread",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.liveblocks.io/v2/rooms/:roomId/threads/:threadId/subscribe",
+            "params": [
+              {
+                "name": "roomId",
+                "value": "",
+                "type": "path",
+                "description": "The room identifier."
+              },
+              {
+                "name": "threadId",
+                "value": "",
+                "type": "path",
+                "description": "The thread identifier."
+              }
+            ]
+          },
+          "docs": "Subscribe to thread"
+        },
+        {
+          "info": {
+            "name": "Unsubscribe from thread",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.liveblocks.io/v2/rooms/:roomId/threads/:threadId/unsubscribe",
+            "params": [
+              {
+                "name": "roomId",
+                "value": "",
+                "type": "path",
+                "description": "The room identifier."
+              },
+              {
+                "name": "threadId",
+                "value": "",
+                "type": "path",
+                "description": "The thread identifier."
+              }
+            ]
+          },
+          "docs": "Unsubscribe from thread"
+        },
+        {
+          "info": {
+            "name": "List thread subscriptions",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.liveblocks.io/v2/rooms/:roomId/threads/:threadId/subscriptions",
+            "params": [
+              {
+                "name": "roomId",
+                "value": "",
+                "type": "path",
+                "description": "The room identifier."
+              },
+              {
+                "name": "threadId",
+                "value": "",
+                "type": "path",
+                "description": "The thread identifier."
+              }
+            ]
+          },
+          "docs": "List thread subscriptions"
+        },
+        {
+          "info": {
+            "name": "List thread participants (deprecated)",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.liveblocks.io/v2/rooms/:roomId/threads/:threadId/participants",
+            "params": [
+              {
+                "name": "roomId",
+                "value": "",
+                "type": "path",
+                "description": "The room identifier."
+              },
+              {
+                "name": "threadId",
+                "value": "",
+                "type": "path",
+                "description": "The thread identifier."
+              }
+            ]
+          },
+          "docs": "List thread participants (deprecated)"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}
