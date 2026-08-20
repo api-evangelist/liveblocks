@@ -34,6 +34,17 @@ tags:
 - Yjs
 - Comments
 - Threads
+- Notification
+- WebSockets
+tags_raw:
+- Real-Time
+- Collaboration
+- Multiplayer
+- Presence
+- CRDT
+- Yjs
+- Comments
+- Threads
 - Notifications
 - WebSockets
 apis:
@@ -46,6 +57,15 @@ apis:
   humanURL: https://liveblocks.io/docs/api-reference/rest-api-endpoints
   baseURL: https://api.liveblocks.io/v2
   tags:
+  - REST
+  - Rooms
+  - Storage
+  - Comments
+  - Threads
+  - Notification
+  - Yjs
+  - Webhook
+  tags_raw:
   - REST
   - Rooms
   - Storage
@@ -71,6 +91,10 @@ apis:
   humanURL: https://liveblocks.io/docs/authentication
   baseURL: https://api.liveblocks.io/v2
   tags:
+  - Authentication
+  - Tokens
+  - Sessions
+  tags_raw:
   - Auth
   - Tokens
   - Sessions
@@ -127,6 +151,8 @@ apis:
   humanURL: https://liveblocks.io/docs/api-reference/rest-api-endpoints
   baseURL: https://api.liveblocks.io/v2
   tags:
+  - Event
+  tags_raw:
   - Events
   properties:
   - type: OpenAPI
