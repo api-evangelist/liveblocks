@@ -94,8 +94,6 @@ apis:
     url: https://liveblocks.io/docs/authentication
   - type: Webhooks
     url: https://liveblocks.io/docs/platform/webhooks
-  - url: graphql/liveblocks-graphql.md
-    type: GraphQL
 - aid: liveblocks:authorization-api
   name: Liveblocks Authorization API
   description: >-
