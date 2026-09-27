@@ -8,16 +8,21 @@ description: Liveblocks is a real-time collaboration platform that provides read
   Redux, Zustand, and Yjs.
 type: Index
 deliveryModel:
-  model: saas
-  open_source: false
+  model: unknown
+  license_evidence:
+    repo: liveblocks/liveblocks
+    spdx: NOASSERTION
+    stars: 4733
+  open_source: unknown
   commercial: true
   callable_host: true
-  label: Hosted service · you call their endpoint
-  confidence: high
+  label: Delivery model not determined — needs a product licence on record
+  confidence: low
   source:
   - openapi
   - pricing
-  generated: '2026-08-28'
+  - repository-unlicensed
+  generated: '2026-09-25'
   method: derived
 accessModel:
   pricing: free

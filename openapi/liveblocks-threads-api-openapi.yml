@@ -141,18 +141,18 @@ paths:
           description: Participants list.
 components:
   parameters:
-    ThreadId:
-      name: threadId
-      in: path
-      required: true
-      description: The thread identifier.
-      schema:
-        type: string
     RoomId:
       name: roomId
       in: path
       required: true
       description: The room identifier.
+      schema:
+        type: string
+    ThreadId:
+      name: threadId
+      in: path
+      required: true
+      description: The thread identifier.
       schema:
         type: string
   securitySchemes:
