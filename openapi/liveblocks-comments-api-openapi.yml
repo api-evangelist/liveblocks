@@ -57,11 +57,11 @@ paths:
           description: Comment deleted.
 components:
   parameters:
-    ThreadId:
-      name: threadId
+    RoomId:
+      name: roomId
       in: path
       required: true
-      description: The thread identifier.
+      description: The room identifier.
       schema:
         type: string
     CommentId:
@@ -71,11 +71,11 @@ components:
       description: The comment identifier.
       schema:
         type: string
-    RoomId:
-      name: roomId
+    ThreadId:
+      name: threadId
       in: path
       required: true
-      description: The room identifier.
+      description: The thread identifier.
       schema:
         type: string
   securitySchemes:
