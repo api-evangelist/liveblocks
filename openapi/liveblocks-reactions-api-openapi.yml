@@ -49,18 +49,18 @@ components:
       description: The room identifier.
       schema:
         type: string
-    CommentId:
-      name: commentId
-      in: path
-      required: true
-      description: The comment identifier.
-      schema:
-        type: string
     ThreadId:
       name: threadId
       in: path
       required: true
       description: The thread identifier.
+      schema:
+        type: string
+    CommentId:
+      name: commentId
+      in: path
+      required: true
+      description: The comment identifier.
       schema:
         type: string
   securitySchemes:
