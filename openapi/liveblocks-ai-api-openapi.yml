@@ -1,0 +1,1467 @@
+openapi: 3.2.0
+info:
+  title: Liveblocks AI API
+  version: '2.0'
+  description: 'The Liveblocks REST API lets you read and modify rooms, threads, notifications, users, permissions, and schemas programmatically. Authenticate requests with a secret key using the `Authorization: Bearer` header.'
+servers:
+- url: https://api.liveblocks.io/v2
+tags:
+- name: AI
+paths:
+  /ai/copilots:
+    get:
+      summary: Get AI copilots
+      description: This endpoint returns a paginated list of AI copilots. The copilots are returned sorted by creation date, from newest to oldest. Corresponds to `liveblocks.getAiCopilots`.
+      tags:
+      - AI
+      parameters:
+      - schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+          description: A limit on the number of copilots to be returned. The limit can range between 1 and 100, and defaults to 20.
+          example: 20
+        in: query
+        name: limit
+      - schema:
+          type: string
+          description: A cursor used for pagination. Get the value from the `nextCursor` response of the previous page.
+          example: eyJjcmVhdGVkQXQiOjE2NjAwMDA5ODgxMzd9
+        in: query
+        name: startingAfter
+      responses:
+        '200':
+          description: Success. Returns the list of AI copilots.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetAiCopilotsResponse'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+      operationId: get-ai-copilots
+    post:
+      summary: Create AI copilot
+      description: This endpoint creates a new AI copilot with the given configuration. Corresponds to `liveblocks.createAiCopilot`.
+      tags:
+      - AI
+      responses:
+        '201':
+          description: Created. Returns the created AI copilot.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AiCopilot'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '422':
+          $ref: '#/components/responses/422'
+      operationId: create-ai-copilot
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAiCopilotRequestBody'
+  /ai/copilots/{copilotId}:
+    get:
+      summary: Get AI copilot
+      description: This endpoint returns an AI copilot by its ID. Corresponds to `liveblocks.getAiCopilot`.
+      tags:
+      - AI
+      parameters:
+      - schema:
+          type: string
+          description: ID of the AI copilot
+          example: cp_abc123
+        name: copilotId
+        in: path
+        required: true
+      responses:
+        '200':
+          description: Success. Returns the AI copilot.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AiCopilot'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+      operationId: get-ai-copilot
+    post:
+      summary: Update AI copilot
+      description: 'This endpoint updates an existing AI copilot''s configuration. Corresponds to `liveblocks.updateAiCopilot`.
+
+
+        This endpoint returns a 422 response if the update doesn''t apply due to validation failures. For example, if the existing copilot uses the "openai" provider and you attempt to update the provider model to an incompatible value for the provider, like "gemini-2.5-pro", you''ll receive a 422 response with an error message explaining where the validation failed.'
+      tags:
+      - AI
+      parameters:
+      - schema:
+          type: string
+          description: ID of the AI copilot
+          example: cp_abc123
+        name: copilotId
+        in: path
+        required: true
+      responses:
+        '200':
+          description: Success. Returns the updated AI copilot.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AiCopilot'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '422':
+          $ref: '#/components/responses/422'
+      operationId: update-ai-copilot
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAiCopilotRequestBody'
+    delete:
+      summary: Delete AI copilot
+      description: This endpoint deletes an AI copilot by its ID. A deleted copilot is no longer accessible and cannot be restored. Corresponds to `liveblocks.deleteAiCopilot`.
+      tags:
+      - AI
+      parameters:
+      - schema:
+          type: string
+          description: ID of the AI copilot
+          example: cp_abc123
+        name: copilotId
+        in: path
+        required: true
+      responses:
+        '204':
+          description: Success. The AI copilot was deleted.
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+      operationId: delete-ai-copilot
+  /ai/copilots/{copilotId}/knowledge:
+    get:
+      summary: Get knowledge sources
+      description: This endpoint returns a paginated list of knowledge sources for a specific AI copilot. Corresponds to `liveblocks.getKnowledgeSources`.
+      tags:
+      - AI
+      parameters:
+      - schema:
+          type: string
+          description: ID of the AI copilot
+          example: cp_abc123
+        name: copilotId
+        in: path
+        required: true
+      - schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+          description: A limit on the number of knowledge sources to be returned. The limit can range between 1 and 100, and defaults to 20.
+          example: 20
+        in: query
+        name: limit
+      - schema:
+          type: string
+          description: A cursor used for pagination. Get the value from the `nextCursor` response of the previous page.
+          example: eyJjcmVhdGVkQXQiOjE2NjAwMDA5ODgxMzd9
+        in: query
+        name: startingAfter
+      responses:
+        '200':
+          description: Success. Returns the list of knowledge sources.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetKnowledgeSourcesResponse'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+      operationId: get-knowledge-sources
+  /ai/copilots/{copilotId}/knowledge/{knowledgeSourceId}:
+    get:
+      summary: Get knowledge source
+      description: This endpoint returns a specific knowledge source by its ID. Corresponds to `liveblocks.getKnowledgeSource`.
+      tags:
+      - AI
+      parameters:
+      - schema:
+          type: string
+          description: ID of the AI copilot
+          example: cp_abc123
+        name: copilotId
+        in: path
+        required: true
+      - schema:
+          type: string
+          description: ID of the knowledge source
+          example: ks_abc123
+        name: knowledgeSourceId
+        in: path
+        required: true
+      responses:
+        '200':
+          description: Success. Returns the knowledge source.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KnowledgeSource'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+      operationId: get-knowledge-source
+  /ai/copilots/{copilotId}/knowledge/web:
+    post:
+      summary: Create web knowledge source
+      description: This endpoint creates a web knowledge source for an AI copilot. This allows the copilot to access and learn from web content. Corresponds to `liveblocks.createWebKnowledgeSource`.
+      tags:
+      - AI
+      parameters:
+      - schema:
+          type: string
+          description: ID of the AI copilot
+          example: cp_abc123
+        name: copilotId
+        in: path
+        required: true
+      responses:
+        '200':
+          description: Success. Returns the ID of the created knowledge source.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateWebKnowledgeSourceResponse'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '422':
+          $ref: '#/components/responses/422'
+      operationId: create-web-knowledge-source
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateWebKnowledgeSourceRequestBody'
+  /ai/copilots/{copilotId}/knowledge/file/{name}:
+    put:
+      summary: Create file knowledge source
+      description: This endpoint creates a file knowledge source for an AI copilot by uploading a file. The copilot can then reference the content of the file when responding. Corresponds to `liveblocks.createFileKnowledgeSource`.
+      tags:
+      - AI
+      parameters:
+      - schema:
+          type: string
+          description: ID of the AI copilot
+          example: cp_abc123
+        name: copilotId
+        in: path
+        required: true
+      - schema:
+          type: string
+          description: Name of the file
+          example: document.pdf
+        name: name
+        in: path
+        required: true
+      responses:
+        '200':
+          description: Success. Returns the ID of the created knowledge source.
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Response
+                properties:
+                  id:
+                    type: string
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '422':
+          $ref: '#/components/responses/422'
+      operationId: create-file-knowledge-source
+      requestBody:
+        required: true
+        content:
+          application/octet-stream:
+            schema:
+              type: string
+              format: binary
+  /ai/copilots/{copilotId}/knowledge/file/{knowledgeSourceId}:
+    get:
+      summary: Get file knowledge source content
+      description: This endpoint returns the content of a file knowledge source as markdown. This allows you to see what content the AI copilot has access to from uploaded files. Corresponds to `liveblocks.getFileKnowledgeSourceMarkdown`.
+      tags:
+      - AI
+      parameters:
+      - schema:
+          type: string
+          description: ID of the AI copilot
+          example: cp_abc123
+        name: copilotId
+        in: path
+        required: true
+      - schema:
+          type: string
+          description: ID of the knowledge source
+          example: ks_abc123
+        name: knowledgeSourceId
+        in: path
+        required: true
+      responses:
+        '200':
+          description: Success. Returns the content of the file knowledge source as markdown.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetFileKnowledgeSourceMarkdownResponse'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+      operationId: get-file-knowledge-source-markdown
+    delete:
+      summary: Delete file knowledge source
+      description: This endpoint deletes a file knowledge source from an AI copilot. The copilot will no longer have access to the content from this file. Corresponds to `liveblocks.deleteFileKnowledgeSource`.
+      tags:
+      - AI
+      parameters:
+      - schema:
+          type: string
+          description: ID of the AI copilot
+          example: cp_abc123
+        name: copilotId
+        in: path
+        required: true
+      - schema:
+          type: string
+          description: ID of the knowledge source
+          example: ks_abc123
+        name: knowledgeSourceId
+        in: path
+        required: true
+      responses:
+        '204':
+          description: Success. The file knowledge source was deleted.
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+      operationId: delete-file-knowledge-source
+  /ai/copilots/{copilotId}/knowledge/web/{knowledgeSourceId}:
+    delete:
+      summary: Delete web knowledge source
+      description: This endpoint deletes a web knowledge source from an AI copilot. The copilot will no longer have access to the content from this source. Corresponds to `liveblocks.deleteWebKnowledgeSource`.
+      tags:
+      - AI
+      parameters:
+      - schema:
+          type: string
+          description: ID of the AI copilot
+          example: cp_abc123
+        name: copilotId
+        in: path
+        required: true
+      - schema:
+          type: string
+          description: ID of the knowledge source
+          example: ks_abc123
+        name: knowledgeSourceId
+        in: path
+        required: true
+      responses:
+        '204':
+          description: Success. The web knowledge source was deleted.
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+      operationId: delete-web-knowledge-source
+  /ai/copilots/{copilotId}/knowledge/web/{knowledgeSourceId}/links:
+    get:
+      summary: Get web knowledge source links
+      description: This endpoint returns a paginated list of links that were indexed from a web knowledge source. This is useful for understanding what content the AI copilot has access to from web sources. Corresponds to `liveblocks.getWebKnowledgeSourceLinks`.
+      tags:
+      - AI
+      parameters:
+      - schema:
+          type: string
+          description: ID of the AI copilot
+          example: cp_abc123
+        name: copilotId
+        in: path
+        required: true
+      - schema:
+          type: string
+          description: ID of the knowledge source
+          example: ks_abc123
+        name: knowledgeSourceId
+        in: path
+        required: true
+      - schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+          description: A limit on the number of links to be returned. The limit can range between 1 and 100, and defaults to 20.
+          example: 20
+        in: query
+        name: limit
+      - schema:
+          type: string
+          description: A cursor used for pagination. Get the value from the `nextCursor` response of the previous page.
+          example: eyJjcmVhdGVkQXQiOjE2NjAwMDA5ODgxMzd9
+        in: query
+        name: startingAfter
+      responses:
+        '200':
+          description: Success. Returns the list of web knowledge source links.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetWebKnowledgeSourceLinksResponse'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+      operationId: get-web-knowledge-source-links
+components:
+  schemas:
+    CreateAiCopilotRequestBody:
+      oneOf:
+      - $ref: '#/components/schemas/CreateAiCopilotOptionsOpenAi'
+      - $ref: '#/components/schemas/CreateAiCopilotOptionsAnthropic'
+      - $ref: '#/components/schemas/CreateAiCopilotOptionsGoogle'
+      - $ref: '#/components/schemas/CreateAiCopilotOptionsOpenAiCompatible'
+      discriminator:
+        propertyName: provider
+        mapping:
+          openai: '#/components/schemas/CreateAiCopilotOptionsOpenAi'
+          anthropic: '#/components/schemas/CreateAiCopilotOptionsAnthropic'
+          google: '#/components/schemas/CreateAiCopilotOptionsGoogle'
+          openai-compatible: '#/components/schemas/CreateAiCopilotOptionsOpenAiCompatible'
+      example:
+        name: My Copilot
+        systemPrompt: You are a helpful assistant.
+        providerApiKey: sk-...
+        provider: openai
+        providerModel: gpt-4o
+    CreateAiCopilotOptionsOpenAiCompatible:
+      allOf:
+      - $ref: '#/components/schemas/CreateAiCopilotOptionsBase'
+      - type: object
+        required:
+        - provider
+        - providerModel
+        - compatibleProviderName
+        - providerBaseUrl
+        properties:
+          provider:
+            type: string
+            const: openai-compatible
+          providerModel:
+            type: string
+          compatibleProviderName:
+            type: string
+          providerBaseUrl:
+            type: string
+      example:
+        name: My Compatible Copilot
+        systemPrompt: You are a helpful assistant.
+        providerApiKey: sk-...
+        provider: openai-compatible
+        providerModel: my-custom-model
+        compatibleProviderName: my-provider
+        providerBaseUrl: https://api.my-provider.com/v1
+    Error:
+      title: Error
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error code
+        message:
+          type: string
+          description: Message explaining the error
+        suggestion:
+          type: string
+          description: A suggestion on how to fix the error
+        docs:
+          type: string
+          description: A link to the documentation
+    GoogleModel:
+      title: GoogleModel
+      type: string
+      enum:
+      - gemini-3-flash-preview
+      - gemini-3.1-pro-preview
+      - gemini-2.5-flash
+      - gemini-2.5-pro
+      - gemini-2.0-flash-001
+      - gemini-1.5-flash
+      - gemini-1.5-pro
+      example: gemini-2.5-flash
+    UpdateAiCopilotRequestBody:
+      title: UpdateAiCopilotRequestBody
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          oneOf:
+          - type: string
+          - type: 'null'
+        systemPrompt:
+          type: string
+        knowledgePrompt:
+          oneOf:
+          - type: string
+          - type: 'null'
+        alwaysUseKnowledge:
+          type: boolean
+        settings:
+          oneOf:
+          - $ref: '#/components/schemas/AiCopilotProviderSettings'
+          - type: 'null'
+        providerApiKey:
+          type: string
+        provider:
+          type: string
+          enum:
+          - openai
+          - anthropic
+          - google
+          - openai-compatible
+        providerModel:
+          type: string
+        providerOptions:
+          oneOf:
+          - $ref: '#/components/schemas/OpenAiProviderOptions'
+          - $ref: '#/components/schemas/AnthropicProviderOptions'
+          - $ref: '#/components/schemas/GoogleProviderOptions'
+          - type: 'null'
+        compatibleProviderName:
+          type: string
+        providerBaseUrl:
+          type: string
+          format: uri
+      additionalProperties: false
+      example:
+        name: Updated Copilot
+        systemPrompt: You are an updated helpful assistant.
+        providerModel: gpt-4o
+        settings:
+          maxTokens: 8192
+    KnowledgeSource:
+      type: object
+      title: KnowledgeSource
+      oneOf:
+      - $ref: '#/components/schemas/KnowledgeSourceWebSource'
+      - $ref: '#/components/schemas/KnowledgeSourceFileSource'
+      discriminator:
+        propertyName: type
+      additionalProperties: false
+      example:
+        id: ks_web123
+        type: ai-knowledge-web-source
+        createdAt: '2024-06-01T12:00:00.000Z'
+        updatedAt: '2024-06-01T12:00:00.000Z'
+        lastIndexedAt: '2024-06-01T12:00:00.000Z'
+        status: ready
+        link:
+          url: https://docs.example.com
+          type: crawl
+    WebKnowledgeSourceLink:
+      title: WebKnowledgeSourceLink
+      type: object
+      properties:
+        id:
+          type: string
+        url:
+          type: string
+        status:
+          type: string
+          enum:
+          - ingesting
+          - ready
+          - error
+        createdAt:
+          type: string
+          format: date-time
+        lastIndexedAt:
+          type: string
+          format: date-time
+      required:
+      - id
+      - url
+      - status
+      - createdAt
+      - lastIndexedAt
+      additionalProperties: false
+      example:
+        id: ksl_abc123
+        url: https://docs.example.com/getting-started
+        status: ready
+        createdAt: '2024-06-01T12:00:00.000Z'
+        lastIndexedAt: '2024-06-01T12:00:00.000Z'
+    CreateAiCopilotOptionsBase:
+      type: object
+      required:
+      - name
+      - systemPrompt
+      - providerApiKey
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        systemPrompt:
+          type: string
+        knowledgePrompt:
+          type: string
+        alwaysUseKnowledge:
+          type: boolean
+        settings:
+          $ref: '#/components/schemas/AiCopilotProviderSettings'
+        providerApiKey:
+          type: string
+      additionalProperties: false
+      example:
+        name: My Copilot
+        systemPrompt: You are a helpful assistant.
+        providerApiKey: sk-...
+        alwaysUseKnowledge: true
+        settings:
+          maxTokens: 4096
+          temperature: 0.7
+    AiCopilot:
+      title: AiCopilot
+      oneOf:
+      - $ref: '#/components/schemas/AiCopilotOpenAi'
+      - $ref: '#/components/schemas/AiCopilotAnthropic'
+      - $ref: '#/components/schemas/AiCopilotGoogle'
+      - $ref: '#/components/schemas/AiCopilotOpenAiCompatible'
+      discriminator:
+        propertyName: provider
+        mapping:
+          openai: '#/components/schemas/AiCopilotOpenAi'
+          anthropic: '#/components/schemas/AiCopilotAnthropic'
+          google: '#/components/schemas/AiCopilotGoogle'
+          openai-compatible: '#/components/schemas/AiCopilotOpenAiCompatible'
+      additionalProperties: false
+      example:
+        type: copilot
+        id: cp_abc123
+        name: My Copilot
+        systemPrompt: You are a helpful assistant.
+        alwaysUseKnowledge: true
+        createdAt: '2024-06-01T12:00:00.000Z'
+        updatedAt: '2024-06-01T12:00:00.000Z'
+        provider: openai
+        providerModel: gpt-4o
+        settings:
+          maxTokens: 4096
+          temperature: 0.7
+    OpenAiModel:
+      title: OpenAiModel
+      type: string
+      enum:
+      - o1
+      - o1-mini
+      - o3
+      - o3-mini
+      - o4-mini
+      - gpt-4.1
+      - gpt-4.1-mini
+      - gpt-4.1-nano
+      - gpt-4o
+      - gpt-4o-mini
+      - gpt-4-turbo
+      - gpt-4
+      - gpt-5
+      - gpt-5-pro
+      - gpt-5-mini
+      - gpt-5-nano
+      - gpt-5-chat-latest
+      - gpt-5.1
+      - gpt-5.1-mini
+      - gpt-5.1-chat-latest
+      - gpt-5.2
+      - gpt-5.2-pro
+      - gpt-5.4
+      - gpt-5.4-pro
+      - gpt-5.4-mini
+      - gpt-5.4-nano
+      - gpt-5.5
+      example: gpt-4o
+    AiCopilotOpenAiCompatible:
+      title: AiCopilotOpenAiCompatible
+      allOf:
+      - $ref: '#/components/schemas/AiCopilotBase'
+      - type: object
+        required:
+        - provider
+        - providerModel
+        - compatibleProviderName
+        - providerBaseUrl
+        properties:
+          provider:
+            type: string
+            const: openai-compatible
+          providerModel:
+            type: string
+          compatibleProviderName:
+            type: string
+          providerBaseUrl:
+            type: string
+      additionalProperties: false
+      example:
+        type: copilot
+        id: cp_compat1
+        name: My Compatible Copilot
+        systemPrompt: You are a helpful assistant.
+        alwaysUseKnowledge: false
+        createdAt: '2024-06-01T12:00:00.000Z'
+        updatedAt: '2024-06-01T12:00:00.000Z'
+        provider: openai-compatible
+        providerModel: my-custom-model
+        compatibleProviderName: my-provider
+        providerBaseUrl: https://api.my-provider.com/v1
+    AiCopilotGoogle:
+      title: AiCopilotGoogle
+      allOf:
+      - $ref: '#/components/schemas/AiCopilotBase'
+      - type: object
+        properties:
+          provider:
+            type: string
+            const: google
+          providerModel:
+            $ref: '#/components/schemas/GoogleModel'
+          providerOptions:
+            $ref: '#/components/schemas/GoogleProviderOptions'
+        required:
+        - provider
+        - providerModel
+      additionalProperties: false
+      example:
+        type: copilot
+        id: cp_abc789
+        name: My Google Copilot
+        systemPrompt: You are a helpful assistant.
+        alwaysUseKnowledge: false
+        createdAt: '2024-06-01T12:00:00.000Z'
+        updatedAt: '2024-06-01T12:00:00.000Z'
+        provider: google
+        providerModel: gemini-2.5-flash
+    AiCopilotAnthropic:
+      title: AiCopilotAnthropic
+      allOf:
+      - $ref: '#/components/schemas/AiCopilotBase'
+      - type: object
+        properties:
+          provider:
+            type: string
+            const: anthropic
+          providerModel:
+            $ref: '#/components/schemas/AnthropicModel'
+          providerOptions:
+            $ref: '#/components/schemas/AnthropicProviderOptions'
+        required:
+        - provider
+        - providerModel
+      additionalProperties: false
+      example:
+        type: copilot
+        id: cp_abc456
+        name: My Anthropic Copilot
+        systemPrompt: You are a helpful assistant.
+        alwaysUseKnowledge: true
+        createdAt: '2024-06-01T12:00:00.000Z'
+        updatedAt: '2024-06-01T12:00:00.000Z'
+        provider: anthropic
+        providerModel: claude-3-5-sonnet-latest
+    KnowledgeSourceBase:
+      type: object
+      required:
+      - id
+      - createdAt
+      - updatedAt
+      - lastIndexedAt
+      - status
+      properties:
+        id:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        lastIndexedAt:
+          type: string
+          format: date-time
+        status:
+          type: string
+          enum:
+          - ingesting
+          - ready
+          - error
+        errorMessage:
+          type: string
+      additionalProperties: false
+      example:
+        id: ks_abc123
+        createdAt: '2024-06-01T12:00:00.000Z'
+        updatedAt: '2024-06-01T12:00:00.000Z'
+        lastIndexedAt: '2024-06-01T12:00:00.000Z'
+        status: ready
+    GetKnowledgeSourcesResponse:
+      title: GetKnowledgeSourcesResponse
+      type: object
+      properties:
+        nextCursor:
+          oneOf:
+          - type: string
+          - type: 'null'
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/KnowledgeSource'
+      required:
+      - nextCursor
+      - data
+      additionalProperties: false
+      example:
+        nextCursor: null
+        data:
+        - id: ks_abc123
+          type: ai-knowledge-web-source
+          createdAt: '2024-06-01T12:00:00.000Z'
+          updatedAt: '2024-06-01T12:00:00.000Z'
+          lastIndexedAt: '2024-06-01T12:00:00.000Z'
+          status: ready
+          link:
+            url: https://docs.example.com
+            type: crawl
+    CreateWebKnowledgeSourceRequestBody:
+      title: CreateWebKnowledgeSourceRequestBody
+      type: object
+      properties:
+        copilotId:
+          type: string
+        url:
+          type: string
+          format: uri
+        type:
+          type: string
+          enum:
+          - individual_link
+          - crawl
+          - sitemap
+      required:
+      - copilotId
+      - url
+      - type
+      example:
+        copilotId: cp_abc123
+        url: https://docs.example.com
+        type: crawl
+    AnthropicModel:
+      title: AnthropicModel
+      type: string
+      enum:
+      - claude-opus-4-7
+      - claude-sonnet-4-6
+      - claude-opus-4-6
+      - claude-opus-4-5-20251101
+      - claude-sonnet-4-5-20250929
+      - claude-haiku-4-5-20251001
+      - claude-opus-4-1-20250805
+      - claude-4-opus-20250514
+      - claude-4-sonnet-20250514
+      - claude-3-7-sonnet-20250219
+      - claude-3-5-sonnet-latest
+      - claude-3-5-haiku-latest
+      - claude-3-opus-latest
+      example: claude-3-5-sonnet-latest
+    AiCopilotOpenAi:
+      title: AiCopilotOpenAi
+      allOf:
+      - $ref: '#/components/schemas/AiCopilotBase'
+      - type: object
+        properties:
+          provider:
+            type: string
+            const: openai
+          providerModel:
+            $ref: '#/components/schemas/OpenAiModel'
+        required:
+        - provider
+        - providerModel
+      additionalProperties: false
+      example:
+        type: copilot
+        id: cp_abc123
+        name: My Copilot
+        systemPrompt: You are a helpful assistant.
+        alwaysUseKnowledge: true
+        createdAt: '2024-06-01T12:00:00.000Z'
+        updatedAt: '2024-06-01T12:00:00.000Z'
+        provider: openai
+        providerModel: gpt-4o
+        settings:
+          maxTokens: 4096
+          temperature: 0.7
+    CreateWebKnowledgeSourceResponse:
+      title: CreateWebKnowledgeSourceResponse
+      type: object
+      properties:
+        id:
+          type: string
+      required:
+      - id
+      additionalProperties: false
+      example:
+        id: ks_abc123
+    AiCopilotBase:
+      type: object
+      required:
+      - type
+      - id
+      - name
+      - systemPrompt
+      - alwaysUseKnowledge
+      - createdAt
+      - updatedAt
+      properties:
+        type:
+          type: string
+          const: copilot
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        systemPrompt:
+          type: string
+        knowledgePrompt:
+          type: string
+        alwaysUseKnowledge:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        lastUsedAt:
+          type: string
+          format: date-time
+        settings:
+          $ref: '#/components/schemas/AiCopilotProviderSettings'
+      additionalProperties: false
+      example:
+        type: copilot
+        id: cp_abc123
+        name: My Copilot
+        systemPrompt: You are a helpful assistant.
+        alwaysUseKnowledge: true
+        createdAt: '2024-06-01T12:00:00.000Z'
+        updatedAt: '2024-06-01T12:00:00.000Z'
+        settings:
+          maxTokens: 4096
+          temperature: 0.7
+    KnowledgeSourceFileSource:
+      allOf:
+      - $ref: '#/components/schemas/KnowledgeSourceBase'
+      - type: object
+        required:
+        - type
+        - file
+        properties:
+          type:
+            type: string
+            const: ai-knowledge-file-source
+          file:
+            type: object
+            required:
+            - name
+            - mimeType
+            properties:
+              name:
+                type: string
+              mimeType:
+                type: string
+      example:
+        id: ks_file123
+        type: ai-knowledge-file-source
+        createdAt: '2024-06-01T12:00:00.000Z'
+        updatedAt: '2024-06-01T12:00:00.000Z'
+        lastIndexedAt: '2024-06-01T12:00:00.000Z'
+        status: ready
+        file:
+          name: document.pdf
+          mimeType: application/pdf
+    AnthropicProviderOptions:
+      type: object
+      required:
+      - anthropic
+      properties:
+        anthropic:
+          type: object
+          properties:
+            thinking:
+              oneOf:
+              - title: AnthropicThinkingEnabled
+                type: object
+                required:
+                - type
+                - budgetTokens
+                properties:
+                  type:
+                    type: string
+                    const: enabled
+                  budgetTokens:
+                    type: integer
+                additionalProperties: false
+              - title: AnthropicThinkingDisabled
+                type: object
+                required:
+                - type
+                properties:
+                  type:
+                    type: string
+                    const: disabled
+                additionalProperties: false
+            webSearch:
+              title: AnthropicWebSearch
+              type: object
+              properties:
+                allowedDomains:
+                  type: array
+                  items:
+                    type: string
+          additionalProperties: false
+      additionalProperties: false
+      example:
+        anthropic:
+          thinking:
+            type: enabled
+            budgetTokens: 10000
+    OpenAiProviderOptions:
+      type: object
+      required:
+      - openai
+      properties:
+        openai:
+          type: object
+          properties:
+            reasoningEffort:
+              type: string
+              enum:
+              - low
+              - medium
+              - high
+            webSearch:
+              type: object
+              properties:
+                allowedDomains:
+                  type: array
+                  items:
+                    type: string
+              additionalProperties: false
+          additionalProperties: false
+      additionalProperties: false
+      example:
+        openai:
+          reasoningEffort: medium
+    GetFileKnowledgeSourceMarkdownResponse:
+      title: GetFileKnowledgeSourceMarkdownResponse
+      type: object
+      properties:
+        id:
+          type: string
+        content:
+          type: string
+      required:
+      - id
+      - content
+      additionalProperties: false
+      example:
+        id: ks_abc123
+        content: '# Document Title
+
+
+          This is the content of the uploaded file.'
+    KnowledgeSourceWebSource:
+      allOf:
+      - $ref: '#/components/schemas/KnowledgeSourceBase'
+      - type: object
+        required:
+        - type
+        - link
+        - status
+        properties:
+          type:
+            type: string
+            const: ai-knowledge-web-source
+          link:
+            type: object
+            required:
+            - url
+            - type
+            properties:
+              url:
+                type: string
+              type:
+                type: string
+                enum:
+                - individual_link
+                - crawl
+                - sitemap
+      additionalProperties: false
+      example:
+        id: ks_web123
+        type: ai-knowledge-web-source
+        createdAt: '2024-06-01T12:00:00.000Z'
+        updatedAt: '2024-06-01T12:00:00.000Z'
+        lastIndexedAt: '2024-06-01T12:00:00.000Z'
+        status: ready
+        link:
+          url: https://docs.example.com
+          type: crawl
+    GoogleProviderOptions:
+      title: GoogleProviderOptions
+      type: object
+      required:
+      - google
+      properties:
+        google:
+          type: object
+          properties:
+            thinkingConfig:
+              type: object
+              properties:
+                thinkingBudget:
+                  type: integer
+      additionalProperties: false
+      example:
+        google:
+          thinkingConfig:
+            thinkingBudget: 10000
+    AiCopilotProviderSettings:
+      title: AiCopilotProviderSettings
+      type: object
+      properties:
+        maxTokens:
+          type: integer
+        temperature:
+          type: number
+        topP:
+          type: number
+        topK:
+          type: number
+        frequencyPenalty:
+          type: number
+        presencePenalty:
+          type: number
+        stopSequences:
+          type: array
+          items:
+            type: string
+        seed:
+          type: integer
+        maxRetries:
+          type: integer
+      additionalProperties: false
+      example:
+        maxTokens: 4096
+        temperature: 0.7
+        topP: 0.9
+    GetAiCopilotsResponse:
+      title: GetAiCopilotsResponse
+      type: object
+      properties:
+        nextCursor:
+          oneOf:
+          - type: string
+          - type: 'null'
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/AiCopilot'
+      required:
+      - nextCursor
+      - data
+      additionalProperties: false
+      example:
+        nextCursor: null
+        data:
+        - type: copilot
+          id: cp_abc123
+          name: My Copilot
+          systemPrompt: You are a helpful assistant.
+          alwaysUseKnowledge: true
+          createdAt: '2024-06-01T12:00:00.000Z'
+          updatedAt: '2024-06-01T12:00:00.000Z'
+          provider: openai
+          providerModel: gpt-4o
+    CreateAiCopilotOptionsOpenAi:
+      allOf:
+      - $ref: '#/components/schemas/CreateAiCopilotOptionsBase'
+      - type: object
+        required:
+        - provider
+        - providerModel
+        properties:
+          provider:
+            type: string
+            const: openai
+          providerModel:
+            $ref: '#/components/schemas/OpenAiModel'
+          providerOptions:
+            $ref: '#/components/schemas/OpenAiProviderOptions'
+        additionalProperties: false
+      additionalProperties: false
+      example:
+        name: My Copilot
+        systemPrompt: You are a helpful assistant.
+        providerApiKey: sk-...
+        provider: openai
+        providerModel: gpt-4o
+    CreateAiCopilotOptionsAnthropic:
+      allOf:
+      - $ref: '#/components/schemas/CreateAiCopilotOptionsBase'
+      - type: object
+        required:
+        - provider
+        - providerModel
+        properties:
+          provider:
+            type: string
+            const: anthropic
+          providerModel:
+            $ref: '#/components/schemas/AnthropicModel'
+          providerOptions:
+            $ref: '#/components/schemas/AnthropicProviderOptions'
+      example:
+        name: My Anthropic Copilot
+        systemPrompt: You are a helpful assistant.
+        providerApiKey: sk-ant-...
+        provider: anthropic
+        providerModel: claude-3-5-sonnet-latest
+    CreateAiCopilotOptionsGoogle:
+      allOf:
+      - $ref: '#/components/schemas/CreateAiCopilotOptionsBase'
+      - type: object
+        required:
+        - provider
+        - providerModel
+        properties:
+          provider:
+            type: string
+            const: google
+          providerModel:
+            $ref: '#/components/schemas/GoogleModel'
+          providerOptions:
+            $ref: '#/components/schemas/GoogleProviderOptions'
+      example:
+        name: My Google Copilot
+        systemPrompt: You are a helpful assistant.
+        providerApiKey: AIza...
+        provider: google
+        providerModel: gemini-2.5-flash
+    GetWebKnowledgeSourceLinksResponse:
+      title: GetWebKnowledgeSourceLinksResponse
+      type: object
+      properties:
+        nextCursor:
+          oneOf:
+          - type: string
+          - type: 'null'
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebKnowledgeSourceLink'
+      required:
+      - nextCursor
+      - data
+      additionalProperties: false
+      example:
+        nextCursor: null
+        data:
+        - id: ksl_abc123
+          url: https://docs.example.com/getting-started
+          status: ready
+          createdAt: '2024-06-01T12:00:00.000Z'
+          lastIndexedAt: '2024-06-01T12:00:00.000Z'
+  responses:
+    '422':
+      description: Unprocessable entity.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            UNPROCESSABLE_ENTITY:
+              value:
+                error: UNPROCESSABLE_ENTITY
+                message: 'Missing key: ''defaultAccesses''.'
+                suggestion: Please ensure the data follows the correct format.
+                docs: ''
+    '401':
+      description: Missing or wrong credentials.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            WRONG_KEY_USED:
+              value:
+                error: WRONG_KEY_USED
+                message: Public key instead of the secret key.
+                suggestion: 'Please use your secret key instead of the public key, the secret key is available in the dashboard: https://liveblocks.io/dashboard/apikeys.'
+                docs: ''
+            MISSING_SECRET_KEY:
+              value:
+                error: MISSING_SECRET_KEY
+                message: Missing secret key in authentication header
+                suggestion: 'Please use a secret key, the secret key is available in the dashboard: https://liveblocks.io/dashboard/apikeys'
+                docs: ''
+            MISSING_MANAGEMENT_API_ACCESS_TOKEN:
+              value:
+                error: MISSING_MANAGEMENT_API_ACCESS_TOKEN
+                message: Missing management api access token in authentication header
+                suggestion: Please provide a management api access token in the authentication header
+                docs: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+            INVALID_MANAGEMENT_API_ACCESS_TOKEN:
+              value:
+                error: INVALID_MANAGEMENT_API_ACCESS_TOKEN
+                message: Invalid management api access token
+                suggestion: Please provide a valid management api access token in the authentication header
+                docs: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+            REVOKED_MANAGEMENT_API_ACCESS_TOKEN:
+              value:
+                error: REVOKED_MANAGEMENT_API_ACCESS_TOKEN
+                message: Revoked management api access token
+                suggestion: Please provide an active management api access token in the authentication header
+                docs: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+            EXPIRED_MANAGEMENT_API_ACCESS_TOKEN:
+              value:
+                error: EXPIRED_MANAGEMENT_API_ACCESS_TOKEN
+                message: Expired management api access token
+                suggestion: Please provide a not expired management api access token in the authentication header
+                docs: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+    '403':
+      description: Unauthorized access.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            INVALID_SECRET_KEY:
+              value:
+                error: INVALID_SECRET_KEY
+                message: Invalid secret key.
+                suggestion: 'Please use a valid secret key, the secret key is available in the dashboard: https://liveblocks.io/dashboard/apikeys.'
+                docs: ''
+            INVALID_PUBLIC_KEY:
+              value:
+                error: INVALID_PUBLIC_KEY
+                message: Invalid public key
+                suggestion: 'Please use a valid public key, the public key is available in the dashboard: https://liveblocks.io/dashboard/apikeys'
+                docs: ''
+            UNAUTHORIZED_ROOM_ACCESS:
+              value:
+                error: UNAUTHORIZED_ROOM_ACCESS
+                message: The user does not have permission to access the room.
+                suggestion: Please add the user’s ID or one of the user’s group IDs to the room first.
+                docs: ''
+            INVALID_MANAGEMENT_API_ACCESS_TOKEN_SCOPE:
+              value:
+                error: INVALID_MANAGEMENT_API_ACCESS_TOKEN_SCOPE
+                message: Invalid management api access token scope
+                suggestion: 'Please provide a management api access token with required scope: ''read:all''.'
+                docs: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+            FEATURE_NOT_ENABLED:
+              value:
+                error: FEATURE_NOT_ENABLED
+                message: The "Management API" feature is not enabled for this account.
+                suggestion: If you want access to this feature, please contact us at support@liveblocks.io
+                docs: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+            PUBLIC_KEY_NOT_ENABLED:
+              value:
+                error: PUBLIC_KEY_NOT_ENABLED
+                message: Public key not enabled
+                suggestion: Please enable the public key for the project
+                docs: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+    '404':
+      description: Resource not found.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            ROOM_NOT_FOUND:
+              value:
+                error: ROOM_NOT_FOUND
+                message: Room not found.
+                suggestion: 'Please use a valid room ID, room IDs are available in the dashboard: https://liveblocks.io/dashboard/rooms.'
+                docs: ''
+            WEBHOOK_NOT_FOUND:
+              value:
+                error: WEBHOOK_NOT_FOUND
+                message: Webhook "ep_xxx" not found.
+                suggestion: 'Please use a valid webhook ID, webhook IDs are available in the dashboard: https://liveblocks.io/dashboard/webhooks'
+                docs: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+            NOT_EXISTING_MANAGEMENT_API_ACCESS_TOKEN:
+              value:
+                error: NOT_EXISTING_MANAGEMENT_API_ACCESS_TOKEN
+                message: Not existing management api access token
+                suggestion: Please provide an existing management api access token in the authentication header
+                docs: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+  securitySchemes:
+    Authorization:
+      name: Bearer sk_xxx
+      type: apiKey
+      in: header
+externalDocs:
+  description: Liveblocks REST API reference
+  url: https://liveblocks.io/docs/api-reference/rest-api-endpoints

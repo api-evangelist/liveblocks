@@ -1,85 +1,2350 @@
 openapi: 3.2.0
 info:
-  title: Liveblocks REST Comments API
-  description: Server-side REST API for managing Liveblocks rooms, room storage, active users, broadcast events, comments and threads, Yjs documents, and version history. Authenticated with a secret key via HTTP Bearer authorization.
-  version: v2
-  contact:
-    name: Liveblocks
-    url: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+  title: Liveblocks Comments API
+  version: '2.0'
+  description: 'The Liveblocks REST API lets you read and modify rooms, threads, notifications, users, permissions, and schemas programmatically. Authenticate requests with a secret key using the `Authorization: Bearer` header.'
 servers:
 - url: https://api.liveblocks.io/v2
-  description: Liveblocks REST API
-security:
-- bearerAuth: []
 tags:
 - name: Comments
 paths:
-  /rooms/{roomId}/threads/{threadId}/comments:
-    parameters:
-    - $ref: '#/components/parameters/RoomId'
-    - $ref: '#/components/parameters/ThreadId'
-    post:
-      tags:
-      - Comments
-      summary: Add comment
-      operationId: addComment
-      responses:
-        '200':
-          description: Comment added.
-  /rooms/{roomId}/threads/{threadId}/comments/{commentId}:
-    parameters:
-    - $ref: '#/components/parameters/RoomId'
-    - $ref: '#/components/parameters/ThreadId'
-    - $ref: '#/components/parameters/CommentId'
+  /rooms/{roomId}/threads:
     get:
+      summary: Get room threads
+      description: This endpoint returns the threads in the requested room. Corresponds to `liveblocks.getThreads`.
       tags:
       - Comments
-      summary: Get comment
-      operationId: getComment
+      parameters:
+      - name: roomId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the room
+          example: my-room-id
+      - schema:
+          type: string
+          description: Query to filter threads. You can filter by `metadata`, `resolved`, and `visibility`, for example, `metadata["status"]:"open" AND metadata["color"]:"red" AND resolved:true AND visibility:"private"`. Learn more about [filtering threads with query language](https://liveblocks.io/docs/guides/how-to-filter-threads-using-query-language).
+          example: metadata["color"]:"blue"
+        in: query
+        name: query
+      operationId: get-threads
       responses:
         '200':
-          description: Comment details.
+          description: Success. Returns list of threads in a room.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetThreadsResponse'
+              examples:
+                Success:
+                  value:
+                    data:
+                    - type: thread
+                      id: thread-id
+                      roomId: room-id
+                      comments:
+                      - type: comment
+                        threadId: thread-id
+                        roomId: room-id
+                        id: comment-id
+                        userId: string
+                        createdAt: '2019-08-24T14:15:22Z'
+                        editedAt: '2019-08-24T14:15:22Z'
+                        deletedAt: '2019-08-24T14:15:22Z'
+                        body: {}
+                        metadata: {}
+                        reactions: []
+                        attachments: []
+                      createdAt: '2019-08-24T14:15:22Z'
+                      metadata: {}
+                      resolved: false
+                      visibility: public
+                      updatedAt: '2019-08-24T14:15:22Z'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404-thread'
     post:
+      summary: Create thread
+      description: 'This endpoint creates a new thread and the first comment in the thread. Corresponds to `liveblocks.createThread`.
+
+
+        A comment’s body is an array of paragraphs, each containing child nodes. Here’s an example of how to construct a comment’s body, which can be submitted under `comment.body`.
+
+
+        ```json
+
+        {
+
+        "version": 1,
+
+        "content": [
+
+        {
+
+        "type": "paragraph",
+
+        "children": [{ "text": "Hello " }, { "text": "world", "bold": true }]
+
+        }
+
+        ]
+
+        }
+
+        ```
+
+
+        `metadata` supports maximum 50 entries. Key length has a limit of 40 characters maximum. Value length has a limit of 4000 characters maximum for strings.'
       tags:
       - Comments
-      summary: Update comment
-      operationId: updateComment
+      operationId: create-thread
+      parameters:
+      - name: roomId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the room
+          example: my-room-id
       responses:
         '200':
-          description: Comment updated.
-    delete:
+          description: Success. Returns the created thread.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Thread'
+              examples:
+                example:
+                  value:
+                    type: thread
+                    id: thread-id
+                    roomId: room-id
+                    comments:
+                    - type: comment
+                      threadId: thread-id
+                      roomId: room-id
+                      id: comment-id
+                      userId: alice
+                      createdAt: '2022-07-13T14:32:50.697Z'
+                      body: {}
+                      metadata: {}
+                      reactions: []
+                      attachments: []
+                    createdAt: '2022-07-13T14:32:50.697Z'
+                    updatedAt: '2022-07-13T14:32:50.697Z'
+                    metadata:
+                      color: blue
+                    resolved: false
+                    visibility: public
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '409':
+          $ref: '#/components/responses/409-thread'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateThreadRequestBody'
+            examples:
+              example:
+                value:
+                  comment:
+                    userId: alice
+                    createdAt: '2022-07-13T14:32:50.697Z'
+                    body:
+                      version: 1
+                      content: []
+                    metadata:
+                      tag: important
+                      spam: false
+                  metadata:
+                    color: blue
+  /rooms/{roomId}/threads/{threadId}:
+    get:
+      summary: Get thread
       tags:
       - Comments
-      summary: Delete comment
-      operationId: deleteComment
+      description: This endpoint returns a thread by its ID. Corresponds to `liveblocks.getThread`.
+      operationId: get-thread
+      parameters:
+      - name: roomId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the room
+          example: my-room-id
+      - name: threadId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the thread
+          example: th_abc123
+      responses:
+        '200':
+          description: Success. Returns requested thread.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Thread'
+              examples:
+                Success:
+                  value:
+                    type: thread
+                    id: thread-id
+                    roomId: room-id
+                    comments:
+                    - type: comment
+                      threadId: thread-id
+                      roomId: room-id
+                      id: comment-id
+                      userId: string
+                      createdAt: '2019-08-24T14:15:22Z'
+                      editedAt: '2019-08-24T14:15:22Z'
+                      deletedAt: '2019-08-24T14:15:22Z'
+                      body: {}
+                      metadata: {}
+                      reactions: []
+                      attachments: []
+                    createdAt: '2019-08-24T14:15:22Z'
+                    metadata: {}
+                    resolved: false
+                    visibility: public
+                    updatedAt: '2019-08-24T14:15:22Z'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404-thread'
+    delete:
+      summary: Delete thread
+      tags:
+      - Comments
+      description: This endpoint deletes a thread by its ID. Corresponds to `liveblocks.deleteThread`.
+      operationId: delete-thread
+      parameters:
+      - name: roomId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the room
+          example: my-room-id
+      - name: threadId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the thread
+          example: th_abc123
       responses:
         '204':
-          description: Comment deleted.
-components:
-  parameters:
-    RoomId:
+          description: Success. The thread has been deleted.
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404-thread'
+  /rooms/{roomId}/threads/{threadId}/participants:
+    get:
+      summary: Get thread participants
+      tags:
+      - Comments
+      deprecated: true
+      description: '**Deprecated.** Prefer using thread subscriptions instead.
+
+
+        This endpoint returns the list of thread participants. It is a list of unique user IDs representing all the thread comment authors and mentioned users in comments. Corresponds to `liveblocks.getThreadParticipants`.'
+      operationId: get-thread-participants
+      parameters:
+      - name: roomId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the room
+          example: my-room-id
+      - name: threadId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the thread
+          example: th_abc123
+      responses:
+        '200':
+          description: Success. Returns the thread’s participants
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetThreadParticipantsResponse'
+              examples:
+                Success:
+                  value:
+                    participantIds:
+                    - user-1
+                    - user-2
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404-thread'
+  /rooms/{roomId}/threads/{threadId}/metadata:
+    post:
+      summary: Edit thread metadata
+      tags:
+      - Comments
+      description: 'This endpoint edits the metadata of a thread. The metadata is a JSON object that can be used to store any information you want about the thread, in `string`, `number`, or `boolean` form. Set a property to `null` to remove it. Corresponds to `liveblocks.editThreadMetadata`.
+
+
+        `metadata` supports maximum 50 entries. Key length has a limit of 40 characters maximum. Value length has a limit of 4000 characters maximum for strings.'
+      operationId: edit-thread-metadata
+      parameters:
+      - name: roomId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the room
+          example: my-room-id
+      - name: threadId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the thread
+          example: th_abc123
+      responses:
+        '200':
+          description: Success. Returns the updated metadata.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThreadMetadata'
+              examples:
+                Success:
+                  value:
+                    color: yellow
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404-thread'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EditThreadMetadataRequestBody'
+            examples:
+              example:
+                value:
+                  metadata:
+                    color: yellow
+                  userId: alice
+                  createdAt: '2023-07-13T14:32:50.697Z'
+  /rooms/{roomId}/threads/{threadId}/mark-as-resolved:
+    post:
+      summary: Mark thread as resolved
+      tags:
+      - Comments
+      description: This endpoint marks a thread as resolved. The request body must include a `userId` to identify who resolved the thread. Returns the updated thread. Corresponds to `liveblocks.markThreadAsResolved`.
+      operationId: mark-thread-as-resolved
+      parameters:
+      - name: roomId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the room
+          example: my-room-id
+      - name: threadId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the thread
+          example: th_abc123
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MarkThreadAsResolvedRequestBody'
+      responses:
+        '200':
+          description: Success. Returns the updated thread.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Thread'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404-thread'
+  /rooms/{roomId}/threads/{threadId}/mark-as-unresolved:
+    post:
+      summary: Mark thread as unresolved
+      tags:
+      - Comments
+      description: This endpoint marks a thread as unresolved. The request body must include a `userId` to identify who unresolved the thread. Returns the updated thread. Corresponds to `liveblocks.markThreadAsUnresolved`.
+      operationId: mark-thread-as-unresolved
+      parameters:
+      - name: roomId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the room
+          example: my-room-id
+      - name: threadId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the thread
+          example: th_abc123
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MarkThreadAsUnresolvedRequestBody'
+      responses:
+        '200':
+          description: Success. Returns the updated thread.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Thread'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404-thread'
+  /rooms/{roomId}/threads/{threadId}/subscribe:
+    parameters:
+    - schema:
+        type: string
+        example: my-room-id
       name: roomId
       in: path
       required: true
-      description: The room identifier.
-      schema:
+    - schema:
         type: string
-    CommentId:
-      name: commentId
-      in: path
-      required: true
-      description: The comment identifier.
-      schema:
-        type: string
-    ThreadId:
+        example: th_abc123
       name: threadId
       in: path
       required: true
-      description: The thread identifier.
-      schema:
+    post:
+      summary: Subscribe to thread
+      tags:
+      - Comments
+      description: This endpoint subscribes to a thread. Corresponds to `liveblocks.subscribeToThread`.
+      operationId: subscribe-to-thread
+      parameters:
+      - name: roomId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the room
+          example: my-room-id
+      - name: threadId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the thread
+          example: th_abc123
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubscribeToThreadRequestBody'
+      responses:
+        '200':
+          description: Success. Returns the thread subscription.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscription'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404-thread'
+  /rooms/{roomId}/threads/{threadId}/unsubscribe:
+    parameters:
+    - schema:
         type: string
+        example: my-room-id
+      name: roomId
+      in: path
+      required: true
+    - schema:
+        type: string
+        example: th_abc123
+      name: threadId
+      in: path
+      required: true
+    post:
+      summary: Unsubscribe from thread
+      tags:
+      - Comments
+      description: This endpoint unsubscribes from a thread. Corresponds to `liveblocks.unsubscribeFromThread`.
+      operationId: unsubscribe-from-thread
+      parameters:
+      - name: roomId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the room
+          example: my-room-id
+      - name: threadId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the thread
+          example: th_abc123
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UnsubscribeFromThreadRequestBody'
+      responses:
+        '200':
+          description: Success.
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404-thread'
+  /rooms/{roomId}/threads/{threadId}/subscriptions:
+    parameters:
+    - schema:
+        type: string
+        example: my-room-id
+      name: roomId
+      in: path
+      required: true
+    - schema:
+        type: string
+        example: th_abc123
+      name: threadId
+      in: path
+      required: true
+    get:
+      summary: Get thread subscriptions
+      tags:
+      - Comments
+      description: This endpoint gets the list of subscriptions to a thread. Corresponds to `liveblocks.getThreadSubscriptions`.
+      operationId: get-thread-subscriptions
+      parameters:
+      - name: roomId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the room
+          example: my-room-id
+      - name: threadId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the thread
+          example: th_abc123
+      responses:
+        '200':
+          description: Success.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetThreadSubscriptionsResponse'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404-thread'
+  /rooms/{roomId}/threads/{threadId}/comments:
+    post:
+      summary: Create comment
+      description: 'This endpoint creates a new comment, adding it as a reply to a thread. Corresponds to `liveblocks.createComment`.
+
+
+        A comment’s body is an array of paragraphs, each containing child nodes. Here’s an example of how to construct a comment’s body, which can be submitted under `body`.
+
+
+        ```json
+
+        {
+
+        "version": 1,
+
+        "content": [
+
+        {
+
+        "type": "paragraph",
+
+        "children": [{ "text": "Hello " }, { "text": "world", "bold": true }]
+
+        }
+
+        ]
+
+        }
+
+        ```
+
+
+        `metadata` supports maximum 50 entries. Key length has a limit of 40 characters maximum. Value length has a limit of 4000 characters maximum for strings.'
+      tags:
+      - Comments
+      operationId: create-comment
+      parameters:
+      - name: roomId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the room
+          example: my-room-id
+      - name: threadId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the thread
+          example: th_abc123
+      responses:
+        '200':
+          description: Success. Returns the created comment.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+              examples:
+                example:
+                  value:
+                    type: comment
+                    threadId: thread-id
+                    roomId: room-id
+                    id: comment-id
+                    userId: alice
+                    createdAt: '2022-07-13T14:32:50.697Z'
+                    body: {}
+                    metadata: {}
+                    reactions: []
+                    attachments: []
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404-thread'
+        '409':
+          $ref: '#/components/responses/409-comment'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCommentRequestBody'
+            examples:
+              example:
+                value:
+                  userId: alice
+                  createdAt: '2022-07-13T14:32:50.697Z'
+                  body:
+                    version: 1
+                    content: []
+                  metadata:
+                    tag: important
+                    spam: false
+  /rooms/{roomId}/threads/{threadId}/comments/{commentId}:
+    get:
+      summary: Get comment
+      tags:
+      - Comments
+      description: This endpoint returns a comment by its ID. Corresponds to `liveblocks.getComment`.
+      operationId: get-comment
+      parameters:
+      - name: roomId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the room
+          example: my-room-id
+      - name: threadId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the thread
+          example: th_abc123
+      - name: commentId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the comment
+          example: cm_abc123
+      responses:
+        '200':
+          description: Success. Returns the requested comment.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+              examples:
+                Success:
+                  value:
+                    type: comment
+                    threadId: thread-id
+                    roomId: room-id
+                    id: comment-id
+                    userId: alice
+                    createdAt: '2019-08-24T14:15:22Z'
+                    editedAt: '2019-08-24T14:15:22Z'
+                    deletedAt: '2019-08-24T14:15:22Z'
+                    body: {}
+                    metadata: {}
+                    reactions: []
+                    attachments: []
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404-thread'
+    post:
+      summary: Edit comment
+      description: 'This endpoint edits the specified comment. Corresponds to `liveblocks.editComment`.
+
+
+        A comment’s body is an array of paragraphs, each containing child nodes. Here’s an example of how to construct a comment’s body, which can be submitted under `body`.
+
+
+        ```json
+
+        {
+
+        "version": 1,
+
+        "content": [
+
+        {
+
+        "type": "paragraph",
+
+        "children": [{ "text": "Hello " }, { "text": "world", "bold": true }]
+
+        }
+
+        ]
+
+        }
+
+        ```'
+      tags:
+      - Comments
+      operationId: edit-comment
+      parameters:
+      - name: roomId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the room
+          example: my-room-id
+      - name: threadId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the thread
+          example: th_abc123
+      - name: commentId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the comment
+          example: cm_abc123
+      responses:
+        '200':
+          description: Success. Returns the edited comment.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+              examples:
+                example:
+                  value:
+                    type: comment
+                    threadId: thread-id
+                    roomId: room-id
+                    id: comment-id
+                    userId: alice
+                    createdAt: '2023-07-13T14:32:50.697Z'
+                    body: {}
+                    metadata: {}
+                    reactions: []
+                    attachments: []
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404-thread'
+        '409':
+          $ref: '#/components/responses/409-comment'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EditCommentRequestBody'
+            examples:
+              example:
+                value:
+                  editedAt: '2023-07-13T14:32:50.697Z'
+                  body:
+                    version: 1
+                    content: []
+    delete:
+      summary: Delete comment
+      tags:
+      - Comments
+      parameters:
+      - name: roomId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the room
+          example: my-room-id
+      - name: threadId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the thread
+          example: th_abc123
+      - name: commentId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the comment
+          example: cm_abc123
+      responses:
+        '204':
+          description: Success. The comment was deleted
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404-comment'
+      operationId: delete-comment
+      description: This endpoint deletes a comment. A deleted comment is no longer accessible from the API or the dashboard and it cannot be restored. Corresponds to `liveblocks.deleteComment`.
+  /rooms/{roomId}/threads/{threadId}/comments/{commentId}/add-reaction:
+    post:
+      summary: Add comment reaction
+      description: This endpoint adds a reaction to a comment. Corresponds to `liveblocks.addCommentReaction`.
+      tags:
+      - Comments
+      operationId: add-comment-reaction
+      parameters:
+      - name: roomId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the room
+          example: my-room-id
+      - name: threadId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the thread
+          example: th_abc123
+      - name: commentId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the comment
+          example: cm_abc123
+      responses:
+        '200':
+          description: Success. Returns the created reaction.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentReaction'
+              examples:
+                example:
+                  value:
+                    emoji: 👨‍👩‍👧
+                    createdAt: '2022-07-13T14:32:50.697Z'
+                    userId: alice
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404-comment'
+        '409':
+          $ref: '#/components/responses/409-comment-reaction'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddCommentReactionRequestBody'
+            examples:
+              example:
+                value:
+                  emoji: 👨‍👩‍👧
+                  createdAt: '2022-07-13T14:32:50.697Z'
+                  userId: alice
+  /rooms/{roomId}/threads/{threadId}/comments/{commentId}/remove-reaction:
+    post:
+      summary: Remove comment reaction
+      description: This endpoint removes a comment reaction. A deleted comment reaction is no longer accessible from the API or the dashboard and it cannot be restored. Corresponds to `liveblocks.removeCommentReaction`.
+      tags:
+      - Comments
+      operationId: remove-comment-reaction
+      parameters:
+      - name: roomId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the room
+          example: my-room-id
+      - name: threadId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the thread
+          example: th_abc123
+      - name: commentId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the comment
+          example: cm_abc123
+      responses:
+        '204':
+          description: Success. The comment reaction was deleted
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404-comment-reaction'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RemoveCommentReactionRequestBody'
+            examples:
+              example:
+                value:
+                  emoji: 👨‍👩‍👧
+                  userId: alice
+                  removedAt: '2022-07-13T14:32:50.697Z'
+  /rooms/{roomId}/attachments/{attachmentId}:
+    get:
+      summary: Get attachment
+      description: Gets an attachment's metadata and a presigned download URL. The URL expires after 1 hour.
+      tags:
+      - Comments
+      operationId: get-attachment
+      parameters:
+      - name: roomId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the room
+          example: my-room-id
+      - name: attachmentId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the attachment
+          example: at_abc123
+      responses:
+        '200':
+          description: Success. Returns the attachment metadata with a presigned download URL.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AttachmentWithUrl'
+              examples:
+                Success:
+                  value:
+                    type: attachment
+                    id: at_abc123
+                    mimeType: image/png
+                    name: screenshot.png
+                    size: 12345
+                    url: https://example.com/at_abc123?X-Amz-Expires=3600&X-Amz-Signature=...
+                    expiresAt: '2026-03-16T14:00:00.000Z'
+        '401':
+          $ref: '#/components/responses/401'
+        '404':
+          description: Attachment not found
+  /rooms/{roomId}/attachments/{attachmentId}/upload/{name}:
+    put:
+      summary: Upload attachment
+      description: Uploads a file's bytes and returns a draft comment attachment. Pass the returned attachment ID in the comment's attachment IDs when creating or editing a comment. For large files, use the multipart upload operations instead.
+      tags:
+      - Comments
+      operationId: upload-attachment
+      parameters:
+      - name: roomId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the room
+          example: my-room-id
+      - name: attachmentId
+        in: path
+        required: true
+        schema:
+          type: string
+          pattern: ^at_[A-Za-z0-9_-]{21}$
+          description: ID for the attachment
+          example: at_abc123456789012345678
+      - name: name
+        in: path
+        required: true
+        schema:
+          type: string
+          description: Name of the file
+          example: screenshot.png
+      - name: userId
+        in: query
+        required: true
+        schema:
+          type: string
+          description: ID of the user uploading the attachment
+          example: alice
+      - name: fileSize
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 0
+          description: Expected file size in bytes
+          example: 12345
+      requestBody:
+        required: true
+        content:
+          application/octet-stream:
+            schema:
+              type: string
+              format: binary
+      responses:
+        '200':
+          description: Success. Returns the uploaded draft attachment.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentAttachment'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '409':
+          description: An attachment with this ID already exists.
+        '413':
+          description: The attachment exceeds the project's per-file upload limit.
+        '422':
+          $ref: '#/components/responses/422'
+  /rooms/{roomId}/attachments/{attachmentId}/multipart/{name}:
+    post:
+      summary: Create attachment multipart upload
+      description: Starts a multipart upload for a draft comment attachment.
+      tags:
+      - Comments
+      operationId: create-attachment-multipart-upload
+      parameters:
+      - name: roomId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the room
+          example: my-room-id
+      - name: attachmentId
+        in: path
+        required: true
+        schema:
+          type: string
+          pattern: ^at_[A-Za-z0-9_-]{21}$
+          description: ID for the attachment
+          example: at_abc123456789012345678
+      - name: name
+        in: path
+        required: true
+        schema:
+          type: string
+          description: Name of the file
+          example: recording.mp4
+      - name: fileSize
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 0
+          description: Expected file size in bytes
+          example: 10485760
+      responses:
+        '200':
+          description: Success. Returns identifiers for the multipart upload.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AttachmentMultipartUpload'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '409':
+          description: An attachment with this ID already exists.
+        '413':
+          description: The attachment exceeds the project's per-file upload limit.
+        '422':
+          $ref: '#/components/responses/422'
+  /rooms/{roomId}/attachments/{attachmentId}/multipart/{uploadId}/{partNumber}:
+    put:
+      summary: Upload attachment multipart part
+      description: Uploads one part of an attachment multipart upload.
+      tags:
+      - Comments
+      operationId: upload-attachment-multipart-part
+      parameters:
+      - name: roomId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the room
+          example: my-room-id
+      - name: attachmentId
+        in: path
+        required: true
+        schema:
+          type: string
+          pattern: ^at_[A-Za-z0-9_-]{21}$
+          description: ID of the attachment
+          example: at_abc123456789012345678
+      - name: uploadId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID returned when the multipart upload was created
+      - name: partNumber
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+          description: One-based part number
+          example: 1
+      requestBody:
+        required: true
+        content:
+          application/octet-stream:
+            schema:
+              type: string
+              format: binary
+      responses:
+        '200':
+          description: Success. Returns the uploaded part's number and ETag.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AttachmentMultipartPart'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '409':
+          description: The multipart upload belongs to a different project or room.
+  /rooms/{roomId}/attachments/{attachmentId}/multipart/{uploadId}/complete:
+    post:
+      summary: Complete attachment multipart upload
+      description: Completes a multipart upload and returns a draft comment attachment. Pass the returned attachment ID in the comment's attachment IDs when creating or editing a comment.
+      tags:
+      - Comments
+      operationId: complete-attachment-multipart-upload
+      parameters:
+      - name: roomId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the room
+          example: my-room-id
+      - name: attachmentId
+        in: path
+        required: true
+        schema:
+          type: string
+          pattern: ^at_[A-Za-z0-9_-]{21}$
+          description: ID of the attachment
+          example: at_abc123456789012345678
+      - name: uploadId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID returned when the multipart upload was created
+      - name: userId
+        in: query
+        required: true
+        schema:
+          type: string
+          description: ID of the user uploading the attachment
+          example: alice
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CompleteAttachmentMultipartUploadRequestBody'
+      responses:
+        '200':
+          description: Success. Returns the uploaded draft attachment.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentAttachment'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '409':
+          description: The multipart upload belongs to a different project or room.
+        '413':
+          description: The completed attachment exceeds the project's per-file upload limit.
+        '422':
+          $ref: '#/components/responses/422'
+  /rooms/{roomId}/attachments/{attachmentId}/multipart/{uploadId}:
+    delete:
+      summary: Abort attachment multipart upload
+      description: Aborts a multipart upload and discards its uploaded parts.
+      tags:
+      - Comments
+      operationId: abort-attachment-multipart-upload
+      parameters:
+      - name: roomId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the room
+          example: my-room-id
+      - name: attachmentId
+        in: path
+        required: true
+        schema:
+          type: string
+          pattern: ^at_[A-Za-z0-9_-]{21}$
+          description: ID of the attachment
+          example: at_abc123456789012345678
+      - name: uploadId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID returned when the multipart upload was created
+      responses:
+        '204':
+          description: Success. The multipart upload was aborted.
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '409':
+          description: The multipart upload belongs to a different project or room.
+  /rooms/{roomId}/threads/{threadId}/comments/{commentId}/metadata:
+    post:
+      summary: Edit comment metadata
+      tags:
+      - Comments
+      description: 'This endpoint edits the metadata of a comment. The metadata is a JSON object that can be used to store any information you want about the comment, in `string`, `number`, or `boolean` form. Set a property to `null` to remove it. Corresponds to `liveblocks.editCommentMetadata`.
+
+
+        `metadata` supports maximum 50 entries. Key length has a limit of 40 characters maximum. Value length has a limit of 4000 characters maximum for strings.'
+      operationId: edit-comment-metadata
+      parameters:
+      - name: roomId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the room
+          example: my-room-id
+      - name: threadId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the thread
+          example: th_abc123
+      - name: commentId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the comment
+          example: cm_abc123
+      responses:
+        '200':
+          description: Success. Returns the updated metadata.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentMetadata'
+              examples:
+                Success:
+                  value:
+                    tag: important
+                    reviewed: false
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404-comment'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EditCommentMetadataRequestBody'
+            examples:
+              example:
+                value:
+                  metadata:
+                    tag: null
+                    reviewed: true
+                  userId: alice
+                  updatedAt: '2023-07-13T14:32:50.697Z'
+  /rooms/{roomId}/threads/{threadId}/inbox-notifications:
+    parameters:
+    - schema:
+        type: string
+        example: my-room-id
+      name: roomId
+      in: path
+      required: true
+    - schema:
+        type: string
+        example: th_abc123
+      name: threadId
+      in: path
+      required: true
+    get:
+      summary: Get thread inbox notifications
+      tags:
+      - Comments
+      description: This endpoint returns the inbox notifications associated with a specific thread. Because this endpoint is not user-scoped, each notification includes a `userId` field identifying which user the notification belongs to. Only thread-kind notifications are returned.
+      operationId: get-thread-inbox-notifications
+      parameters:
+      - name: roomId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the room
+          example: my-room-id
+      - name: threadId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the thread
+          example: th_abc123
+      responses:
+        '200':
+          description: Success. Returns the inbox notifications for the thread.
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Response
+                properties:
+                  data:
+                    type: array
+                    items:
+                      allOf:
+                      - $ref: '#/components/schemas/InboxNotificationThreadData'
+                      - type: object
+                        properties:
+                          userId:
+                            type: string
+                            description: The user ID this notification belongs to.
+                        required:
+                        - userId
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+components:
+  schemas:
+    ThreadMetadata:
+      type: object
+      title: ThreadMetadata
+      additionalProperties:
+        oneOf:
+        - type: string
+          maxLength: 4000
+        - type: number
+        - type: boolean
+      required: []
+      examples:
+      - color: blue
+        age: 25
+      description: Custom metadata attached to a thread. Supports maximum 50 entries. Key length has a limit of 40 characters maximum. Value length has a limit of 4000 characters maximum for strings.
+      maxProperties: 50
+      propertyNames:
+        maxLength: 40
+    Error:
+      title: Error
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error code
+        message:
+          type: string
+          description: Message explaining the error
+        suggestion:
+          type: string
+          description: A suggestion on how to fix the error
+        docs:
+          type: string
+          description: A link to the documentation
+    GetThreadSubscriptionsResponse:
+      type: object
+      title: GetThreadSubscriptionsResponse
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserSubscription'
+      required:
+      - data
+      additionalProperties: false
+      example:
+        data:
+        - kind: thread
+          subjectId: th_abc123
+          createdAt: '2022-07-13T14:32:50.697Z'
+          userId: alice
+    AttachmentMultipartPart:
+      type: object
+      title: AttachmentMultipartPart
+      properties:
+        partNumber:
+          type: integer
+          minimum: 1
+        etag:
+          type: string
+      required:
+      - partNumber
+      - etag
+      additionalProperties: false
+    CommentAttachment:
+      type: object
+      title: CommentAttachment
+      properties:
+        type:
+          type: string
+          const: attachment
+        id:
+          type: string
+        mimeType:
+          type: string
+        name:
+          type: string
+        size:
+          type: integer
+      required:
+      - type
+      - id
+      - mimeType
+      - name
+      - size
+      additionalProperties: false
+      example:
+        type: attachment
+        id: at_abc123
+        mimeType: image/png
+        name: screenshot.png
+        size: 12345
+    AddCommentReactionRequestBody:
+      type: object
+      title: AddCommentReactionRequestBody
+      properties:
+        userId:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        emoji:
+          type: string
+      required:
+      - userId
+      - emoji
+      additionalProperties: false
+      examples:
+      - emoji: 👨‍👩‍👧
+        createdAt: '2022-07-13T14:32:50.697Z'
+        userId: alice
+    MarkThreadAsResolvedRequestBody:
+      type: object
+      title: MarkThreadAsResolvedRequestBody
+      required:
+      - userId
+      properties:
+        userId:
+          type: string
+          description: The user ID of the user who marked the thread as resolved.
+      additionalProperties: false
+      example:
+        userId: alice
+    RemoveCommentReactionRequestBody:
+      type: object
+      title: RemoveCommentReactionRequestBody
+      properties:
+        userId:
+          type: string
+        removedAt:
+          type: string
+          format: date-time
+        emoji:
+          type: string
+      required:
+      - userId
+      - emoji
+      additionalProperties: false
+      examples:
+      - emoji: 👨‍👩‍👧
+        removedAt: '2022-07-13T14:32:50.697Z'
+        userId: alice
+    SubscribeToThreadRequestBody:
+      type: object
+      title: SubscribeToThreadRequestBody
+      required:
+      - userId
+      properties:
+        userId:
+          type: string
+      additionalProperties: false
+      example:
+        userId: alice
+    CreateThreadRequestBody:
+      title: CreateThreadRequestBody
+      type: object
+      properties:
+        comment:
+          type: object
+          properties:
+            userId:
+              type: string
+            createdAt:
+              type: string
+              format: date-time
+            body:
+              $ref: '#/components/schemas/CommentBody'
+            metadata:
+              $ref: '#/components/schemas/CommentMetadata'
+            attachmentIds:
+              type: array
+              items:
+                type: string
+              maxItems: 10
+          required:
+          - userId
+          - body
+          additionalProperties: false
+        metadata:
+          $ref: '#/components/schemas/ThreadMetadata'
+        visibility:
+          type: string
+          enum:
+          - public
+          - private
+          default: public
+      required:
+      - comment
+      examples:
+      - comment:
+          userId: alice
+          createdAt: '2022-07-13T14:32:50.697Z'
+          body:
+            version: 1
+            content: []
+          metadata:
+            tag: important
+            spam: false
+        metadata:
+          color: blue
+        visibility: private
+    Thread:
+      type: object
+      title: Thread
+      properties:
+        type:
+          const: thread
+        id:
+          type: string
+        roomId:
+          type: string
+        comments:
+          type: array
+          items:
+            $ref: '#/components/schemas/Comment'
+        createdAt:
+          type: string
+          format: date-time
+        metadata:
+          $ref: '#/components/schemas/ThreadMetadata'
+        resolved:
+          type: boolean
+        visibility:
+          type: string
+          enum:
+          - public
+          - private
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+      - type
+      - id
+      - roomId
+      - comments
+      - createdAt
+      - updatedAt
+      - metadata
+      - resolved
+      - visibility
+      example:
+        type: thread
+        id: th_abc123
+        roomId: my-room-id
+        comments:
+        - type: comment
+          threadId: th_abc123
+          roomId: my-room-id
+          id: cm_abc123
+          userId: alice
+          createdAt: '2022-07-13T14:32:50.697Z'
+          body:
+            version: 1
+            content: []
+          metadata: {}
+          reactions: []
+          attachments: []
+        createdAt: '2022-07-13T14:32:50.697Z'
+        updatedAt: '2022-07-13T14:32:50.697Z'
+        metadata:
+          color: blue
+        resolved: false
+        visibility: public
+    CompleteAttachmentMultipartUploadRequestBody:
+      type: object
+      title: CompleteAttachmentMultipartUploadRequestBody
+      properties:
+        parts:
+          type: array
+          items:
+            $ref: '#/components/schemas/AttachmentMultipartPart'
+      required:
+      - parts
+      additionalProperties: false
+    EditCommentMetadataRequestBody:
+      title: EditCommentMetadataRequestBody
+      type: object
+      properties:
+        metadata:
+          type: object
+          additionalProperties:
+            oneOf:
+            - type: string
+            - type: number
+            - type: boolean
+            - type: 'null'
+        userId:
+          type: string
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+      - metadata
+      - userId
+      additionalProperties: false
+      examples:
+      - metadata:
+          tag: important
+        userId: alice
+        updatedAt: '2023-07-13T14:32:50.697Z'
+    AttachmentWithUrl:
+      type: object
+      title: AttachmentWithUrl
+      properties:
+        type:
+          type: string
+          const: attachment
+        id:
+          type: string
+        mimeType:
+          type: string
+        name:
+          type: string
+        size:
+          type: integer
+        url:
+          type: string
+          description: Presigned download URL for the attachment
+        expiresAt:
+          type: string
+          format: date-time
+          description: ISO 8601 timestamp when the presigned URL expires
+      required:
+      - type
+      - id
+      - mimeType
+      - name
+      - size
+      - url
+      - expiresAt
+      additionalProperties: false
+      example:
+        type: attachment
+        id: at_abc123
+        mimeType: image/png
+        name: screenshot.png
+        size: 12345
+        url: https://example.com/at_abc123?X-Amz-Expires=3600&X-Amz-Signature=...
+        expiresAt: '2026-03-16T14:00:00.000Z'
+    UserSubscription:
+      title: UserSubscription
+      allOf:
+      - $ref: '#/components/schemas/Subscription'
+      - type: object
+        properties:
+          userId:
+            type: string
+      example:
+        kind: thread
+        subjectId: th_abc123
+        createdAt: '2022-07-13T14:32:50.697Z'
+        userId: alice
+    UnsubscribeFromThreadRequestBody:
+      type: object
+      title: UnsubscribeFromThreadRequestBody
+      required:
+      - userId
+      properties:
+        userId:
+          type: string
+      additionalProperties: false
+      example:
+        userId: alice
+    GetThreadsResponse:
+      title: GetThreadsResponse
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Thread'
+      required:
+      - data
+      additionalProperties: false
+      example:
+        data:
+        - type: thread
+          id: th_abc123
+          roomId: my-room-id
+          comments:
+          - type: comment
+            threadId: th_abc123
+            roomId: my-room-id
+            id: cm_abc123
+            userId: alice
+            createdAt: '2022-07-13T14:32:50.697Z'
+            body:
+              version: 1
+              content: []
+            metadata: {}
+            reactions: []
+            attachments: []
+          createdAt: '2022-07-13T14:32:50.697Z'
+          updatedAt: '2022-07-13T14:32:50.697Z'
+          metadata: {}
+          resolved: false
+          visibility: public
+    GetThreadParticipantsResponse:
+      title: GetThreadParticipantsResponse
+      type: object
+      properties:
+        participantIds:
+          type: array
+          items:
+            type: string
+      required:
+      - participantIds
+      additionalProperties: false
+      example:
+        participantIds:
+        - user-1
+        - user-2
+    CommentMetadata:
+      type: object
+      title: CommentMetadata
+      additionalProperties:
+        oneOf:
+        - type: string
+          maxLength: 4000
+        - type: number
+        - type: boolean
+      required: []
+      examples:
+      - tag: important
+        spam: false
+      description: Custom metadata attached to a comment. Supports maximum 50 entries. Key length has a limit of 40 characters maximum. Value length has a limit of 4000 characters maximum for strings.
+      maxProperties: 50
+      propertyNames:
+        maxLength: 40
+    Subscription:
+      title: Subscription
+      type: object
+      properties:
+        kind:
+          type: string
+        subjectId:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+      required:
+      - kind
+      - subjectId
+      - createdAt
+      additionalProperties: false
+      example:
+        kind: thread
+        subjectId: th_abc123
+        createdAt: '2022-07-13T14:32:50.697Z'
+    CommentBody:
+      type: object
+      title: CommentBody
+      properties:
+        version:
+          type: integer
+        content:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+      required:
+      - version
+      - content
+      additionalProperties: false
+      example:
+        version: 1
+        content:
+        - type: paragraph
+          children:
+          - text: 'Hello '
+          - text: world
+            bold: true
+    CreateCommentRequestBody:
+      title: CreateCommentRequestBody
+      type: object
+      properties:
+        userId:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        body:
+          $ref: '#/components/schemas/CommentBody'
+        metadata:
+          $ref: '#/components/schemas/CommentMetadata'
+        attachmentIds:
+          type: array
+          items:
+            type: string
+          maxItems: 10
+      additionalProperties: false
+      required:
+      - userId
+      - body
+      examples:
+      - userId: alice
+        createdAt: '2022-07-13T14:32:50.697Z'
+        body:
+          version: 1
+          content: []
+        metadata:
+          tag: important
+          spam: false
+    MarkThreadAsUnresolvedRequestBody:
+      type: object
+      title: MarkThreadAsUnresolvedRequestBody
+      required:
+      - userId
+      properties:
+        userId:
+          type: string
+          description: The user ID of the user who marked the thread as unresolved.
+      additionalProperties: false
+      example:
+        userId: alice
+    AttachmentMultipartUpload:
+      type: object
+      title: AttachmentMultipartUpload
+      properties:
+        attachmentId:
+          type: string
+          pattern: ^at_[A-Za-z0-9_-]{21}$
+        uploadId:
+          type: string
+      required:
+      - attachmentId
+      - uploadId
+      additionalProperties: false
+    EditCommentRequestBody:
+      title: EditCommentRequestBody
+      type: object
+      properties:
+        editedAt:
+          type: string
+          format: date-time
+        body:
+          $ref: '#/components/schemas/CommentBody'
+        metadata:
+          $ref: '#/components/schemas/CommentMetadata'
+        attachmentIds:
+          type: array
+          items:
+            type: string
+          maxItems: 10
+      required:
+      - body
+      additionalProperties: false
+      examples:
+      - editedAt: '2022-07-13T14:32:50.697Z'
+        body:
+          version: 1
+          content: []
+        metadata:
+          tag: important
+          spam: false
+    InboxNotificationThreadData:
+      title: InboxNotificationThreadData
+      type: object
+      properties:
+        id:
+          type: string
+        kind:
+          type: string
+        threadId:
+          type: string
+        roomId:
+          type: string
+        organizationId:
+          type: string
+        readAt:
+          oneOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+        notifiedAt:
+          type: string
+          format: date-time
+      required:
+      - kind
+      - id
+      - roomId
+      - threadId
+      - notifiedAt
+      - readAt
+      example:
+        kind: thread
+        id: in_abc123
+        roomId: my-room-id
+        organizationId: org_123456789
+        threadId: th_abc123
+        notifiedAt: '2024-01-15T10:30:00.000Z'
+        readAt: null
+    Comment:
+      type: object
+      title: Comment
+      properties:
+        type:
+          const: comment
+        threadId:
+          type: string
+        roomId:
+          type: string
+        id:
+          type: string
+        userId:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        editedAt:
+          type: string
+          format: date-time
+        deletedAt:
+          type: string
+          format: date-time
+        body:
+          $ref: '#/components/schemas/CommentBody'
+        metadata:
+          $ref: '#/components/schemas/CommentMetadata'
+        reactions:
+          type: array
+          items:
+            $ref: '#/components/schemas/CommentReaction'
+        attachments:
+          type: array
+          items:
+            $ref: '#/components/schemas/CommentAttachment'
+      required:
+      - type
+      - threadId
+      - roomId
+      - id
+      - userId
+      - createdAt
+      - metadata
+      - reactions
+      - attachments
+      examples:
+      - type: comment
+        threadId: thread-id
+        roomId: room-id
+        id: comment-id
+        userId: string
+        createdAt: '2019-08-24T14:15:22Z'
+        editedAt: '2019-08-24T14:15:22Z'
+        deletedAt: '2019-08-24T14:15:22Z'
+        body: {}
+        metadata: {}
+        reactions: []
+        attachments: []
+    CommentReaction:
+      type: object
+      title: CommentReaction
+      properties:
+        userId:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        emoji:
+          type: string
+      required:
+      - userId
+      - emoji
+      - createdAt
+      additionalProperties: false
+      examples:
+      - emoji: 👨‍👩‍👧
+        createdAt: '2022-07-13T14:32:50.697Z'
+        userId: alice
+    EditThreadMetadataRequestBody:
+      title: EditThreadMetadataRequestBody
+      type: object
+      properties:
+        metadata:
+          type: object
+          additionalProperties:
+            oneOf:
+            - type: string
+            - type: number
+            - type: boolean
+            - type: 'null'
+        userId:
+          type: string
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+      - metadata
+      - userId
+      examples:
+      - metadata:
+          color: blue
+        userId: alice
+        createdAt: '2023-07-13T14:32:50.697Z'
+  responses:
+    409-comment:
+      description: Comment already exists.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            RESOURCE_ALREADY_EXISTS:
+              value:
+                error: RESOURCE_ALREADY_EXISTS
+                message: Comment already exists
+        application/xml:
+          schema:
+            type: object
+            properties: {}
+    404-comment-reaction:
+      description: Comment not found.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            RESOURCE_NOT_FOUND:
+              value:
+                error: RESOURCE_NOT_FOUND
+                message: Comment reaction not found
+        application/xml:
+          schema:
+            type: object
+            properties: {}
+    '422':
+      description: Unprocessable entity.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            UNPROCESSABLE_ENTITY:
+              value:
+                error: UNPROCESSABLE_ENTITY
+                message: 'Missing key: ''defaultAccesses''.'
+                suggestion: Please ensure the data follows the correct format.
+                docs: ''
+    '401':
+      description: Missing or wrong credentials.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            WRONG_KEY_USED:
+              value:
+                error: WRONG_KEY_USED
+                message: Public key instead of the secret key.
+                suggestion: 'Please use your secret key instead of the public key, the secret key is available in the dashboard: https://liveblocks.io/dashboard/apikeys.'
+                docs: ''
+            MISSING_SECRET_KEY:
+              value:
+                error: MISSING_SECRET_KEY
+                message: Missing secret key in authentication header
+                suggestion: 'Please use a secret key, the secret key is available in the dashboard: https://liveblocks.io/dashboard/apikeys'
+                docs: ''
+            MISSING_MANAGEMENT_API_ACCESS_TOKEN:
+              value:
+                error: MISSING_MANAGEMENT_API_ACCESS_TOKEN
+                message: Missing management api access token in authentication header
+                suggestion: Please provide a management api access token in the authentication header
+                docs: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+            INVALID_MANAGEMENT_API_ACCESS_TOKEN:
+              value:
+                error: INVALID_MANAGEMENT_API_ACCESS_TOKEN
+                message: Invalid management api access token
+                suggestion: Please provide a valid management api access token in the authentication header
+                docs: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+            REVOKED_MANAGEMENT_API_ACCESS_TOKEN:
+              value:
+                error: REVOKED_MANAGEMENT_API_ACCESS_TOKEN
+                message: Revoked management api access token
+                suggestion: Please provide an active management api access token in the authentication header
+                docs: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+            EXPIRED_MANAGEMENT_API_ACCESS_TOKEN:
+              value:
+                error: EXPIRED_MANAGEMENT_API_ACCESS_TOKEN
+                message: Expired management api access token
+                suggestion: Please provide a not expired management api access token in the authentication header
+                docs: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+    404-comment:
+      description: Comment not found.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            RESOURCE_NOT_FOUND:
+              value:
+                error: RESOURCE_NOT_FOUND
+                message: Comment not found
+        application/xml:
+          schema:
+            type: object
+            properties: {}
+    404-thread:
+      description: Thread not found.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            RESOURCE_NOT_FOUND:
+              value:
+                error: RESOURCE_NOT_FOUND
+                message: Thread not found
+        application/xml:
+          schema:
+            type: object
+            properties: {}
+    409-comment-reaction:
+      description: Reaction already exists.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            RESOURCE_ALREADY_EXISTS:
+              value:
+                error: RESOURCE_ALREADY_EXISTS
+                message: Reaction already exists
+        application/xml:
+          schema:
+            type: object
+            properties: {}
+    '403':
+      description: Unauthorized access.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            INVALID_SECRET_KEY:
+              value:
+                error: INVALID_SECRET_KEY
+                message: Invalid secret key.
+                suggestion: 'Please use a valid secret key, the secret key is available in the dashboard: https://liveblocks.io/dashboard/apikeys.'
+                docs: ''
+            INVALID_PUBLIC_KEY:
+              value:
+                error: INVALID_PUBLIC_KEY
+                message: Invalid public key
+                suggestion: 'Please use a valid public key, the public key is available in the dashboard: https://liveblocks.io/dashboard/apikeys'
+                docs: ''
+            UNAUTHORIZED_ROOM_ACCESS:
+              value:
+                error: UNAUTHORIZED_ROOM_ACCESS
+                message: The user does not have permission to access the room.
+                suggestion: Please add the user’s ID or one of the user’s group IDs to the room first.
+                docs: ''
+            INVALID_MANAGEMENT_API_ACCESS_TOKEN_SCOPE:
+              value:
+                error: INVALID_MANAGEMENT_API_ACCESS_TOKEN_SCOPE
+                message: Invalid management api access token scope
+                suggestion: 'Please provide a management api access token with required scope: ''read:all''.'
+                docs: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+            FEATURE_NOT_ENABLED:
+              value:
+                error: FEATURE_NOT_ENABLED
+                message: The "Management API" feature is not enabled for this account.
+                suggestion: If you want access to this feature, please contact us at support@liveblocks.io
+                docs: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+            PUBLIC_KEY_NOT_ENABLED:
+              value:
+                error: PUBLIC_KEY_NOT_ENABLED
+                message: Public key not enabled
+                suggestion: Please enable the public key for the project
+                docs: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+    '404':
+      description: Resource not found.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            ROOM_NOT_FOUND:
+              value:
+                error: ROOM_NOT_FOUND
+                message: Room not found.
+                suggestion: 'Please use a valid room ID, room IDs are available in the dashboard: https://liveblocks.io/dashboard/rooms.'
+                docs: ''
+            WEBHOOK_NOT_FOUND:
+              value:
+                error: WEBHOOK_NOT_FOUND
+                message: Webhook "ep_xxx" not found.
+                suggestion: 'Please use a valid webhook ID, webhook IDs are available in the dashboard: https://liveblocks.io/dashboard/webhooks'
+                docs: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+            NOT_EXISTING_MANAGEMENT_API_ACCESS_TOKEN:
+              value:
+                error: NOT_EXISTING_MANAGEMENT_API_ACCESS_TOKEN
+                message: Not existing management api access token
+                suggestion: Please provide an existing management api access token in the authentication header
+                docs: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+    409-thread:
+      description: Thread already exists.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            RESOURCE_ALREADY_EXISTS:
+              value:
+                error: RESOURCE_ALREADY_EXISTS
+                message: Thread already exists
+        application/xml:
+          schema:
+            type: object
+            properties: {}
   securitySchemes:
-    bearerAuth:
-      type: http
-      scheme: bearer
-      description: Authenticate with a Liveblocks secret key as a Bearer token.
+    Authorization:
+      name: Bearer sk_xxx
+      type: apiKey
+      in: header
+externalDocs:
+  description: Liveblocks REST API reference
+  url: https://liveblocks.io/docs/api-reference/rest-api-endpoints

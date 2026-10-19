@@ -141,16 +141,6 @@ apis:
     url: https://www.npmjs.com/package/@liveblocks/node
   - type: SDKs
     url: https://www.npmjs.com/package/@liveblocks/yjs
-- aid: liveblocks:liveblocks-active-users-api
-  name: Liveblocks Active Users API
-  description: The Active Users API from Liveblocks — 2 operation(s) for active users.
-  humanURL: https://liveblocks.io/docs/api-reference/rest-api-endpoints
-  baseURL: https://api.liveblocks.io/v2
-  tags:
-  - Active Users
-  properties:
-  - type: OpenAPI
-    url: openapi/liveblocks-active-users-api-openapi.yml
 - aid: liveblocks:liveblocks-comments-api
   name: Liveblocks Comments API
   description: The Comments API from Liveblocks — 2 operation(s) for comments.
@@ -161,38 +151,6 @@ apis:
   properties:
   - type: OpenAPI
     url: openapi/liveblocks-comments-api-openapi.yml
-- aid: liveblocks:liveblocks-events-api
-  name: Liveblocks Events API
-  description: The Events API from Liveblocks — 1 operation(s) for events.
-  humanURL: https://liveblocks.io/docs/api-reference/rest-api-endpoints
-  baseURL: https://api.liveblocks.io/v2
-  tags:
-  - Event
-  tags_raw:
-  - Events
-  properties:
-  - type: OpenAPI
-    url: openapi/liveblocks-events-api-openapi.yml
-- aid: liveblocks:liveblocks-reactions-api
-  name: Liveblocks Reactions API
-  description: The Reactions API from Liveblocks — 2 operation(s) for reactions.
-  humanURL: https://liveblocks.io/docs/api-reference/rest-api-endpoints
-  baseURL: https://api.liveblocks.io/v2
-  tags:
-  - Reactions
-  properties:
-  - type: OpenAPI
-    url: openapi/liveblocks-reactions-api-openapi.yml
-- aid: liveblocks:liveblocks-rooms-api
-  name: Liveblocks Rooms API
-  description: The Rooms API from Liveblocks — 6 operation(s) for rooms.
-  humanURL: https://liveblocks.io/docs/api-reference/rest-api-endpoints
-  baseURL: https://api.liveblocks.io/v2
-  tags:
-  - Rooms
-  properties:
-  - type: OpenAPI
-    url: openapi/liveblocks-rooms-api-openapi.yml
 - aid: liveblocks:liveblocks-storage-api
   name: Liveblocks Storage API
   description: The Storage API from Liveblocks — 2 operation(s) for storage.
@@ -203,26 +161,6 @@ apis:
   properties:
   - type: OpenAPI
     url: openapi/liveblocks-storage-api-openapi.yml
-- aid: liveblocks:liveblocks-threads-api
-  name: Liveblocks Threads API
-  description: The Threads API from Liveblocks — 9 operation(s) for threads.
-  humanURL: https://liveblocks.io/docs/api-reference/rest-api-endpoints
-  baseURL: https://api.liveblocks.io/v2
-  tags:
-  - Threads
-  properties:
-  - type: OpenAPI
-    url: openapi/liveblocks-threads-api-openapi.yml
-- aid: liveblocks:liveblocks-versions-api
-  name: Liveblocks Versions API
-  description: The Versions API from Liveblocks — 3 operation(s) for versions.
-  humanURL: https://liveblocks.io/docs/api-reference/rest-api-endpoints
-  baseURL: https://api.liveblocks.io/v2
-  tags:
-  - Versions
-  properties:
-  - type: OpenAPI
-    url: openapi/liveblocks-versions-api-openapi.yml
 - aid: liveblocks:liveblocks-yjs-api
   name: Liveblocks Yjs API
   description: The Yjs API from Liveblocks — 2 operation(s) for yjs.
@@ -233,6 +171,86 @@ apis:
   properties:
   - type: OpenAPI
     url: openapi/liveblocks-yjs-api-openapi.yml
+- aid: liveblocks:liveblocks-ai-api
+  name: Liveblocks AI API
+  description: The AI API from Liveblocks — 9 operation(s) for ai.
+  humanURL: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+  baseURL: https://api.liveblocks.io/v2
+  tags:
+  - AI
+  properties:
+  - type: OpenAPI
+    url: openapi/liveblocks-ai-api-openapi.yml
+- aid: liveblocks:liveblocks-auth-api
+  name: Liveblocks Auth API
+  description: The Auth API from Liveblocks — 2 operation(s) for auth.
+  humanURL: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+  baseURL: https://api.liveblocks.io/v2
+  tags:
+  - Auth
+  properties:
+  - type: OpenAPI
+    url: openapi/liveblocks-auth-api-openapi.yml
+- aid: liveblocks:liveblocks-feeds-api
+  name: Liveblocks Feeds API
+  description: The Feeds API from Liveblocks — 4 operation(s) for feeds.
+  humanURL: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+  baseURL: https://api.liveblocks.io/v2
+  tags:
+  - Feeds
+  properties:
+  - type: OpenAPI
+    url: openapi/liveblocks-feeds-api-openapi.yml
+- aid: liveblocks:liveblocks-groups-api
+  name: Liveblocks Groups API
+  description: The Groups API from Liveblocks — 5 operation(s) for groups.
+  humanURL: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+  baseURL: https://api.liveblocks.io/v2
+  tags:
+  - Groups
+  properties:
+  - type: OpenAPI
+    url: openapi/liveblocks-groups-api-openapi.yml
+- aid: liveblocks:liveblocks-management-api
+  name: Liveblocks Management API
+  description: The Management API from Liveblocks — 13 operation(s) for management.
+  humanURL: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+  baseURL: https://api.liveblocks.io/v2
+  tags:
+  - Management
+  properties:
+  - type: OpenAPI
+    url: openapi/liveblocks-management-api-openapi.yml
+- aid: liveblocks:liveblocks-notifications-api
+  name: Liveblocks Notifications API
+  description: The Notifications API from Liveblocks — 8 operation(s) for notifications.
+  humanURL: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+  baseURL: https://api.liveblocks.io/v2
+  tags:
+  - Notifications
+  properties:
+  - type: OpenAPI
+    url: openapi/liveblocks-notifications-api-openapi.yml
+- aid: liveblocks:liveblocks-room-api
+  name: Liveblocks Room API
+  description: The Room API from Liveblocks — 9 operation(s) for room.
+  humanURL: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+  baseURL: https://api.liveblocks.io/v2
+  tags:
+  - Room
+  properties:
+  - type: OpenAPI
+    url: openapi/liveblocks-room-api-openapi.yml
+- aid: liveblocks:liveblocks-version-history-api
+  name: Liveblocks Version History API
+  description: The Version History API from Liveblocks — 3 operation(s) for version history.
+  humanURL: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+  baseURL: https://api.liveblocks.io/v2
+  tags:
+  - Version History
+  properties:
+  - type: OpenAPI
+    url: openapi/liveblocks-version-history-api-openapi.yml
 common:
 - type: Plans
   url: plans/liveblocks-plans-pricing.yml

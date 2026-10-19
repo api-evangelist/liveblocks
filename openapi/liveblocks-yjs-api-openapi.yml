@@ -1,60 +1,289 @@
 openapi: 3.2.0
 info:
-  title: Liveblocks REST Yjs API
-  description: Server-side REST API for managing Liveblocks rooms, room storage, active users, broadcast events, comments and threads, Yjs documents, and version history. Authenticated with a secret key via HTTP Bearer authorization.
-  version: v2
-  contact:
-    name: Liveblocks
-    url: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+  title: Liveblocks Yjs API
+  version: '2.0'
+  description: 'The Liveblocks REST API lets you read and modify rooms, threads, notifications, users, permissions, and schemas programmatically. Authenticate requests with a secret key using the `Authorization: Bearer` header.'
 servers:
 - url: https://api.liveblocks.io/v2
-  description: Liveblocks REST API
-security:
-- bearerAuth: []
 tags:
 - name: Yjs
 paths:
   /rooms/{roomId}/ydoc:
-    parameters:
-    - $ref: '#/components/parameters/RoomId'
     get:
+      summary: Get Yjs document
+      description: This endpoint returns a JSON representation of the room’s Yjs document. Corresponds to `liveblocks.getYjsDocument`.
       tags:
       - Yjs
-      summary: Get Yjs document as JSON
-      operationId: getYdocJson
+      parameters:
+      - name: roomId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the room
+          example: my-room-id
+      - schema:
+          type: boolean
+          description: If present, YText will return formatting.
+        name: formatting
+        in: query
+        allowEmptyValue: true
+        required: false
+      - schema:
+          type: string
+          description: Returns only a single key’s value, e.g. `doc.get(key).toJSON()`.
+          example: root
+        name: key
+        in: query
+        required: false
+      - schema:
+          type: string
+          enum:
+          - ymap
+          - ytext
+          - yxmltext
+          - yxmlfragment
+          - yarray
+          description: Used with key to override the inferred type, i.e. `"ymap"` will return `doc.get(key, Y.Map)`.
+          example: ymap
+        name: type
+        in: query
+        required: false
       responses:
         '200':
-          description: Yjs document.
+          description: Success. Returns the room’s Yjs document as JSON.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetYjsDocumentResponse'
+              examples:
+                example:
+                  value:
+                    someYText: Contents of YText
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+      operationId: get-yjs-document
     put:
+      summary: Send a binary Yjs update
       tags:
       - Yjs
-      summary: Apply Yjs binary update
-      operationId: applyYdocUpdate
-      responses:
-        '204':
-          description: Update applied.
-  /rooms/{roomId}/ydoc-binary:
-    parameters:
-    - $ref: '#/components/parameters/RoomId'
-    get:
-      tags:
-      - Yjs
-      summary: Export Yjs document as binary
-      operationId: getYdocBinary
+      parameters:
+      - schema:
+          type: string
+          description: ID of the room
+          example: my-room-id
+        name: roomId
+        in: path
+        required: true
+      - name: guid
+        in: query
+        required: false
+        schema:
+          type: string
+          description: ID of the subdocument
+          example: subdoc-guid-123
       responses:
         '200':
-          description: Binary Yjs document.
+          description: Success. The given room’s Yjs doc has been updated.
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+      operationId: send-yjs-binary-update
+      description: 'This endpoint is used to send a Yjs binary update to the room’s Yjs document. You can use this endpoint to initialize Yjs data for the room or to update the room’s Yjs document. To send an update to a subdocument instead of the main document, pass its `guid`. Corresponds to `liveblocks.sendYjsBinaryUpdate`.
+
+
+        The update is typically obtained by calling `Y.encodeStateAsUpdate(doc)`. See the Yjs documentation for more details. When manually making this HTTP call, set the HTTP header `Content-Type` to `application/octet-stream`, and send the binary update (a `Uint8Array`) in the body of the HTTP request. This endpoint does not accept JSON, unlike most other endpoints.'
+      requestBody:
+        required: true
+        content:
+          application/octet-stream:
+            schema:
+              type: string
+              format: binary
+  /rooms/{roomId}/ydoc-binary:
+    get:
+      summary: Get Yjs document encoded as a binary Yjs update
+      description: This endpoint returns the room's Yjs document encoded as a single binary update. This can be used by `Y.applyUpdate(responseBody)` to get a copy of the document in your back end. See Yjs documentation for more information on working with updates. To return a subdocument instead of the main document, pass its `guid`. Corresponds to `liveblocks.getYjsDocumentAsBinaryUpdate`.
+      tags:
+      - Yjs
+      parameters:
+      - name: roomId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the room
+          example: my-room-id
+      - name: guid
+        in: query
+        required: false
+        schema:
+          type: string
+          description: ID of the subdocument
+          example: subdoc-guid-123
+      responses:
+        '200':
+          description: Success. Returns the room's Yjs document encoded as a binary Yjs update.
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+      operationId: get-yjs-document-as-binary-update
 components:
-  parameters:
-    RoomId:
-      name: roomId
-      in: path
-      required: true
-      description: The room identifier.
-      schema:
-        type: string
+  responses:
+    '403':
+      description: Unauthorized access.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            INVALID_SECRET_KEY:
+              value:
+                error: INVALID_SECRET_KEY
+                message: Invalid secret key.
+                suggestion: 'Please use a valid secret key, the secret key is available in the dashboard: https://liveblocks.io/dashboard/apikeys.'
+                docs: ''
+            INVALID_PUBLIC_KEY:
+              value:
+                error: INVALID_PUBLIC_KEY
+                message: Invalid public key
+                suggestion: 'Please use a valid public key, the public key is available in the dashboard: https://liveblocks.io/dashboard/apikeys'
+                docs: ''
+            UNAUTHORIZED_ROOM_ACCESS:
+              value:
+                error: UNAUTHORIZED_ROOM_ACCESS
+                message: The user does not have permission to access the room.
+                suggestion: Please add the user’s ID or one of the user’s group IDs to the room first.
+                docs: ''
+            INVALID_MANAGEMENT_API_ACCESS_TOKEN_SCOPE:
+              value:
+                error: INVALID_MANAGEMENT_API_ACCESS_TOKEN_SCOPE
+                message: Invalid management api access token scope
+                suggestion: 'Please provide a management api access token with required scope: ''read:all''.'
+                docs: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+            FEATURE_NOT_ENABLED:
+              value:
+                error: FEATURE_NOT_ENABLED
+                message: The "Management API" feature is not enabled for this account.
+                suggestion: If you want access to this feature, please contact us at support@liveblocks.io
+                docs: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+            PUBLIC_KEY_NOT_ENABLED:
+              value:
+                error: PUBLIC_KEY_NOT_ENABLED
+                message: Public key not enabled
+                suggestion: Please enable the public key for the project
+                docs: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+    '404':
+      description: Resource not found.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            ROOM_NOT_FOUND:
+              value:
+                error: ROOM_NOT_FOUND
+                message: Room not found.
+                suggestion: 'Please use a valid room ID, room IDs are available in the dashboard: https://liveblocks.io/dashboard/rooms.'
+                docs: ''
+            WEBHOOK_NOT_FOUND:
+              value:
+                error: WEBHOOK_NOT_FOUND
+                message: Webhook "ep_xxx" not found.
+                suggestion: 'Please use a valid webhook ID, webhook IDs are available in the dashboard: https://liveblocks.io/dashboard/webhooks'
+                docs: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+            NOT_EXISTING_MANAGEMENT_API_ACCESS_TOKEN:
+              value:
+                error: NOT_EXISTING_MANAGEMENT_API_ACCESS_TOKEN
+                message: Not existing management api access token
+                suggestion: Please provide an existing management api access token in the authentication header
+                docs: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+    '401':
+      description: Missing or wrong credentials.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            WRONG_KEY_USED:
+              value:
+                error: WRONG_KEY_USED
+                message: Public key instead of the secret key.
+                suggestion: 'Please use your secret key instead of the public key, the secret key is available in the dashboard: https://liveblocks.io/dashboard/apikeys.'
+                docs: ''
+            MISSING_SECRET_KEY:
+              value:
+                error: MISSING_SECRET_KEY
+                message: Missing secret key in authentication header
+                suggestion: 'Please use a secret key, the secret key is available in the dashboard: https://liveblocks.io/dashboard/apikeys'
+                docs: ''
+            MISSING_MANAGEMENT_API_ACCESS_TOKEN:
+              value:
+                error: MISSING_MANAGEMENT_API_ACCESS_TOKEN
+                message: Missing management api access token in authentication header
+                suggestion: Please provide a management api access token in the authentication header
+                docs: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+            INVALID_MANAGEMENT_API_ACCESS_TOKEN:
+              value:
+                error: INVALID_MANAGEMENT_API_ACCESS_TOKEN
+                message: Invalid management api access token
+                suggestion: Please provide a valid management api access token in the authentication header
+                docs: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+            REVOKED_MANAGEMENT_API_ACCESS_TOKEN:
+              value:
+                error: REVOKED_MANAGEMENT_API_ACCESS_TOKEN
+                message: Revoked management api access token
+                suggestion: Please provide an active management api access token in the authentication header
+                docs: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+            EXPIRED_MANAGEMENT_API_ACCESS_TOKEN:
+              value:
+                error: EXPIRED_MANAGEMENT_API_ACCESS_TOKEN
+                message: Expired management api access token
+                suggestion: Please provide a not expired management api access token in the authentication header
+                docs: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+  schemas:
+    Error:
+      title: Error
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error code
+        message:
+          type: string
+          description: Message explaining the error
+        suggestion:
+          type: string
+          description: A suggestion on how to fix the error
+        docs:
+          type: string
+          description: A link to the documentation
+    GetYjsDocumentResponse:
+      title: GetYjsDocumentResponse
+      type: object
+      additionalProperties: true
+      example:
+        someYText: Contents of YText
   securitySchemes:
-    bearerAuth:
-      type: http
-      scheme: bearer
-      description: Authenticate with a Liveblocks secret key as a Bearer token.
+    Authorization:
+      name: Bearer sk_xxx
+      type: apiKey
+      in: header
+externalDocs:
+  description: Liveblocks REST API reference
+  url: https://liveblocks.io/docs/api-reference/rest-api-endpoints

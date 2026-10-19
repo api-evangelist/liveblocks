@@ -1,0 +1,373 @@
+openapi: 3.2.0
+info:
+  title: Liveblocks Version History API
+  version: '2.0'
+  description: 'The Liveblocks REST API lets you read and modify rooms, threads, notifications, users, permissions, and schemas programmatically. Authenticate requests with a secret key using the `Authorization: Bearer` header.'
+servers:
+- url: https://api.liveblocks.io/v2
+tags:
+- name: Version History
+paths:
+  /rooms/{roomId}/versions:
+    get:
+      summary: Get Version History
+      description: This endpoint returns a list of version history snapshots for the room. The versions are returned sorted by creation date, from newest to oldest. Corresponds to `liveblocks.getVersionHistory`.
+      tags:
+      - Version History
+      operationId: get-version-history
+      parameters:
+      - name: roomId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the room
+          example: my-room-id
+      - schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+          description: A limit on the number of versions to be returned. The limit can range between 1 and 100, and defaults to 20.
+          example: 20
+        in: query
+        name: limit
+      - schema:
+          type: string
+          description: A cursor used for pagination. Get the value from the `nextCursor` response of the previous page.
+          example: eyJjcmVhdGVkQXQiOjE2NjAwMDA5ODgxMzd9
+        in: query
+        name: cursor
+      responses:
+        '200':
+          description: Success. Returns the list of version history snapshots and the next page cursor.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetVersionHistoryResponse'
+              examples:
+                example:
+                  value:
+                    data:
+                    - id: vh_abc123
+                      createdAt: '2024-10-15T10:30:00.000Z'
+                      authors:
+                      - id: user-123
+                      - id: user-456
+                    nextCursor: eyJjcmVhdGVkQXQiOiIyMDI0LTEwLTE1VDEwOjMwOjAwLjAwMFoifQ==
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+    post:
+      summary: Create version history snapshot
+      description: This endpoint creates a new version history snapshot of the room, capturing both its Storage and Yjs documents. Corresponds to `liveblocks.createVersionHistorySnapshot`.
+      tags:
+      - Version History
+      operationId: create-version-history-snapshot
+      parameters:
+      - name: roomId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the room
+          example: my-room-id
+      responses:
+        '200':
+          description: Success. Returns the created version ID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateVersionHistorySnapshotResponse'
+              examples:
+                example:
+                  value:
+                    data:
+                      id: vh_abc123
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+  /rooms/{roomId}/versions/{versionId}/yjs:
+    get:
+      summary: Get Yjs document version
+      description: This endpoint returns a specific version of the room's Yjs document encoded as a binary Yjs update. Corresponds to `liveblocks.getYjsVersion`.
+      tags:
+      - Version History
+      operationId: get-yjs-version
+      parameters:
+      - name: roomId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the room
+          example: my-room-id
+      - name: versionId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the version
+          example: vh_abc123
+      responses:
+        '200':
+          description: Success. Returns the Yjs document version as a binary stream.
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+  /rooms/{roomId}/versions/{versionId}:
+    delete:
+      summary: Delete a version
+      description: This endpoint permanently deletes a version from the room's history. Corresponds to `liveblocks.deleteVersion`.
+      tags:
+      - Version History
+      operationId: delete-version
+      parameters:
+      - name: roomId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the room
+          example: my-room-id
+      - name: versionId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the version
+          example: vh_abc123
+      responses:
+        '204':
+          description: Success. The version was deleted.
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+components:
+  responses:
+    '403':
+      description: Unauthorized access.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            INVALID_SECRET_KEY:
+              value:
+                error: INVALID_SECRET_KEY
+                message: Invalid secret key.
+                suggestion: 'Please use a valid secret key, the secret key is available in the dashboard: https://liveblocks.io/dashboard/apikeys.'
+                docs: ''
+            INVALID_PUBLIC_KEY:
+              value:
+                error: INVALID_PUBLIC_KEY
+                message: Invalid public key
+                suggestion: 'Please use a valid public key, the public key is available in the dashboard: https://liveblocks.io/dashboard/apikeys'
+                docs: ''
+            UNAUTHORIZED_ROOM_ACCESS:
+              value:
+                error: UNAUTHORIZED_ROOM_ACCESS
+                message: The user does not have permission to access the room.
+                suggestion: Please add the user’s ID or one of the user’s group IDs to the room first.
+                docs: ''
+            INVALID_MANAGEMENT_API_ACCESS_TOKEN_SCOPE:
+              value:
+                error: INVALID_MANAGEMENT_API_ACCESS_TOKEN_SCOPE
+                message: Invalid management api access token scope
+                suggestion: 'Please provide a management api access token with required scope: ''read:all''.'
+                docs: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+            FEATURE_NOT_ENABLED:
+              value:
+                error: FEATURE_NOT_ENABLED
+                message: The "Management API" feature is not enabled for this account.
+                suggestion: If you want access to this feature, please contact us at support@liveblocks.io
+                docs: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+            PUBLIC_KEY_NOT_ENABLED:
+              value:
+                error: PUBLIC_KEY_NOT_ENABLED
+                message: Public key not enabled
+                suggestion: Please enable the public key for the project
+                docs: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+    '404':
+      description: Resource not found.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            ROOM_NOT_FOUND:
+              value:
+                error: ROOM_NOT_FOUND
+                message: Room not found.
+                suggestion: 'Please use a valid room ID, room IDs are available in the dashboard: https://liveblocks.io/dashboard/rooms.'
+                docs: ''
+            WEBHOOK_NOT_FOUND:
+              value:
+                error: WEBHOOK_NOT_FOUND
+                message: Webhook "ep_xxx" not found.
+                suggestion: 'Please use a valid webhook ID, webhook IDs are available in the dashboard: https://liveblocks.io/dashboard/webhooks'
+                docs: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+            NOT_EXISTING_MANAGEMENT_API_ACCESS_TOKEN:
+              value:
+                error: NOT_EXISTING_MANAGEMENT_API_ACCESS_TOKEN
+                message: Not existing management api access token
+                suggestion: Please provide an existing management api access token in the authentication header
+                docs: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+    '401':
+      description: Missing or wrong credentials.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            WRONG_KEY_USED:
+              value:
+                error: WRONG_KEY_USED
+                message: Public key instead of the secret key.
+                suggestion: 'Please use your secret key instead of the public key, the secret key is available in the dashboard: https://liveblocks.io/dashboard/apikeys.'
+                docs: ''
+            MISSING_SECRET_KEY:
+              value:
+                error: MISSING_SECRET_KEY
+                message: Missing secret key in authentication header
+                suggestion: 'Please use a secret key, the secret key is available in the dashboard: https://liveblocks.io/dashboard/apikeys'
+                docs: ''
+            MISSING_MANAGEMENT_API_ACCESS_TOKEN:
+              value:
+                error: MISSING_MANAGEMENT_API_ACCESS_TOKEN
+                message: Missing management api access token in authentication header
+                suggestion: Please provide a management api access token in the authentication header
+                docs: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+            INVALID_MANAGEMENT_API_ACCESS_TOKEN:
+              value:
+                error: INVALID_MANAGEMENT_API_ACCESS_TOKEN
+                message: Invalid management api access token
+                suggestion: Please provide a valid management api access token in the authentication header
+                docs: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+            REVOKED_MANAGEMENT_API_ACCESS_TOKEN:
+              value:
+                error: REVOKED_MANAGEMENT_API_ACCESS_TOKEN
+                message: Revoked management api access token
+                suggestion: Please provide an active management api access token in the authentication header
+                docs: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+            EXPIRED_MANAGEMENT_API_ACCESS_TOKEN:
+              value:
+                error: EXPIRED_MANAGEMENT_API_ACCESS_TOKEN
+                message: Expired management api access token
+                suggestion: Please provide a not expired management api access token in the authentication header
+                docs: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+  schemas:
+    Error:
+      title: Error
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error code
+        message:
+          type: string
+          description: Message explaining the error
+        suggestion:
+          type: string
+          description: A suggestion on how to fix the error
+        docs:
+          type: string
+          description: A link to the documentation
+    GetVersionHistoryResponse:
+      title: GetVersionHistoryResponse
+      type: object
+      properties:
+        nextCursor:
+          description: Cursor for pagination to get the next page of results
+          oneOf:
+          - type: string
+          - type: 'null'
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/HistoryVersion'
+      required:
+      - data
+      - nextCursor
+      additionalProperties: false
+      example:
+        data:
+        - id: vh_abc123
+          createdAt: '2024-10-15T10:30:00.000Z'
+          authors:
+          - id: user-123
+        nextCursor: eyJjcmVhdGVkQXQiOiIyMDI0LTEwLTE1VDEwOjMwOjAwLjAwMFoifQ==
+    CreateVersionHistorySnapshotResponse:
+      title: CreateVersionHistorySnapshotResponse
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+              description: Unique identifier for the created version
+          required:
+          - id
+          additionalProperties: false
+      required:
+      - data
+      additionalProperties: false
+      example:
+        data:
+          id: vh_abc123
+    HistoryVersion:
+      title: HistoryVersion
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the version
+        createdAt:
+          type: string
+          format: date-time
+          description: ISO 8601 timestamp of when the version was created
+        authors:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                description: User ID of the author
+          description: List of users who contributed to this version
+      required:
+      - id
+      - createdAt
+      - authors
+      example:
+        id: vh_abc123
+        createdAt: '2024-10-15T10:30:00.000Z'
+        authors:
+        - id: user-123
+        - id: user-456
+  securitySchemes:
+    Authorization:
+      name: Bearer sk_xxx
+      type: apiKey
+      in: header
+externalDocs:
+  description: Liveblocks REST API reference
+  url: https://liveblocks.io/docs/api-reference/rest-api-endpoints

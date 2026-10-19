@@ -1,69 +1,1021 @@
 openapi: 3.2.0
 info:
-  title: Liveblocks REST Storage API
-  description: Server-side REST API for managing Liveblocks rooms, room storage, active users, broadcast events, comments and threads, Yjs documents, and version history. Authenticated with a secret key via HTTP Bearer authorization.
-  version: v2
-  contact:
-    name: Liveblocks
-    url: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+  title: Liveblocks Storage API
+  version: '2.0'
+  description: 'The Liveblocks REST API lets you read and modify rooms, threads, notifications, users, permissions, and schemas programmatically. Authenticate requests with a secret key using the `Authorization: Bearer` header.'
 servers:
 - url: https://api.liveblocks.io/v2
-  description: Liveblocks REST API
-security:
-- bearerAuth: []
 tags:
 - name: Storage
 paths:
   /rooms/{roomId}/storage:
-    parameters:
-    - $ref: '#/components/parameters/RoomId'
     get:
+      summary: Get Storage document
+      description: 'Returns the contents of the room’s Storage tree. Corresponds to `liveblocks.getStorageDocument`.
+
+
+        The default outputted format is called “plain LSON”, which includes information on the Live data structures in the tree. These nodes show up in the output as objects with two properties, for example:
+
+
+        ```json
+
+        {
+
+        "liveblocksType": "LiveObject",
+
+        "data": ...
+
+        }
+
+        ```
+
+
+        If you’re not interested in this information, you can use the simpler `?format=json` query param, see below.'
       tags:
       - Storage
-      summary: Get storage
-      description: Retrieve a room's storage document.
-      operationId: getStorage
+      parameters:
+      - schema:
+          type: string
+          description: ID of the room
+          example: my-room-id
+        name: roomId
+        in: path
+        required: true
+      - schema:
+          type: string
+          enum:
+          - plain-lson
+          - json
+          description: Use the `json` format to output a simplified JSON representation of the Storage tree. In that format, each LiveObject and LiveMap becomes a simple JSON object, each LiveList becomes a simple JSON array, and each LiveFile becomes its metadata object. This is a lossy format because information about the original data structures is not retained, but it may be easier to work with.
+          example: json
+        name: format
+        in: query
+        required: false
       responses:
         '200':
-          description: Storage document.
+          description: Success. Returns the room’s Storage as JSON.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetStorageDocumentResponse'
+              examples:
+                example:
+                  value:
+                    liveblocksType: LiveObject
+                    data:
+                      aLiveObject:
+                        liveblocksType: LiveObject
+                        data:
+                          a: 1
+                      aLiveList:
+                        liveblocksType: LiveList
+                        data:
+                        - a
+                        - b
+                      aLiveMap:
+                        liveblocksType: LiveMap
+                        data:
+                          a: 1
+                          b: 2
+                      aLiveFile:
+                        liveblocksType: LiveFile
+                        data:
+                          id: fl_abc123456789012345678
+                          name: photo.png
+                          size: 12345
+                          mimeType: image/png
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+      operationId: get-storage-document
     post:
+      summary: Initialize Storage document
       tags:
       - Storage
-      summary: Initialize storage
-      operationId: initializeStorage
+      operationId: initialize-storage-document
+      parameters:
+      - schema:
+          type: string
+          description: ID of the room
+          example: my-room-id
+        name: roomId
+        in: path
+        required: true
       responses:
         '200':
-          description: Storage initialized.
+          description: Success. The Storage is initialized. Returns the room’s Storage as JSON.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InitializeStorageDocumentResponse'
+              examples:
+                example:
+                  value:
+                    liveblocksType: LiveObject
+                    data:
+                      aLiveObject:
+                        liveblocksType: LiveObject
+                        data:
+                          a: 1
+                      aLiveList:
+                        liveblocksType: LiveList
+                        data:
+                        - a
+                        - b
+                      aLiveMap:
+                        liveblocksType: LiveMap
+                        data:
+                          a: 1
+                          b: 2
+                      aLiveFile:
+                        liveblocksType: LiveFile
+                        data:
+                          id: fl_abc123456789012345678
+                          name: photo.png
+                          size: 12345
+                          mimeType: image/png
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '409':
+          description: Storage already exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                CANNOT_UPDATE_EXISTING_STORAGE:
+                  value:
+                    error: CANNOT_UPDATE_EXISTING_STORAGE
+                    message: The room already has storage data. It's only possible to initialize the storage for an empty room.
+                    suggestion: Create another room or clear this room storage first.
+                    docs: ''
+      description: 'This endpoint initializes or reinitializes a room’s Storage. The room must already exist. Calling this endpoint will disconnect all users from the room if there are any, triggering a reconnect. Corresponds to `liveblocks.initializeStorageDocument`.
+
+
+        The format of the request body is the same as what’s returned by the get Storage endpoint.
+
+
+        For each Liveblocks data structure that you want to create, you need a JSON element having two properties:
+
+        - `"liveblocksType"` => `"LiveObject" | "LiveList" | "LiveMap" | "LiveFile"`
+
+        - `"data"` => contains the nested data structures (children) and data.
+
+
+        The root’s type can only be LiveObject.
+
+
+        A utility function, `toPlainLson` is included in `@liveblocks/client` from `1.0.9` to help convert `LiveObject`, `LiveList`, `LiveMap`, and `LiveFile` to the structure expected by the endpoint.'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                liveblocksType:
+                  type: string
+                  const: LiveObject
+                data:
+                  type: object
+                  additionalProperties: true
+              required:
+              - liveblocksType
+              - data
+            examples:
+              example:
+                value:
+                  liveblocksType: LiveObject
+                  data:
+                    aLiveObject:
+                      liveblocksType: LiveObject
+                      data:
+                        a: 1
+                    aLiveList:
+                      liveblocksType: LiveList
+                      data:
+                      - a
+                      - b
+                    aLiveMap:
+                      liveblocksType: LiveMap
+                      data:
+                        a: 1
+                        b: 2
+                    aLiveFile:
+                      liveblocksType: LiveFile
+                      data:
+                        id: fl_abc123456789012345678
+                        name: photo.png
+                        size: 12345
+                        mimeType: image/png
     delete:
+      summary: Delete Storage document
       tags:
       - Storage
-      summary: Clear storage
-      operationId: clearStorage
+      operationId: delete-storage-document
+      parameters:
+      - schema:
+          type: string
+          description: ID of the room
+          example: my-room-id
+        name: roomId
+        in: path
+        required: true
+      responses:
+        '200':
+          description: Success. The room has no more Storage.
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+      description: This endpoint deletes all of the room’s Storage data. Calling this endpoint will disconnect all users from the room if there are any. Corresponds to `liveblocks.deleteStorageDocument`.
+  /rooms/{roomId}/storage/json-patch:
+    patch:
+      summary: Apply JSON Patch to Storage
+      description: 'Applies a sequence of JSON Patch operations to the room''s Storage document, useful for modifying Storage. Operations are applied in order; if any operation fails, the document is not changed and a 422 response with a helpful message is returned.
+
+
+        **Paths and data types:** Be as specific as possible with your target path. Every parent in the chain of path segments must be a LiveObject, LiveList, or LiveMap. Complex nested objects passed in `add` or `replace` operations are automatically converted to LiveObjects and LiveLists. LiveText is a leaf node: only the LiveText node itself is addressable, not fields under its serialized `data`. Use `replace` with a string or a LiveTextData array to replace the whole node, for example `/text` with `[["Hello"]]`; use `remove` on `/text` to remove the node. LiveText versioning is internal and is not part of this API.
+
+
+        **Performance:** For large Storage documents, applying a patch can be expensive because the full state is reconstructed on the server to apply the operations. Very large documents may not be suitable for this endpoint.
+
+
+        For a **full guide with examples**, see Modifying storage via REST API with JSON Patch.'
+      tags:
+      - Storage
+      operationId: patch-storage-document
+      parameters:
+      - schema:
+          type: string
+          description: ID of the room
+          example: my-room-id
+        name: roomId
+        in: path
+        required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchStorageDocumentRequestBody'
+            examples:
+              addAndRemove:
+                summary: Add and remove
+                value:
+                - op: add
+                  path: /score
+                  value: 42
+                - op: remove
+                  path: /oldKey
+              appendToList:
+                summary: Append to LiveList
+                value:
+                - op: add
+                  path: /layers/-
+                  value: newLayer
+              addLiveFile:
+                summary: Add a LiveFile
+                value:
+                - op: add
+                  path: /photo
+                  value:
+                    liveblocksType: LiveFile
+                    data:
+                      id: fl_abc123456789012345678
+                      name: photo.png
+                      size: 12345
+                      mimeType: image/png
+      responses:
+        '200':
+          description: Success. All operations were applied; the Storage document was updated.
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '422':
+          description: Patch failed. The document was not changed. The response body includes an error code and a helpful message (e.g. invalid path, test failed, index out of bounds).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                INVALID_STORAGE_MUTATION_REQUEST:
+                  value:
+                    error: INVALID_STORAGE_MUTATION_REQUEST
+                    message: 'Test failed: value at path "/name" does not match.'
+                    suggestion: Ensure the test value matches the current document value.
+                    docs: ''
+                UNPROCESSABLE_ENTITY:
+                  value:
+                    error: UNPROCESSABLE_ENTITY
+                    message: 'Invalid JSON pointer: path must start with "/".'
+                    suggestion: Please ensure the data follows the correct format.
+                    docs: ''
+  /rooms/{roomId}/storage/files/{fileId}:
+    get:
+      summary: Get Storage file
+      description: Returns an uploaded Storage file's metadata and a presigned download URL. The URL expires after one hour.
+      tags:
+      - Storage
+      operationId: get-storage-file
+      parameters:
+      - schema:
+          type: string
+          description: ID of the room
+          example: my-room-id
+        name: roomId
+        in: path
+        required: true
+      - schema:
+          type: string
+          pattern: ^fl_[A-Za-z0-9_-]{21}$
+          description: ID of the Storage file
+          example: fl_abc123456789012345678
+        name: fileId
+        in: path
+        required: true
+      responses:
+        '200':
+          description: Success. Returns the file metadata and presigned download URL.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StorageFileWithUrl'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+  /rooms/{roomId}/storage/files/{fileId}/upload/{name}:
+    put:
+      summary: Upload Storage file
+      description: Uploads a file's bytes to a room and returns the metadata needed to create a LiveFile. For large files, use the multipart upload operations instead. Repeating the request with the same file ID, name, and file size returns the existing upload.
+      tags:
+      - Storage
+      operationId: upload-storage-file
+      parameters:
+      - schema:
+          type: string
+          description: ID of the room
+          example: my-room-id
+        name: roomId
+        in: path
+        required: true
+      - schema:
+          type: string
+          pattern: ^fl_[A-Za-z0-9_-]{21}$
+          description: ID for the Storage file
+          example: fl_abc123456789012345678
+        name: fileId
+        in: path
+        required: true
+      - schema:
+          type: string
+          description: Name of the file
+          example: photo.png
+        name: name
+        in: path
+        required: true
+      - schema:
+          type: integer
+          minimum: 0
+          description: Expected file size in bytes.
+          example: 12345
+        name: fileSize
+        in: query
+        required: false
+      requestBody:
+        required: true
+        content:
+          application/octet-stream:
+            schema:
+              type: string
+              format: binary
+      responses:
+        '200':
+          description: Success. Returns the uploaded file metadata.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LiveFileData'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '409':
+          description: A file with this ID already exists with different metadata.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '413':
+          description: The file exceeds the project's per-file upload limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /rooms/{roomId}/storage/files/{fileId}/multipart/{name}:
+    post:
+      summary: Create Storage file multipart upload
+      description: Starts a multipart upload for a Storage file.
+      tags:
+      - Storage
+      operationId: create-storage-file-multipart-upload
+      parameters:
+      - schema:
+          type: string
+          description: ID of the room
+          example: my-room-id
+        name: roomId
+        in: path
+        required: true
+      - schema:
+          type: string
+          pattern: ^fl_[A-Za-z0-9_-]{21}$
+          description: ID for the Storage file
+          example: fl_abc123456789012345678
+        name: fileId
+        in: path
+        required: true
+      - schema:
+          type: string
+          description: Name of the file
+          example: video.mp4
+        name: name
+        in: path
+        required: true
+      - schema:
+          type: integer
+          minimum: 0
+          description: Expected file size in bytes
+          example: 10485760
+        name: fileSize
+        in: query
+        required: false
+      responses:
+        '200':
+          description: Success. Returns identifiers for the multipart upload.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StorageFileMultipartUpload'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '409':
+          description: A file with this ID already exists.
+        '413':
+          description: The file exceeds the project's per-file upload limit.
+  /rooms/{roomId}/storage/files/{fileId}/multipart/{uploadId}/{partNumber}:
+    put:
+      summary: Upload Storage file multipart part
+      description: Uploads one part of a Storage file multipart upload.
+      tags:
+      - Storage
+      operationId: upload-storage-file-multipart-part
+      parameters:
+      - schema:
+          type: string
+          description: ID of the room
+          example: my-room-id
+        name: roomId
+        in: path
+        required: true
+      - schema:
+          type: string
+          pattern: ^fl_[A-Za-z0-9_-]{21}$
+          description: ID of the Storage file
+          example: fl_abc123456789012345678
+        name: fileId
+        in: path
+        required: true
+      - schema:
+          type: string
+          description: ID returned when the multipart upload was created
+        name: uploadId
+        in: path
+        required: true
+      - schema:
+          type: integer
+          minimum: 1
+          description: One-based part number
+          example: 1
+        name: partNumber
+        in: path
+        required: true
+      requestBody:
+        required: true
+        content:
+          application/octet-stream:
+            schema:
+              type: string
+              format: binary
+      responses:
+        '200':
+          description: Success. Returns the uploaded part's number and ETag.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StorageFileMultipartPart'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+  /rooms/{roomId}/storage/files/{fileId}/multipart/{uploadId}/complete:
+    post:
+      summary: Complete Storage file multipart upload
+      description: Completes a multipart upload and returns the metadata needed to create a LiveFile.
+      tags:
+      - Storage
+      operationId: complete-storage-file-multipart-upload
+      parameters:
+      - schema:
+          type: string
+          description: ID of the room
+          example: my-room-id
+        name: roomId
+        in: path
+        required: true
+      - schema:
+          type: string
+          pattern: ^fl_[A-Za-z0-9_-]{21}$
+          description: ID of the Storage file
+          example: fl_abc123456789012345678
+        name: fileId
+        in: path
+        required: true
+      - schema:
+          type: string
+          description: ID returned when the multipart upload was created
+        name: uploadId
+        in: path
+        required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CompleteStorageFileMultipartUploadRequestBody'
+      responses:
+        '200':
+          description: Success. Returns the uploaded file metadata.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LiveFileData'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '413':
+          description: The completed file exceeds the project's per-file upload limit.
+  /rooms/{roomId}/storage/files/{fileId}/multipart/{uploadId}:
+    delete:
+      summary: Abort Storage file multipart upload
+      description: Aborts a multipart upload and discards its uploaded parts.
+      tags:
+      - Storage
+      operationId: abort-storage-file-multipart-upload
+      parameters:
+      - schema:
+          type: string
+          description: ID of the room
+          example: my-room-id
+        name: roomId
+        in: path
+        required: true
+      - schema:
+          type: string
+          pattern: ^fl_[A-Za-z0-9_-]{21}$
+          description: ID of the Storage file
+          example: fl_abc123456789012345678
+        name: fileId
+        in: path
+        required: true
+      - schema:
+          type: string
+          description: ID returned when the multipart upload was created
+        name: uploadId
+        in: path
+        required: true
       responses:
         '204':
-          description: Storage cleared.
-  /rooms/{roomId}/storage/json-patch:
-    parameters:
-    - $ref: '#/components/parameters/RoomId'
-    patch:
-      tags:
-      - Storage
-      summary: Patch storage with JSON Patch
-      operationId: patchStorage
-      responses:
-        '200':
-          description: Storage patched.
+          description: Success. The multipart upload was aborted.
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
 components:
-  parameters:
-    RoomId:
-      name: roomId
-      in: path
-      required: true
-      description: The room identifier.
-      schema:
-        type: string
+  schemas:
+    StorageFileWithUrl:
+      title: StorageFileWithUrl
+      description: Uploaded Storage file metadata with a temporary download URL.
+      type: object
+      properties:
+        id:
+          type: string
+          pattern: ^fl_[A-Za-z0-9_-]{21}$
+        name:
+          type: string
+        size:
+          type: integer
+          minimum: 0
+        mimeType:
+          type: string
+        url:
+          type: string
+          format: uri
+          description: Presigned download URL
+        expiresAt:
+          type: string
+          format: date-time
+          description: Expiration time of the presigned URL
+      required:
+      - id
+      - name
+      - size
+      - mimeType
+      - url
+      - expiresAt
+      additionalProperties: false
+    PatchStorageDocumentRequestBody:
+      title: PatchStorageDocumentRequestBody
+      type: array
+      items:
+        oneOf:
+        - title: AddJsonPatchOperation
+          type: object
+          properties:
+            op:
+              type: string
+              const: add
+            path:
+              type: string
+              description: A JSON Pointer to the target location (RFC 6901). Must start with "/".
+            value: {}
+          required:
+          - op
+          - path
+          - value
+          additionalProperties: false
+        - title: RemoveJsonPatchOperation
+          type: object
+          properties:
+            op:
+              type: string
+              const: remove
+            path:
+              type: string
+              description: A JSON Pointer to the target location (RFC 6901). Must start with "/".
+          required:
+          - op
+          - path
+          additionalProperties: false
+        - title: ReplaceJsonPatchOperation
+          type: object
+          properties:
+            op:
+              type: string
+              const: replace
+            path:
+              type: string
+              description: A JSON Pointer to the target location (RFC 6901). Must start with "/".
+            value: {}
+        - title: CopyJsonPatchOperation
+          type: object
+          properties:
+            op:
+              type: string
+              const: copy
+            from:
+              type: string
+              description: A JSON Pointer to the source location (RFC 6901). Must start with "/".
+            path:
+              type: string
+              description: A JSON Pointer to the target location (RFC 6901). Must start with "/".
+          required:
+          - op
+          - from
+          - path
+          additionalProperties: false
+        - title: MoveJsonPatchOperation
+          type: object
+          properties:
+            op:
+              type: string
+              const: move
+            from:
+              type: string
+              description: A JSON Pointer to the source location (RFC 6901). Must start with "/".
+            path:
+              type: string
+              description: A JSON Pointer to the target location (RFC 6901). Must start with "/".
+          required:
+          - op
+          - from
+          - path
+          additionalProperties: false
+        - title: TestJsonPatchOperation
+          type: object
+          properties:
+            op:
+              type: string
+              const: test
+            path:
+              type: string
+              description: A JSON Pointer to the target location (RFC 6901). Must start with "/".
+            value: {}
+          required:
+          - op
+          - path
+          - value
+          additionalProperties: false
+      example:
+      - op: add
+        path: /score
+        value: 42
+      - op: remove
+        path: /oldKey
+    StorageFileMultipartUpload:
+      title: StorageFileMultipartUpload
+      type: object
+      properties:
+        fileId:
+          type: string
+          pattern: ^fl_[A-Za-z0-9_-]{21}$
+        uploadId:
+          type: string
+      required:
+      - fileId
+      - uploadId
+      additionalProperties: false
+    GetStorageDocumentResponse:
+      title: GetStorageDocumentResponse
+      type: object
+      additionalProperties: true
+      example:
+        liveblocksType: LiveObject
+        data:
+          aLiveObject:
+            liveblocksType: LiveObject
+            data:
+              a: 1
+          aLiveList:
+            liveblocksType: LiveList
+            data:
+            - a
+            - b
+          aLiveMap:
+            liveblocksType: LiveMap
+            data:
+              a: 1
+              b: 2
+          aLiveFile:
+            liveblocksType: LiveFile
+            data:
+              id: fl_abc123456789012345678
+              name: photo.png
+              size: 12345
+              mimeType: image/png
+    Error:
+      title: Error
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error code
+        message:
+          type: string
+          description: Message explaining the error
+        suggestion:
+          type: string
+          description: A suggestion on how to fix the error
+        docs:
+          type: string
+          description: A link to the documentation
+    CompleteStorageFileMultipartUploadRequestBody:
+      title: CompleteStorageFileMultipartUploadRequestBody
+      type: object
+      properties:
+        parts:
+          type: array
+          items:
+            $ref: '#/components/schemas/StorageFileMultipartPart'
+      required:
+      - parts
+      additionalProperties: false
+    LiveFileData:
+      title: LiveFileData
+      description: Immutable reference to a file from Storage stored inside a LiveFile node.
+      type: object
+      properties:
+        id:
+          type: string
+          pattern: ^fl_[A-Za-z0-9_-]{21}$
+          description: ID of the uploaded Storage file
+          example: fl_abc123456789012345678
+        name:
+          type: string
+          description: Original file name
+          example: photo.png
+        size:
+          type: integer
+          minimum: 0
+          description: File size in bytes
+          example: 12345
+        mimeType:
+          type: string
+          description: File MIME type
+          example: image/png
+      required:
+      - id
+      - name
+      - size
+      - mimeType
+      additionalProperties: false
+    StorageFileMultipartPart:
+      title: StorageFileMultipartPart
+      type: object
+      properties:
+        partNumber:
+          type: integer
+          minimum: 1
+        etag:
+          type: string
+      required:
+      - partNumber
+      - etag
+      additionalProperties: false
+    InitializeStorageDocumentResponse:
+      title: InitializeStorageDocumentResponse
+      type: object
+      properties:
+        liveblocksType:
+          type: string
+          const: LiveObject
+        data:
+          type: object
+          additionalProperties: true
+      example:
+        liveblocksType: LiveObject
+        data:
+          aLiveObject:
+            liveblocksType: LiveObject
+            data:
+              a: 1
+          aLiveList:
+            liveblocksType: LiveList
+            data:
+            - a
+            - b
+          aLiveFile:
+            liveblocksType: LiveFile
+            data:
+              id: fl_abc123456789012345678
+              name: photo.png
+              size: 12345
+              mimeType: image/png
+  responses:
+    '403':
+      description: Unauthorized access.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            INVALID_SECRET_KEY:
+              value:
+                error: INVALID_SECRET_KEY
+                message: Invalid secret key.
+                suggestion: 'Please use a valid secret key, the secret key is available in the dashboard: https://liveblocks.io/dashboard/apikeys.'
+                docs: ''
+            INVALID_PUBLIC_KEY:
+              value:
+                error: INVALID_PUBLIC_KEY
+                message: Invalid public key
+                suggestion: 'Please use a valid public key, the public key is available in the dashboard: https://liveblocks.io/dashboard/apikeys'
+                docs: ''
+            UNAUTHORIZED_ROOM_ACCESS:
+              value:
+                error: UNAUTHORIZED_ROOM_ACCESS
+                message: The user does not have permission to access the room.
+                suggestion: Please add the user’s ID or one of the user’s group IDs to the room first.
+                docs: ''
+            INVALID_MANAGEMENT_API_ACCESS_TOKEN_SCOPE:
+              value:
+                error: INVALID_MANAGEMENT_API_ACCESS_TOKEN_SCOPE
+                message: Invalid management api access token scope
+                suggestion: 'Please provide a management api access token with required scope: ''read:all''.'
+                docs: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+            FEATURE_NOT_ENABLED:
+              value:
+                error: FEATURE_NOT_ENABLED
+                message: The "Management API" feature is not enabled for this account.
+                suggestion: If you want access to this feature, please contact us at support@liveblocks.io
+                docs: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+            PUBLIC_KEY_NOT_ENABLED:
+              value:
+                error: PUBLIC_KEY_NOT_ENABLED
+                message: Public key not enabled
+                suggestion: Please enable the public key for the project
+                docs: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+    '404':
+      description: Resource not found.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            ROOM_NOT_FOUND:
+              value:
+                error: ROOM_NOT_FOUND
+                message: Room not found.
+                suggestion: 'Please use a valid room ID, room IDs are available in the dashboard: https://liveblocks.io/dashboard/rooms.'
+                docs: ''
+            WEBHOOK_NOT_FOUND:
+              value:
+                error: WEBHOOK_NOT_FOUND
+                message: Webhook "ep_xxx" not found.
+                suggestion: 'Please use a valid webhook ID, webhook IDs are available in the dashboard: https://liveblocks.io/dashboard/webhooks'
+                docs: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+            NOT_EXISTING_MANAGEMENT_API_ACCESS_TOKEN:
+              value:
+                error: NOT_EXISTING_MANAGEMENT_API_ACCESS_TOKEN
+                message: Not existing management api access token
+                suggestion: Please provide an existing management api access token in the authentication header
+                docs: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+    '401':
+      description: Missing or wrong credentials.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            WRONG_KEY_USED:
+              value:
+                error: WRONG_KEY_USED
+                message: Public key instead of the secret key.
+                suggestion: 'Please use your secret key instead of the public key, the secret key is available in the dashboard: https://liveblocks.io/dashboard/apikeys.'
+                docs: ''
+            MISSING_SECRET_KEY:
+              value:
+                error: MISSING_SECRET_KEY
+                message: Missing secret key in authentication header
+                suggestion: 'Please use a secret key, the secret key is available in the dashboard: https://liveblocks.io/dashboard/apikeys'
+                docs: ''
+            MISSING_MANAGEMENT_API_ACCESS_TOKEN:
+              value:
+                error: MISSING_MANAGEMENT_API_ACCESS_TOKEN
+                message: Missing management api access token in authentication header
+                suggestion: Please provide a management api access token in the authentication header
+                docs: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+            INVALID_MANAGEMENT_API_ACCESS_TOKEN:
+              value:
+                error: INVALID_MANAGEMENT_API_ACCESS_TOKEN
+                message: Invalid management api access token
+                suggestion: Please provide a valid management api access token in the authentication header
+                docs: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+            REVOKED_MANAGEMENT_API_ACCESS_TOKEN:
+              value:
+                error: REVOKED_MANAGEMENT_API_ACCESS_TOKEN
+                message: Revoked management api access token
+                suggestion: Please provide an active management api access token in the authentication header
+                docs: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+            EXPIRED_MANAGEMENT_API_ACCESS_TOKEN:
+              value:
+                error: EXPIRED_MANAGEMENT_API_ACCESS_TOKEN
+                message: Expired management api access token
+                suggestion: Please provide a not expired management api access token in the authentication header
+                docs: https://liveblocks.io/docs/api-reference/rest-api-endpoints
   securitySchemes:
-    bearerAuth:
-      type: http
-      scheme: bearer
-      description: Authenticate with a Liveblocks secret key as a Bearer token.
+    Authorization:
+      name: Bearer sk_xxx
+      type: apiKey
+      in: header
+externalDocs:
+  description: Liveblocks REST API reference
+  url: https://liveblocks.io/docs/api-reference/rest-api-endpoints

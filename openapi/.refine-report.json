@@ -1,17 +1,19 @@
 {
   "provider": "liveblocks",
   "sources": [
-    "_original/liveblocks-openapi.yml"
+    "_original/liveblocks-openapi.json"
   ],
   "outputs": [
-    "liveblocks-active-users-api-openapi.yml",
+    "liveblocks-ai-api-openapi.yml",
+    "liveblocks-auth-api-openapi.yml",
     "liveblocks-comments-api-openapi.yml",
-    "liveblocks-events-api-openapi.yml",
-    "liveblocks-reactions-api-openapi.yml",
-    "liveblocks-rooms-api-openapi.yml",
+    "liveblocks-feeds-api-openapi.yml",
+    "liveblocks-groups-api-openapi.yml",
+    "liveblocks-management-api-openapi.yml",
+    "liveblocks-notifications-api-openapi.yml",
+    "liveblocks-room-api-openapi.yml",
     "liveblocks-storage-api-openapi.yml",
-    "liveblocks-threads-api-openapi.yml",
-    "liveblocks-versions-api-openapi.yml",
+    "liveblocks-version-history-api-openapi.yml",
     "liveblocks-yjs-api-openapi.yml"
   ],
   "archived": [],
@@ -19,18 +21,8 @@
   "warnings": [],
   "notes": [
     "sourced from openapi/_original/ (1 archived document(s)); previously refined output at the top level was skipped rather than re-split",
-    "liveblocks-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
-    "apis.yml register: already-registered"
+    "liveblocks-openapi.json: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "apis.yml register: written (+8 apis, 14 total)"
   ],
-  "skipped": [
-    "liveblocks-active-users-api-openapi.yml: previously refined output, superseded by openapi/_original/",
-    "liveblocks-comments-api-openapi.yml: previously refined output, superseded by openapi/_original/",
-    "liveblocks-events-api-openapi.yml: previously refined output, superseded by openapi/_original/",
-    "liveblocks-reactions-api-openapi.yml: previously refined output, superseded by openapi/_original/",
-    "liveblocks-rooms-api-openapi.yml: previously refined output, superseded by openapi/_original/",
-    "liveblocks-storage-api-openapi.yml: previously refined output, superseded by openapi/_original/",
-    "liveblocks-threads-api-openapi.yml: previously refined output, superseded by openapi/_original/",
-    "liveblocks-versions-api-openapi.yml: previously refined output, superseded by openapi/_original/",
-    "liveblocks-yjs-api-openapi.yml: previously refined output, superseded by openapi/_original/"
-  ]
+  "skipped": []
 }

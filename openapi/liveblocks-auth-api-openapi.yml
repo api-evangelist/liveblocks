@@ -1,0 +1,269 @@
+openapi: 3.2.0
+info:
+  title: Liveblocks Auth API
+  version: '2.0'
+  description: 'The Liveblocks REST API lets you read and modify rooms, threads, notifications, users, permissions, and schemas programmatically. Authenticate requests with a secret key using the `Authorization: Bearer` header.'
+servers:
+- url: https://api.liveblocks.io/v2
+tags:
+- name: Auth
+paths:
+  /authorize-user:
+    post:
+      summary: Get access token with secret key
+      tags:
+      - Auth
+      operationId: authorize-user
+      responses:
+        '200':
+          description: Success. Returns an access token that can be used to enter one or more rooms.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorizeUserResponse'
+              examples:
+                example:
+                  value:
+                    token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIi...
+        '403':
+          $ref: '#/components/responses/403'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthorizeUserRequestBody'
+            examples:
+              example:
+                value:
+                  userId: user-123
+                  userInfo:
+                    name: bob
+                    avatar: https://example.org/images/user123.jpg
+                  organizationId: acme-corp
+                  permissions:
+                    my-room-1:
+                    - '*:write'
+                    my-room-2:
+                    - '*:write'
+                    my-room-*:
+                    - '*:read'
+      description: 'This endpoint lets your application server (your back end) obtain a token that one of its clients (your frontend) can use to enter a Liveblocks room. You use this endpoint to implement your own application’s custom authentication endpoint. When making this request, you’ll have to use your secret key.
+
+
+        **Important:** The difference with an ID token is that an access token holds all the permissions, and is the source of truth. With ID tokens, permissions are set in the Liveblocks back end (through REST API calls) and "checked at the door" every time they are used to enter a room.
+
+
+        **Note:** When using the `@liveblocks/node` package, you can use `Liveblocks.prepareSession` in your back end to build this request.
+
+
+        You can pass the property `userId` in the request’s body. This can be whatever internal identifier you use for your user accounts as long as it uniquely identifies an account. The property `userId` is used by Liveblocks to calculate your account’s Monthly Active Users. One unique `userId` corresponds to one MAU.
+
+
+        Additionally, you can set custom metadata to the token, which will be publicly accessible by other clients through the `user.info` property. This is useful for storing static data like avatar images or the user’s display name.
+
+
+        Lastly, you’ll specify the exact permissions to give to the user using the `permissions` field. This is done in an object where the keys are room names, or room name patterns (ending in a `*`), and a list of permissions to assign the user for any room that matches that name exactly (or starts with the pattern’s prefix). For tips, see Manage permissions with access tokens.'
+  /identify-user:
+    post:
+      summary: Get ID token with secret key
+      tags:
+      - Auth
+      operationId: identify-user
+      responses:
+        '200':
+          description: Success. Returns an ID token that can be used to enter one or more rooms.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdentifyUserResponse'
+              examples:
+                example:
+                  value:
+                    token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIi...
+        '403':
+          $ref: '#/components/responses/403'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IdentifyUserRequestBody'
+            examples:
+              example:
+                value:
+                  userId: user-123
+                  organizationId: acme-corp
+                  groupIds:
+                  - marketing
+                  - engineering
+                  userInfo:
+                    name: bob
+                    avatar: https://example.org/images/user123.jpg
+      description: 'This endpoint lets your application server (your back end) obtain a token that one of its clients (your frontend) can use to enter a Liveblocks room. You use this endpoint to implement your own application’s custom authentication endpoint. When using this endpoint to obtain ID tokens, you should manage your permissions by assigning user and/or group permissions to rooms explicitly, see our Manage permissions with ID tokens section.
+
+
+        **Important:** The difference with an access token is that an ID token doesn’t hold any permissions itself. With ID tokens, permissions are set in the Liveblocks back end (through REST API calls) and "checked at the door" every time they are used to enter a room. With access tokens, all permissions are set in the token itself, and thus controlled from your back end entirely.
+
+
+        **Note:** When using the `@liveblocks/node` package, you can use `Liveblocks.identifyUser` in your back end to build this request.
+
+
+        You can pass the property `userId` in the request’s body. This can be whatever internal identifier you use for your user accounts as long as it uniquely identifies an account. The property `userId` is used by Liveblocks to calculate your account’s Monthly Active Users. One unique `userId` corresponds to one MAU.
+
+
+        If you want to use group permissions, you can also declare which `groupIds` this user belongs to. The group ID values are yours, but they will have to match the group IDs you assign permissions to when assigning permissions to rooms, see Manage permissions with ID tokens).
+
+
+        Additionally, you can set custom metadata to the token, which will be publicly accessible by other clients through the `user.info` property. This is useful for storing static data like avatar images or the user’s display name.'
+components:
+  responses:
+    '403':
+      description: Unauthorized access.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            INVALID_SECRET_KEY:
+              value:
+                error: INVALID_SECRET_KEY
+                message: Invalid secret key.
+                suggestion: 'Please use a valid secret key, the secret key is available in the dashboard: https://liveblocks.io/dashboard/apikeys.'
+                docs: ''
+            INVALID_PUBLIC_KEY:
+              value:
+                error: INVALID_PUBLIC_KEY
+                message: Invalid public key
+                suggestion: 'Please use a valid public key, the public key is available in the dashboard: https://liveblocks.io/dashboard/apikeys'
+                docs: ''
+            UNAUTHORIZED_ROOM_ACCESS:
+              value:
+                error: UNAUTHORIZED_ROOM_ACCESS
+                message: The user does not have permission to access the room.
+                suggestion: Please add the user’s ID or one of the user’s group IDs to the room first.
+                docs: ''
+            INVALID_MANAGEMENT_API_ACCESS_TOKEN_SCOPE:
+              value:
+                error: INVALID_MANAGEMENT_API_ACCESS_TOKEN_SCOPE
+                message: Invalid management api access token scope
+                suggestion: 'Please provide a management api access token with required scope: ''read:all''.'
+                docs: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+            FEATURE_NOT_ENABLED:
+              value:
+                error: FEATURE_NOT_ENABLED
+                message: The "Management API" feature is not enabled for this account.
+                suggestion: If you want access to this feature, please contact us at support@liveblocks.io
+                docs: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+            PUBLIC_KEY_NOT_ENABLED:
+              value:
+                error: PUBLIC_KEY_NOT_ENABLED
+                message: Public key not enabled
+                suggestion: Please enable the public key for the project
+                docs: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+  schemas:
+    Error:
+      title: Error
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error code
+        message:
+          type: string
+          description: Message explaining the error
+        suggestion:
+          type: string
+          description: A suggestion on how to fix the error
+        docs:
+          type: string
+          description: A link to the documentation
+    AuthorizeUserResponse:
+      title: AuthorizeUserResponse
+      type: object
+      properties:
+        token:
+          type: string
+      required:
+      - token
+      additionalProperties: false
+      example:
+        token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIi...
+    IdentifyUserRequestBody:
+      title: IdentifyUserRequestBody
+      type: object
+      properties:
+        userId:
+          type: string
+        organizationId:
+          type: string
+        groupIds:
+          type: array
+          items:
+            type: string
+        userInfo:
+          type: object
+      required:
+      - userId
+      additionalProperties: false
+      example:
+        userId: user-123
+        organizationId: acme-corp
+        groupIds:
+        - marketing
+        - engineering
+        userInfo:
+          name: bob
+          avatar: https://example.org/images/user123.jpg
+    IdentifyUserResponse:
+      title: IdentifyUserResponse
+      type: object
+      properties:
+        token:
+          type: string
+      required:
+      - token
+      additionalProperties: false
+      example:
+        token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIi...
+    AuthorizeUserRequestBody:
+      title: AuthorizeUserRequestBody
+      type: object
+      properties:
+        userId:
+          type: string
+        userInfo:
+          type: object
+        organizationId:
+          type: string
+        permissions:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+      required:
+      - userId
+      - permissions
+      additionalProperties: false
+      example:
+        userId: user-123
+        userInfo:
+          name: bob
+          avatar: https://example.org/images/user123.jpg
+        organizationId: acme-corp
+        permissions:
+          my-room-1:
+          - '*:write'
+          my-room-2:
+          - '*:write'
+          my-room-*:
+          - '*:read'
+  securitySchemes:
+    Authorization:
+      name: Bearer sk_xxx
+      type: apiKey
+      in: header
+externalDocs:
+  description: Liveblocks REST API reference
+  url: https://liveblocks.io/docs/api-reference/rest-api-endpoints

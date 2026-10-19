@@ -1,0 +1,771 @@
+openapi: 3.2.0
+info:
+  title: Liveblocks Feeds API
+  version: '2.0'
+  description: 'The Liveblocks REST API lets you read and modify rooms, threads, notifications, users, permissions, and schemas programmatically. Authenticate requests with a secret key using the `Authorization: Bearer` header.'
+servers:
+- url: https://api.liveblocks.io/v2
+tags:
+- name: Feeds
+paths:
+  /rooms/{roomId}/feeds:
+    get:
+      summary: Get room feeds
+      description: This endpoint returns the feeds in the requested room. Corresponds to `liveblocks.getFeeds`.
+      tags:
+      - Feeds
+      operationId: get-feeds
+      parameters:
+      - name: roomId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the room
+          example: my-room-id
+      - name: cursor
+        in: query
+        schema:
+          type: string
+          description: A cursor used for pagination. Get the value from the `nextCursor` response of the previous page.
+          example: eyJjcmVhdGVkQXQiOjE2NjAwMDA5ODgxMzd9
+      - name: since
+        in: query
+        schema:
+          type: integer
+          description: Only return feeds with `createdAt` greater than this Unix timestamp in milliseconds.
+          example: 1660000988137
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+          description: A limit on the number of feeds to be returned. The limit can range between 1 and 100, and defaults to 20.
+          example: 20
+      responses:
+        '200':
+          description: Success. Returns list of feeds in a room.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetFeedsResponse'
+              examples:
+                example:
+                  value:
+                    nextCursor: eyJjcmVhdGVkQXQiOjE2NjAwMDA5ODgxMzd9
+                    data:
+                    - feedId: my-feed-id
+                      metadata:
+                        type: chat
+                        name: General Discussion
+                      createdAt: 1660000988137
+                      updatedAt: 1660000988137
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+    post:
+      summary: Create feed
+      description: This endpoint creates a new feed in a room. Corresponds to `liveblocks.createFeed`.
+      tags:
+      - Feeds
+      operationId: create-feed
+      parameters:
+      - name: roomId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the room
+          example: my-room-id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateFeedRequestBody'
+            examples:
+              example:
+                value:
+                  feedId: my-feed-id
+                  metadata:
+                    type: chat
+                    name: General Discussion
+      responses:
+        '200':
+          description: Success. Returns the created feed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Feed'
+              examples:
+                example:
+                  value:
+                    feedId: my-feed-id
+                    metadata:
+                      type: chat
+                      name: General Discussion
+                    createdAt: 1660000988137
+                    updatedAt: 1660000988137
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '422':
+          $ref: '#/components/responses/422'
+  /rooms/{roomId}/feeds/{feedId}:
+    get:
+      summary: Get feed
+      description: This endpoint returns a feed by its ID. Corresponds to `liveblocks.getFeed`.
+      tags:
+      - Feeds
+      operationId: get-feed
+      parameters:
+      - name: roomId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the room
+          example: my-room-id
+      - name: feedId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the feed
+          example: fd_abc123
+      responses:
+        '200':
+          description: Success. Returns the feed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Feed'
+              examples:
+                example:
+                  value:
+                    feedId: my-feed-id
+                    metadata:
+                      type: chat
+                      name: General Discussion
+                    createdAt: 1660000988137
+                    updatedAt: 1660000988137
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+    patch:
+      summary: Update feed
+      description: This endpoint updates the metadata of a feed. Corresponds to `liveblocks.updateFeed`.
+      tags:
+      - Feeds
+      operationId: update-feed
+      parameters:
+      - name: roomId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the room
+          example: my-room-id
+      - name: feedId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the feed
+          example: fd_abc123
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateFeedRequestBody'
+            examples:
+              example:
+                value:
+                  metadata:
+                    type: chat
+                    name: Updated Discussion
+      responses:
+        '200':
+          description: Success. Returns the updated feed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Feed'
+              examples:
+                example:
+                  value:
+                    feedId: my-feed-id
+                    metadata:
+                      type: chat
+                      name: Updated Discussion
+                    createdAt: 1660000988137
+                    updatedAt: 1660001000000
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '422':
+          $ref: '#/components/responses/422'
+    delete:
+      summary: Delete feed
+      description: This endpoint deletes a feed. Corresponds to `liveblocks.deleteFeed`.
+      tags:
+      - Feeds
+      operationId: delete-feed
+      parameters:
+      - name: roomId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the room
+          example: my-room-id
+      - name: feedId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the feed
+          example: fd_abc123
+      responses:
+        '204':
+          description: Success. The feed was deleted.
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+  /rooms/{roomId}/feeds/{feedId}/messages:
+    get:
+      summary: Get feed messages
+      description: This endpoint returns the messages in a feed. Corresponds to `liveblocks.getFeedMessages`.
+      tags:
+      - Feeds
+      operationId: get-feed-messages
+      parameters:
+      - name: roomId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the room
+          example: my-room-id
+      - name: feedId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the feed
+          example: fd_abc123
+      - name: cursor
+        in: query
+        schema:
+          type: string
+          description: A cursor used for pagination. Get the value from the `nextCursor` response of the previous page.
+          example: eyJjcmVhdGVkQXQiOjE2NjAwMDA5ODgxMzd9
+      - name: since
+        in: query
+        schema:
+          type: integer
+          description: Only return messages with `createdAt` greater than this Unix timestamp in milliseconds.
+          example: 1660000988137
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+          description: A limit on the number of messages to be returned. The limit can range between 1 and 100, and defaults to 20.
+          example: 20
+      responses:
+        '200':
+          description: Success. Returns list of messages in a feed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetFeedMessagesResponse'
+              examples:
+                example:
+                  value:
+                    nextCursor: eyJjcmVhdGVkQXQiOjE2NjAwMDA5ODgxMzd9
+                    data:
+                    - id: msg_xyz789
+                      data:
+                        type: text
+                        content: Hello, world!
+                      createdAt: 1660000988137
+                      updatedAt: 1660000988137
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+    post:
+      summary: Create feed message
+      description: This endpoint creates a new message in a feed. Corresponds to `liveblocks.createFeedMessage`.
+      tags:
+      - Feeds
+      operationId: create-feed-message
+      parameters:
+      - name: roomId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the room
+          example: my-room-id
+      - name: feedId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the feed
+          example: fd_abc123
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateFeedMessageRequestBody'
+            examples:
+              example:
+                value:
+                  id: msg_xyz789
+                  data:
+                    type: text
+                    content: Hello, world!
+      responses:
+        '200':
+          description: Success. Returns the created feed message.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FeedMessage'
+              examples:
+                example:
+                  value:
+                    id: msg_xyz789
+                    data:
+                      type: text
+                      content: Hello, world!
+                    createdAt: 1660000988137
+                    updatedAt: 1660000988137
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '422':
+          $ref: '#/components/responses/422'
+  /rooms/{roomId}/feeds/{feedId}/messages/{messageId}:
+    patch:
+      summary: Update feed message
+      description: This endpoint updates a feed message. Corresponds to `liveblocks.updateFeedMessage`.
+      tags:
+      - Feeds
+      operationId: update-feed-message
+      parameters:
+      - name: roomId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the room
+          example: my-room-id
+      - name: feedId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the feed
+          example: fd_abc123
+      - name: messageId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the message
+          example: msg_xyz789
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateFeedMessageRequestBody'
+            examples:
+              example:
+                value:
+                  data:
+                    type: text
+                    content: Updated message content
+      responses:
+        '200':
+          description: Success. Returns the updated feed message.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FeedMessage'
+              examples:
+                example:
+                  value:
+                    id: msg_xyz789
+                    data:
+                      type: text
+                      content: Updated message content
+                    createdAt: 1660000988137
+                    updatedAt: 1660001000000
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '422':
+          $ref: '#/components/responses/422'
+    delete:
+      summary: Delete feed message
+      description: This endpoint deletes a feed message. Corresponds to `liveblocks.deleteFeedMessage`.
+      tags:
+      - Feeds
+      operationId: delete-feed-message
+      parameters:
+      - name: roomId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the room
+          example: my-room-id
+      - name: feedId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the feed
+          example: fd_abc123
+      - name: messageId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the message
+          example: msg_xyz789
+      responses:
+        '204':
+          description: Success. The feed message was deleted.
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+components:
+  responses:
+    '403':
+      description: Unauthorized access.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            INVALID_SECRET_KEY:
+              value:
+                error: INVALID_SECRET_KEY
+                message: Invalid secret key.
+                suggestion: 'Please use a valid secret key, the secret key is available in the dashboard: https://liveblocks.io/dashboard/apikeys.'
+                docs: ''
+            INVALID_PUBLIC_KEY:
+              value:
+                error: INVALID_PUBLIC_KEY
+                message: Invalid public key
+                suggestion: 'Please use a valid public key, the public key is available in the dashboard: https://liveblocks.io/dashboard/apikeys'
+                docs: ''
+            UNAUTHORIZED_ROOM_ACCESS:
+              value:
+                error: UNAUTHORIZED_ROOM_ACCESS
+                message: The user does not have permission to access the room.
+                suggestion: Please add the user’s ID or one of the user’s group IDs to the room first.
+                docs: ''
+            INVALID_MANAGEMENT_API_ACCESS_TOKEN_SCOPE:
+              value:
+                error: INVALID_MANAGEMENT_API_ACCESS_TOKEN_SCOPE
+                message: Invalid management api access token scope
+                suggestion: 'Please provide a management api access token with required scope: ''read:all''.'
+                docs: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+            FEATURE_NOT_ENABLED:
+              value:
+                error: FEATURE_NOT_ENABLED
+                message: The "Management API" feature is not enabled for this account.
+                suggestion: If you want access to this feature, please contact us at support@liveblocks.io
+                docs: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+            PUBLIC_KEY_NOT_ENABLED:
+              value:
+                error: PUBLIC_KEY_NOT_ENABLED
+                message: Public key not enabled
+                suggestion: Please enable the public key for the project
+                docs: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+    '404':
+      description: Resource not found.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            ROOM_NOT_FOUND:
+              value:
+                error: ROOM_NOT_FOUND
+                message: Room not found.
+                suggestion: 'Please use a valid room ID, room IDs are available in the dashboard: https://liveblocks.io/dashboard/rooms.'
+                docs: ''
+            WEBHOOK_NOT_FOUND:
+              value:
+                error: WEBHOOK_NOT_FOUND
+                message: Webhook "ep_xxx" not found.
+                suggestion: 'Please use a valid webhook ID, webhook IDs are available in the dashboard: https://liveblocks.io/dashboard/webhooks'
+                docs: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+            NOT_EXISTING_MANAGEMENT_API_ACCESS_TOKEN:
+              value:
+                error: NOT_EXISTING_MANAGEMENT_API_ACCESS_TOKEN
+                message: Not existing management api access token
+                suggestion: Please provide an existing management api access token in the authentication header
+                docs: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+    '422':
+      description: Unprocessable entity.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            UNPROCESSABLE_ENTITY:
+              value:
+                error: UNPROCESSABLE_ENTITY
+                message: 'Missing key: ''defaultAccesses''.'
+                suggestion: Please ensure the data follows the correct format.
+                docs: ''
+    '401':
+      description: Missing or wrong credentials.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            WRONG_KEY_USED:
+              value:
+                error: WRONG_KEY_USED
+                message: Public key instead of the secret key.
+                suggestion: 'Please use your secret key instead of the public key, the secret key is available in the dashboard: https://liveblocks.io/dashboard/apikeys.'
+                docs: ''
+            MISSING_SECRET_KEY:
+              value:
+                error: MISSING_SECRET_KEY
+                message: Missing secret key in authentication header
+                suggestion: 'Please use a secret key, the secret key is available in the dashboard: https://liveblocks.io/dashboard/apikeys'
+                docs: ''
+            MISSING_MANAGEMENT_API_ACCESS_TOKEN:
+              value:
+                error: MISSING_MANAGEMENT_API_ACCESS_TOKEN
+                message: Missing management api access token in authentication header
+                suggestion: Please provide a management api access token in the authentication header
+                docs: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+            INVALID_MANAGEMENT_API_ACCESS_TOKEN:
+              value:
+                error: INVALID_MANAGEMENT_API_ACCESS_TOKEN
+                message: Invalid management api access token
+                suggestion: Please provide a valid management api access token in the authentication header
+                docs: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+            REVOKED_MANAGEMENT_API_ACCESS_TOKEN:
+              value:
+                error: REVOKED_MANAGEMENT_API_ACCESS_TOKEN
+                message: Revoked management api access token
+                suggestion: Please provide an active management api access token in the authentication header
+                docs: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+            EXPIRED_MANAGEMENT_API_ACCESS_TOKEN:
+              value:
+                error: EXPIRED_MANAGEMENT_API_ACCESS_TOKEN
+                message: Expired management api access token
+                suggestion: Please provide a not expired management api access token in the authentication header
+                docs: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+  schemas:
+    GetFeedsResponse:
+      title: GetFeedsResponse
+      type: object
+      additionalProperties: false
+      required:
+      - nextCursor
+      - data
+      properties:
+        nextCursor:
+          oneOf:
+          - type: string
+          - type: 'null'
+          description: Pass as `cursor` to fetch the next page, or null when there are no more results.
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Feed'
+      example:
+        nextCursor: eyJjcmVhdGVkQXQiOjE2NjAwMDA5ODgxMzd9
+        data:
+        - feedId: my-feed-id
+          metadata:
+            type: chat
+            name: General Discussion
+          createdAt: 1660000988137
+          updatedAt: 1660000988137
+    Error:
+      title: Error
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error code
+        message:
+          type: string
+          description: Message explaining the error
+        suggestion:
+          type: string
+          description: A suggestion on how to fix the error
+        docs:
+          type: string
+          description: A link to the documentation
+    Feed:
+      type: object
+      title: Feed
+      description: Feed objects returned by the API use `createdAt` and `updatedAt` (Unix time in milliseconds).
+      properties:
+        feedId:
+          type: string
+        metadata:
+          type: object
+        createdAt:
+          type: number
+          description: Unix timestamp in milliseconds when the feed was created.
+        updatedAt:
+          type: number
+          description: Unix timestamp in milliseconds when the feed was last updated.
+      required:
+      - feedId
+      - metadata
+      - createdAt
+      - updatedAt
+    UpdateFeedRequestBody:
+      type: object
+      title: UpdateFeedRequestBody
+      properties:
+        metadata:
+          type: object
+      required:
+      - metadata
+    GetFeedMessagesResponse:
+      title: GetFeedMessagesResponse
+      type: object
+      additionalProperties: false
+      required:
+      - nextCursor
+      - data
+      properties:
+        nextCursor:
+          oneOf:
+          - type: string
+          - type: 'null'
+          description: Pass as `cursor` to fetch the next page, or null when there are no more results.
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/FeedMessage'
+      example:
+        nextCursor: eyJjcmVhdGVkQXQiOjE2NjAwMDA5ODgxMzd9
+        data:
+        - id: msg_xyz789
+          data:
+            type: text
+            content: Hello, world!
+          createdAt: 1660000988137
+          updatedAt: 1660000988137
+    CreateFeedMessageRequestBody:
+      type: object
+      title: CreateFeedMessageRequestBody
+      description: Request body for `POST /v2/rooms/{roomId}/feeds/{feedId}/messages`. Optional message time is sent as `timestamp` (milliseconds), not `createdAt`.
+      properties:
+        id:
+          type: string
+          description: Optional client-provided message id. If omitted, the server generates one.
+        timestamp:
+          type: number
+          description: Optional. Unix timestamp in milliseconds for the message's creation time. If omitted, the server uses the current time.
+        data:
+          type: object
+      required:
+      - data
+    CreateFeedRequestBody:
+      type: object
+      title: CreateFeedRequestBody
+      description: Request body for `POST /v2/rooms/{roomId}/feeds`. Optional creation time is sent as `timestamp` (milliseconds), not `createdAt`.
+      properties:
+        feedId:
+          type: string
+        metadata:
+          type: object
+        timestamp:
+          type: number
+          description: Optional. Unix timestamp in milliseconds for the feed's creation time. If omitted, the server uses the current time.
+      required:
+      - feedId
+    FeedMessage:
+      type: object
+      title: FeedMessage
+      description: Message objects returned by the API use `createdAt` and `updatedAt` (Unix time in milliseconds). Request bodies for create/update use `timestamp` for optional custom times.
+      properties:
+        id:
+          type: string
+        createdAt:
+          type: number
+          description: Unix timestamp in milliseconds when the message was created.
+        updatedAt:
+          type: number
+          description: Unix timestamp in milliseconds when the message was last updated.
+        data:
+          type: object
+      required:
+      - id
+      - createdAt
+      - updatedAt
+      - data
+    UpdateFeedMessageRequestBody:
+      type: object
+      title: UpdateFeedMessageRequestBody
+      description: Request body for `PATCH /v2/rooms/{roomId}/feeds/{feedId}/messages/{messageId}`. Optional update time is sent as `timestamp` (milliseconds), not `updatedAt`.
+      properties:
+        data:
+          type: object
+        timestamp:
+          type: number
+          description: Optional. Unix timestamp in milliseconds to record as the update time. If omitted, the server uses the current time.
+      required:
+      - data
+  securitySchemes:
+    Authorization:
+      name: Bearer sk_xxx
+      type: apiKey
+      in: header
+externalDocs:
+  description: Liveblocks REST API reference
+  url: https://liveblocks.io/docs/api-reference/rest-api-endpoints

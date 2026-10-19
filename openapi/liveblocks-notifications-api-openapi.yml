@@ -1,0 +1,1120 @@
+openapi: 3.2.0
+info:
+  title: Liveblocks Notifications API
+  version: '2.0'
+  description: 'The Liveblocks REST API lets you read and modify rooms, threads, notifications, users, permissions, and schemas programmatically. Authenticate requests with a secret key using the `Authorization: Bearer` header.'
+servers:
+- url: https://api.liveblocks.io/v2
+tags:
+- name: Notifications
+paths:
+  /users/{userId}/inbox-notifications/{inboxNotificationId}:
+    parameters:
+    - schema:
+        type: string
+        example: user-123
+      name: userId
+      in: path
+      required: true
+    - schema:
+        type: string
+        example: in_abc123
+      name: inboxNotificationId
+      in: path
+      required: true
+    get:
+      summary: Get inbox notification
+      tags:
+      - Notifications
+      parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the user
+          example: user-123
+      - name: inboxNotificationId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the inbox notification
+          example: in_abc123
+      operationId: get-inbox-notification
+      description: This endpoint returns a user’s inbox notification by its ID. Corresponds to `liveblocks.getInboxNotification`.
+      responses:
+        '200':
+          description: Success. Returns the inbox notification.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/InboxNotificationThreadData'
+                - $ref: '#/components/schemas/InboxNotificationCustomData'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+    delete:
+      summary: Delete inbox notification
+      tags:
+      - Notifications
+      parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the user
+          example: user-123
+      - name: inboxNotificationId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the inbox notification
+          example: in_abc123
+      operationId: delete-inbox-notification
+      description: This endpoint deletes a user’s inbox notification by its ID. Corresponds to `liveblocks.deleteInboxNotification`.
+      responses:
+        '204':
+          description: Success. The inbox notification has been deleted.
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+  /users/{userId}/inbox-notifications:
+    parameters:
+    - schema:
+        type: string
+        example: user-123
+      name: userId
+      in: path
+      required: true
+    delete:
+      summary: Delete all inbox notifications
+      tags:
+      - Notifications
+      parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the user
+          example: user-123
+      operationId: delete-all-inbox-notifications
+      description: This endpoint deletes all the user’s inbox notifications. Corresponds to `liveblocks.deleteAllInboxNotifications`.
+      responses:
+        '204':
+          description: Success. All inbox notifications for the user have been deleted.
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+    get:
+      summary: Get all inbox notifications
+      tags:
+      - Notifications
+      parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the user
+          example: user-123
+      - schema:
+          type: string
+          description: The organization ID to filter notifications for.
+          example: org_123456789
+        in: query
+        name: organizationId
+      - schema:
+          type: string
+          description: Query to filter notifications. You can filter by `unread`, for example, `unread:true`.
+          example: metadata["color"]:"blue"
+        in: query
+        name: query
+      - schema:
+          type: integer
+          minimum: 1
+          maximum: 50
+          default: 50
+          description: A limit on the number of inbox notifications to be returned. The limit can range between 1 and 50, and defaults to 50.
+          example: 20
+        in: query
+        name: limit
+      - schema:
+          type: string
+          description: A cursor used for pagination. Get the value from the `nextCursor` response of the previous page.
+          example: eyJjcmVhdGVkQXQiOjE2NjAwMDA5ODgxMzd9
+        in: query
+        name: startingAfter
+      operationId: get-inbox-notifications
+      description: This endpoint returns all the user’s inbox notifications. Corresponds to `liveblocks.getInboxNotifications`.
+      responses:
+        '200':
+          description: Success. Returns the list of inbox notifications for the user.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetInboxNotificationsResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+  /users/{userId}/notification-settings:
+    parameters:
+    - schema:
+        type: string
+        example: user-123
+      name: userId
+      in: path
+      required: true
+    get:
+      summary: Get notification settings
+      tags:
+      - Notifications
+      operationId: get-notification-settings
+      description: This endpoint returns a user's notification settings for the project. Corresponds to `liveblocks.getNotificationSettings`.
+      parameters:
+      - schema:
+          type: string
+          description: ID of the user
+          example: user-123
+        name: userId
+        in: path
+        required: true
+      responses:
+        '200':
+          description: Success. Returns the user's notification settings for the project.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationSettings'
+              examples:
+                example:
+                  value:
+                    email:
+                      thread: true
+                      textMention: false
+                      $customNotification: true
+                    slack:
+                      thread: true
+                      textMention: true
+                      $customNotification: false
+                    teams:
+                      thread: false
+                      textMention: true
+                      $customNotification: true
+                    webPush:
+                      thread: true
+                      textMention: true
+                      $customNotification: false
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+    post:
+      summary: Update notification settings
+      tags:
+      - Notifications
+      operationId: update-notification-settings
+      description: This endpoint updates a user's notification settings for the project. Corresponds to `liveblocks.updateNotificationSettings`.
+      parameters:
+      - schema:
+          type: string
+          description: ID of the user
+          example: user-123
+        name: userId
+        in: path
+        required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateNotificationSettingsRequestBody'
+            examples:
+              example:
+                value:
+                  email:
+                    thread: true
+                    textMention: false
+                  slack:
+                    textMention: false
+                  webPush:
+                    thread: true
+      responses:
+        '200':
+          description: Success. Returns the updated notification settings.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationSettings'
+              examples:
+                example:
+                  value:
+                    email:
+                      thread: true
+                      textMention: false
+                      $customNotification: true
+                    slack:
+                      thread: true
+                      textMention: true
+                      $customNotification: false
+                    teams:
+                      thread: false
+                      textMention: true
+                      $customNotification: true
+                    webPush:
+                      thread: true
+                      textMention: true
+                      $customNotification: false
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '422':
+          $ref: '#/components/responses/422'
+    delete:
+      summary: Delete notification settings
+      tags:
+      - Notifications
+      operationId: delete-notification-settings
+      description: This endpoint deletes a user's notification settings for the project. Corresponds to `liveblocks.deleteNotificationSettings`.
+      parameters:
+      - schema:
+          type: string
+          description: ID of the user
+          example: user-123
+        name: userId
+        in: path
+        required: true
+      responses:
+        '204':
+          description: No Content
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+  /rooms/{roomId}/users/{userId}/subscription-settings:
+    parameters:
+    - schema:
+        type: string
+        example: my-room-id
+      name: roomId
+      in: path
+      required: true
+    - schema:
+        type: string
+        example: user-123
+      name: userId
+      in: path
+      required: true
+    get:
+      summary: Get room subscription settings
+      tags:
+      - Notifications
+      operationId: get-room-subscription-settings
+      description: This endpoint returns a user’s subscription settings for a specific room. Corresponds to `liveblocks.getRoomSubscriptionSettings`.
+      parameters:
+      - schema:
+          type: string
+          description: ID of the room
+          example: my-room-id
+        name: roomId
+        in: path
+        required: true
+      - schema:
+          type: string
+          description: ID of the user
+          example: user-123
+        name: userId
+        in: path
+        required: true
+      responses:
+        '200':
+          description: Success. Returns the user's subscription settings for the specified room.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoomSubscriptionSettings'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+    post:
+      summary: Update room subscription settings
+      tags:
+      - Notifications
+      operationId: update-room-subscription-settings
+      description: This endpoint updates a user’s subscription settings for a specific room. Corresponds to `liveblocks.updateRoomSubscriptionSettings`.
+      parameters:
+      - schema:
+          type: string
+          description: ID of the room
+          example: my-room-id
+        name: roomId
+        in: path
+        required: true
+      - schema:
+          type: string
+          description: ID of the user
+          example: user-123
+        name: userId
+        in: path
+        required: true
+      responses:
+        '200':
+          description: Success. Returns the updated room subscription settings.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoomSubscriptionSettings'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '422':
+          description: Unprocessable Entity
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateRoomSubscriptionSettingsRequestBody'
+    delete:
+      summary: Delete room subscription settings
+      tags:
+      - Notifications
+      operationId: delete-room-subscription-settings
+      description: This endpoint deletes a user’s subscription settings for a specific room. Corresponds to `liveblocks.deleteRoomSubscriptionSettings`.
+      parameters:
+      - schema:
+          type: string
+          description: ID of the room
+          example: my-room-id
+        name: roomId
+        in: path
+        required: true
+      - schema:
+          type: string
+          description: ID of the user
+          example: user-123
+        name: userId
+        in: path
+        required: true
+      responses:
+        '204':
+          description: No Content
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+  /users/{userId}/room-subscription-settings:
+    parameters:
+    - schema:
+        type: string
+        example: user-123
+      name: userId
+      in: path
+      required: true
+    get:
+      summary: Get user room subscription settings
+      tags:
+      - Notifications
+      operationId: get-user-room-subscription-settings
+      description: This endpoint returns the list of a user's room subscription settings. Corresponds to `liveblocks.getUserRoomSubscriptionSettings`.
+      parameters:
+      - schema:
+          type: string
+          description: ID of the user
+          example: user-123
+        name: userId
+        in: path
+        required: true
+      - schema:
+          type: string
+          description: A cursor used for pagination. Get the value from the `nextCursor` response of the previous page.
+          example: eyJjcmVhdGVkQXQiOjE2NjAwMDA5ODgxMzd9
+        in: query
+        name: startingAfter
+      - schema:
+          type: integer
+          minimum: 1
+          maximum: 50
+          default: 50
+          description: A limit on the number of elements to be returned. The limit can range between 1 and 50, and defaults to 50.
+          example: 20
+        in: query
+        name: limit
+      - schema:
+          type: string
+          description: The organization ID to filter room subscription settings for.
+          example: org_123456789
+        in: query
+        name: organizationId
+      responses:
+        '200':
+          description: Success. Returns the list of the user's room subscription settings.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetRoomSubscriptionSettingsResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+  /rooms/{roomId}/users/{userId}/notification-settings:
+    parameters:
+    - schema:
+        type: string
+        example: my-room-id
+      name: roomId
+      in: path
+      required: true
+    - schema:
+        type: string
+        example: user-123
+      name: userId
+      in: path
+      required: true
+    get:
+      summary: Get room notification settings
+      operationId: get-room-notification-settings
+      tags:
+      - Notifications
+      deprecated: true
+      description: '**Deprecated.** Renamed to `/subscription-settings`. Read more in our migration guide.
+
+
+        This endpoint returns a user’s subscription settings for a specific room. Corresponds to `liveblocks.getRoomNotificationSettings`.'
+      parameters:
+      - schema:
+          type: string
+          description: ID of the room
+          example: my-room-id
+        name: roomId
+        in: path
+        required: true
+      - schema:
+          type: string
+          description: ID of the user
+          example: user-123
+        name: userId
+        in: path
+        required: true
+      responses:
+        '200':
+          description: Success. Returns the user's notification settings for the specified room.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoomSubscriptionSettings'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+    post:
+      summary: Update room notification settings
+      operationId: update-room-notification-settings
+      tags:
+      - Notifications
+      deprecated: true
+      description: '**Deprecated.** Renamed to `/subscription-settings`. Read more in our migration guide.
+
+
+        This endpoint updates a user’s notification settings for a specific room. Corresponds to `liveblocks.updateRoomNotificationSettings`.'
+      parameters:
+      - schema:
+          type: string
+          description: ID of the room
+          example: my-room-id
+        name: roomId
+        in: path
+        required: true
+      - schema:
+          type: string
+          description: ID of the user
+          example: user-123
+        name: userId
+        in: path
+        required: true
+      responses:
+        '200':
+          description: Success. Returns the updated room notification settings.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoomSubscriptionSettings'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '422':
+          description: Unprocessable Entity
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateRoomSubscriptionSettingsRequestBody'
+    delete:
+      summary: Delete room notification settings
+      operationId: delete-room-notification-settings
+      tags:
+      - Notifications
+      deprecated: true
+      description: '**Deprecated.** Renamed to `/subscription-settings`. Read more in our migration guide.
+
+
+        This endpoint deletes a user’s notification settings for a specific room. Corresponds to `liveblocks.deleteRoomNotificationSettings`.'
+      parameters:
+      - schema:
+          type: string
+          description: ID of the room
+          example: my-room-id
+        name: roomId
+        in: path
+        required: true
+      - schema:
+          type: string
+          description: ID of the user
+          example: user-123
+        name: userId
+        in: path
+        required: true
+      responses:
+        '204':
+          description: No Content
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+  /inbox-notifications/trigger:
+    parameters: []
+    post:
+      summary: Trigger inbox notification
+      tags:
+      - Notifications
+      operationId: trigger-inbox-notification
+      description: This endpoint triggers an inbox notification. Corresponds to `liveblocks.triggerInboxNotification`.
+      responses:
+        '200':
+          description: No Content
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '422':
+          description: Unprocessable Entity
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TriggerInboxNotificationRequestBody'
+  /inbox-notifications/{inboxNotificationId}/read:
+    parameters:
+    - schema:
+        type: string
+        example: in_abc123
+      name: inboxNotificationId
+      in: path
+      required: true
+    post:
+      summary: Mark inbox notification as read
+      tags:
+      - Notifications
+      operationId: mark-inbox-notification-as-read
+      description: This endpoint marks a specific inbox notification as read.
+      parameters:
+      - name: inboxNotificationId
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the inbox notification
+          example: in_abc123
+      responses:
+        '200':
+          description: Success. The inbox notification has been marked as read. This endpoint does not return any content.
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+components:
+  responses:
+    '403':
+      description: Unauthorized access.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            INVALID_SECRET_KEY:
+              value:
+                error: INVALID_SECRET_KEY
+                message: Invalid secret key.
+                suggestion: 'Please use a valid secret key, the secret key is available in the dashboard: https://liveblocks.io/dashboard/apikeys.'
+                docs: ''
+            INVALID_PUBLIC_KEY:
+              value:
+                error: INVALID_PUBLIC_KEY
+                message: Invalid public key
+                suggestion: 'Please use a valid public key, the public key is available in the dashboard: https://liveblocks.io/dashboard/apikeys'
+                docs: ''
+            UNAUTHORIZED_ROOM_ACCESS:
+              value:
+                error: UNAUTHORIZED_ROOM_ACCESS
+                message: The user does not have permission to access the room.
+                suggestion: Please add the user’s ID or one of the user’s group IDs to the room first.
+                docs: ''
+            INVALID_MANAGEMENT_API_ACCESS_TOKEN_SCOPE:
+              value:
+                error: INVALID_MANAGEMENT_API_ACCESS_TOKEN_SCOPE
+                message: Invalid management api access token scope
+                suggestion: 'Please provide a management api access token with required scope: ''read:all''.'
+                docs: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+            FEATURE_NOT_ENABLED:
+              value:
+                error: FEATURE_NOT_ENABLED
+                message: The "Management API" feature is not enabled for this account.
+                suggestion: If you want access to this feature, please contact us at support@liveblocks.io
+                docs: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+            PUBLIC_KEY_NOT_ENABLED:
+              value:
+                error: PUBLIC_KEY_NOT_ENABLED
+                message: Public key not enabled
+                suggestion: Please enable the public key for the project
+                docs: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+    '422':
+      description: Unprocessable entity.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            UNPROCESSABLE_ENTITY:
+              value:
+                error: UNPROCESSABLE_ENTITY
+                message: 'Missing key: ''defaultAccesses''.'
+                suggestion: Please ensure the data follows the correct format.
+                docs: ''
+    '401':
+      description: Missing or wrong credentials.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            WRONG_KEY_USED:
+              value:
+                error: WRONG_KEY_USED
+                message: Public key instead of the secret key.
+                suggestion: 'Please use your secret key instead of the public key, the secret key is available in the dashboard: https://liveblocks.io/dashboard/apikeys.'
+                docs: ''
+            MISSING_SECRET_KEY:
+              value:
+                error: MISSING_SECRET_KEY
+                message: Missing secret key in authentication header
+                suggestion: 'Please use a secret key, the secret key is available in the dashboard: https://liveblocks.io/dashboard/apikeys'
+                docs: ''
+            MISSING_MANAGEMENT_API_ACCESS_TOKEN:
+              value:
+                error: MISSING_MANAGEMENT_API_ACCESS_TOKEN
+                message: Missing management api access token in authentication header
+                suggestion: Please provide a management api access token in the authentication header
+                docs: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+            INVALID_MANAGEMENT_API_ACCESS_TOKEN:
+              value:
+                error: INVALID_MANAGEMENT_API_ACCESS_TOKEN
+                message: Invalid management api access token
+                suggestion: Please provide a valid management api access token in the authentication header
+                docs: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+            REVOKED_MANAGEMENT_API_ACCESS_TOKEN:
+              value:
+                error: REVOKED_MANAGEMENT_API_ACCESS_TOKEN
+                message: Revoked management api access token
+                suggestion: Please provide an active management api access token in the authentication header
+                docs: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+            EXPIRED_MANAGEMENT_API_ACCESS_TOKEN:
+              value:
+                error: EXPIRED_MANAGEMENT_API_ACCESS_TOKEN
+                message: Expired management api access token
+                suggestion: Please provide a not expired management api access token in the authentication header
+                docs: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+  schemas:
+    TriggerInboxNotificationRequestBody:
+      title: TriggerInboxNotificationRequestBody
+      type: object
+      properties:
+        userId:
+          type: string
+        kind:
+          type: string
+          pattern: ^\$[a-zA-Z_]{1,128}$
+          description: A custom notification kind. Must start with '$' and contain only letters and underscores (max 128 characters).
+        subjectId:
+          type: string
+        roomId:
+          type: string
+        activityData:
+          type: object
+          additionalProperties:
+            oneOf:
+            - type: string
+            - type: number
+            - type: boolean
+        organizationId:
+          type: string
+      required:
+      - userId
+      - kind
+      - subjectId
+      - activityData
+      example:
+        userId: alice
+        kind: $fileUploaded
+        subjectId: file123
+        activityData:
+          url: url-to-file
+    InboxNotificationThreadData:
+      title: InboxNotificationThreadData
+      type: object
+      properties:
+        id:
+          type: string
+        kind:
+          type: string
+        threadId:
+          type: string
+        roomId:
+          type: string
+        organizationId:
+          type: string
+        readAt:
+          oneOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+        notifiedAt:
+          type: string
+          format: date-time
+      required:
+      - kind
+      - id
+      - roomId
+      - threadId
+      - notifiedAt
+      - readAt
+      example:
+        kind: thread
+        id: in_abc123
+        roomId: my-room-id
+        organizationId: org_123456789
+        threadId: th_abc123
+        notifiedAt: '2024-01-15T10:30:00.000Z'
+        readAt: null
+    Error:
+      title: Error
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error code
+        message:
+          type: string
+          description: Message explaining the error
+        suggestion:
+          type: string
+          description: A suggestion on how to fix the error
+        docs:
+          type: string
+          description: A link to the documentation
+    NotificationChannelSettings:
+      type: object
+      properties:
+        thread:
+          type: boolean
+        textMention:
+          type: boolean
+      additionalProperties:
+        type: boolean
+        description: Custom notification kinds prefixed by a '$'
+      example:
+        thread: true
+        textMention: false
+        $customNotification: true
+    UserRoomSubscriptionSettings:
+      title: UserRoomSubscriptionSettings
+      type: object
+      properties:
+        threads:
+          type: string
+          enum:
+          - all
+          - replies_and_mentions
+          - none
+        textMentions:
+          enum:
+          - mine
+          - none
+        roomId:
+          type: string
+      required:
+      - threads
+      - textMentions
+      - roomId
+      additionalProperties: false
+      example:
+        threads: all
+        textMentions: mine
+        roomId: my-room-id
+    GetInboxNotificationsResponse:
+      type: object
+      properties:
+        nextCursor:
+          oneOf:
+          - type: string
+          - type: 'null'
+          description: A cursor to use for pagination. Pass this value as `startingAfter` to get the next page of results. `null` if there are no more results.
+        data:
+          type: array
+          items:
+            oneOf:
+            - $ref: '#/components/schemas/InboxNotificationThreadData'
+            - $ref: '#/components/schemas/InboxNotificationCustomData'
+      required:
+      - data
+      - nextCursor
+      additionalProperties: false
+      example:
+        nextCursor: null
+        data:
+        - kind: thread
+          id: in_abc123
+          roomId: my-room-id
+          threadId: th_abc123
+          notifiedAt: '2024-01-15T10:30:00.000Z'
+          readAt: null
+    InboxNotificationActivity:
+      title: InboxNotificationActivity
+      type: object
+      properties:
+        id:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        data:
+          type: object
+          additionalProperties:
+            oneOf:
+            - type: string
+            - type: boolean
+            - type: number
+      required:
+      - id
+      - createdAt
+      - data
+      additionalProperties: false
+      example:
+        id: act_abc123
+        createdAt: '2024-01-15T10:30:00.000Z'
+        data:
+          url: url-to-file
+    NotificationSettings:
+      type: object
+      properties:
+        email:
+          $ref: '#/components/schemas/NotificationChannelSettings'
+        slack:
+          $ref: '#/components/schemas/NotificationChannelSettings'
+        teams:
+          $ref: '#/components/schemas/NotificationChannelSettings'
+        webPush:
+          $ref: '#/components/schemas/NotificationChannelSettings'
+      additionalProperties: false
+      description: Notification settings for each supported channel
+      example:
+        email:
+          thread: true
+          textMention: false
+          $customNotification: true
+        slack:
+          thread: true
+          textMention: true
+          $customNotification: false
+        teams:
+          thread: false
+          textMention: true
+          $customNotification: true
+        webPush:
+          thread: true
+          textMention: true
+          $customNotification: false
+    RoomSubscriptionSettings:
+      title: RoomSubscriptionSettings
+      type: object
+      properties:
+        threads:
+          enum:
+          - all
+          - replies_and_mentions
+          - none
+        textMentions:
+          enum:
+          - mine
+          - none
+      required:
+      - threads
+      - textMentions
+      additionalProperties: false
+      example:
+        threads: all
+        textMentions: mine
+    UpdateNotificationSettingsRequestBody:
+      title: UpdateNotificationSettingsRequestBody
+      type: object
+      properties:
+        email:
+          $ref: '#/components/schemas/NotificationChannelSettings'
+        slack:
+          $ref: '#/components/schemas/NotificationChannelSettings'
+        teams:
+          $ref: '#/components/schemas/NotificationChannelSettings'
+        webPush:
+          $ref: '#/components/schemas/NotificationChannelSettings'
+      additionalProperties: false
+      description: Partial notification settings - all properties are optional
+      example:
+        email:
+          thread: true
+          textMention: false
+        slack:
+          textMention: false
+        webPush:
+          thread: true
+    UpdateRoomSubscriptionSettingsRequestBody:
+      title: UpdateRoomSubscriptionSettingsRequestBody
+      type: object
+      properties:
+        threads:
+          enum:
+          - all
+          - replies_and_mentions
+          - none
+        textMentions:
+          enum:
+          - mine
+          - none
+      additionalProperties: false
+      description: Partial room subscription settings - all properties are optional
+      example:
+        threads: replies_and_mentions
+        textMentions: none
+    InboxNotificationCustomData:
+      title: InboxNotificationCustomData
+      type: object
+      properties:
+        id:
+          type: string
+        kind:
+          type: string
+          const: custom
+        subjectId:
+          type: string
+        roomId:
+          oneOf:
+          - type: string
+          - type: 'null'
+        readAt:
+          oneOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+        notifiedAt:
+          type: string
+          format: date-time
+        activities:
+          type: array
+          items:
+            $ref: '#/components/schemas/InboxNotificationActivity'
+      required:
+      - kind
+      - id
+      - subjectId
+      - notifiedAt
+      - readAt
+      - activities
+      additionalProperties: false
+      example:
+        kind: custom
+        id: in_xyz789
+        subjectId: file123
+        roomId: null
+        notifiedAt: '2024-01-15T10:30:00.000Z'
+        readAt: null
+        activities:
+        - id: act_abc123
+          createdAt: '2024-01-15T10:30:00.000Z'
+          data:
+            url: url-to-file
+    GetRoomSubscriptionSettingsResponse:
+      type: object
+      properties:
+        nextCursor:
+          oneOf:
+          - type: string
+          - type: 'null'
+          description: A cursor to use for pagination. Pass this value as `startingAfter` to get the next page of results. `null` if there are no more results.
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserRoomSubscriptionSettings'
+      required:
+      - data
+      - nextCursor
+      additionalProperties: false
+      example:
+        nextCursor: null
+        data:
+        - threads: all
+          textMentions: mine
+          roomId: my-room-id
+  securitySchemes:
+    Authorization:
+      name: Bearer sk_xxx
+      type: apiKey
+      in: header
+externalDocs:
+  description: Liveblocks REST API reference
+  url: https://liveblocks.io/docs/api-reference/rest-api-endpoints

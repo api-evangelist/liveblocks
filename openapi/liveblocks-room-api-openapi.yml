@@ -1,0 +1,1338 @@
+openapi: 3.2.0
+info:
+  title: Liveblocks Room API
+  version: '2.0'
+  description: 'The Liveblocks REST API lets you read and modify rooms, threads, notifications, users, permissions, and schemas programmatically. Authenticate requests with a secret key using the `Authorization: Bearer` header.'
+servers:
+- url: https://api.liveblocks.io/v2
+tags:
+- name: Room
+paths:
+  /rooms:
+    get:
+      summary: Get rooms
+      description: 'This endpoint returns a list of your rooms. The rooms are returned sorted by creation date, from newest to oldest. You can filter rooms by room ID prefixes, metadata, users accesses, and groups accesses. Corresponds to `liveblocks.getRooms`.
+
+
+        There is a pagination system where the cursor to the next page is returned in the response as `nextCursor`, which can be combined with `startingAfter`.
+
+        You can also limit the number of rooms by query.
+
+
+        Filtering by metadata works by giving key values like `metadata.color=red`. Of course you can combine multiple metadata clauses to refine the response like `metadata.color=red&metadata.type=text`. Notice here the operator AND is applied between each clauses.
+
+
+        Filtering by groups or userId works by giving a list of groups like `groupIds=marketing,GZo7tQ,product` or/and a userId like `userId=user1`.
+
+        Notice here the operator OR is applied between each `groupIds` and the `userId`.'
+      tags:
+      - Room
+      parameters:
+      - schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+          description: A limit on the number of rooms to be returned. The limit can range between 1 and 100, and defaults to 20.
+          example: 20
+        in: query
+        name: limit
+      - schema:
+          type: string
+          description: A cursor used for pagination. Get the value from the `nextCursor` response of the previous page.
+          example: eyJjcmVhdGVkQXQiOjE2NjAwMDA5ODgxMzd9
+        in: query
+        name: startingAfter
+      - schema:
+          type: string
+          description: A filter on organization ID.
+          example: org_123456789
+        in: query
+        name: organizationId
+      - schema:
+          type: string
+          description: Query to filter rooms. You can filter by `roomId` and `metadata`, for example, `metadata["roomType"]:"whiteboard" AND roomId^"liveblocks:engineering"`. Learn more about [filtering rooms with query language](https://liveblocks.io/docs/guides/how-to-filter-rooms-using-query-language).
+          example: metadata["color"]:"blue"
+        in: query
+        name: query
+      - schema:
+          type: string
+          description: A filter on users accesses.
+          example: user-123
+        in: query
+        name: userId
+      - schema:
+          type: string
+          description: A filter on groups accesses. Multiple groups can be used.
+          example: group1,group2
+        in: query
+        name: groupIds
+      responses:
+        '200':
+          description: Success. Returns the list of rooms, the next page cursor, and the next page URL.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetRoomsResponse'
+              examples:
+                example:
+                  value:
+                    nextCursor: W1siaWQiLCJVRzhWYl82SHRUS0NzXzFvci1HZHQiXSxbImNyZWF0ZWRBdCIsMTY2MDAwMDk4ODEzN11d
+                    data:
+                    - type: room
+                      id: HTOGSiXcORTECjfNBBLii
+                      lastConnectionAt: '2022-08-08T23:23:15.281Z'
+                      createdAt: '2022-08-08T23:23:15.281Z'
+                      organizationId: org_123456789
+                      metadata:
+                        name:
+                        - My room
+                        type:
+                        - whiteboard
+                      defaultAccesses:
+                      - '*:write'
+                      groupsAccesses:
+                        product:
+                        - '*:write'
+                      usersAccesses:
+                        vinod:
+                        - '*:write'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '422':
+          $ref: '#/components/responses/422'
+      operationId: get-rooms
+    post:
+      summary: Create room
+      description: 'This endpoint creates a new room. `id` and `defaultAccesses` are required. When provided with a `?idempotent` query argument, will not return a 409 when the room already exists, but instead return the existing room as-is. Corresponds to `liveblocks.createRoom`, or to `liveblocks.getOrCreateRoom` when `?idempotent` is provided.
+
+        - `defaultAccesses` is the default room permission list, for example `[]`, `["*:read"]`, `["*:write"]`, or a more granular permission list.
+
+        - `metadata` could be key/value as `string` or `string[]`. `metadata` supports maximum 50 entries. Key length has a limit of 40 characters maximum. Value length has a limit of 256 characters maximum. `metadata` is optional field.
+
+        - `usersAccesses` contains user-specific permission lists. It can contain 1000 ids maximum. Id length has a limit of 256 characters. `usersAccesses` is optional field.
+
+        - `groupsAccesses` contains group-specific permission lists and is optional.'
+      tags:
+      - Room
+      parameters:
+      - schema:
+          type: boolean
+          description: When provided, will not return a 409 when the room already exists, but instead return the existing room as-is. Corresponds to [`liveblocks.getOrCreateRoom`](https://liveblocks.io/docs/api-reference/liveblocks-node#get-or-create-rooms-roomId).
+          example: true
+        in: query
+        name: idempotent
+      responses:
+        '200':
+          description: Success. Returns the created room.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Room'
+              examples:
+                example:
+                  value:
+                    type: room
+                    id: my-room-3ebc26e2bf96
+                    lastConnectionAt: '2022-08-22T15:10:25.225Z'
+                    createdAt: '2022-08-22T15:10:25.225Z'
+                    organizationId: org_123456789
+                    metadata:
+                      color: blue
+                    defaultAccesses:
+                    - '*:write'
+                    groupsAccesses:
+                      product:
+                      - '*:write'
+                    usersAccesses:
+                      alice:
+                      - '*:write'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '409':
+          $ref: '#/components/responses/409'
+        '422':
+          $ref: '#/components/responses/422'
+      operationId: create-room
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRoomRequestBody'
+            examples:
+              example:
+                value:
+                  id: my-room-3ebc26e2bf96
+                  defaultAccesses:
+                  - '*:write'
+                  metadata:
+                    color: blue
+                  usersAccesses:
+                    alice:
+                    - '*:write'
+                  groupsAccesses:
+                    product:
+                    - '*:write'
+  /rooms/{roomId}:
+    get:
+      summary: Get room
+      tags:
+      - Room
+      operationId: get-room
+      parameters:
+      - schema:
+          type: string
+          description: ID of the room
+          example: my-room-id
+        name: roomId
+        in: path
+        required: true
+      responses:
+        '200':
+          description: Success. Returns the room.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Room'
+              examples:
+                example:
+                  value:
+                    type: room
+                    id: react-todo-list
+                    lastConnectionAt: '2022-08-04T21:07:09.380Z'
+                    createdAt: '2022-07-13T14:32:50.697Z'
+                    organizationId: org_123456789
+                    metadata:
+                      color: blue
+                      size: '10'
+                      target:
+                      - abc
+                      - def
+                    defaultAccesses:
+                    - '*:write'
+                    groupsAccesses:
+                      marketing:
+                      - '*:write'
+                    usersAccesses:
+                      alice:
+                      - '*:write'
+                      vinod:
+                      - '*:write'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+      description: This endpoint returns a room by its ID. Corresponds to `liveblocks.getRoom`.
+    post:
+      summary: Update room
+      tags:
+      - Room
+      parameters:
+      - schema:
+          type: string
+          description: ID of the room
+          example: my-room-id
+        name: roomId
+        in: path
+        required: true
+      responses:
+        '200':
+          description: Success. Returns the updated room.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Room'
+              examples:
+                example:
+                  value:
+                    type: room
+                    id: react-todo-list
+                    lastConnectionAt: '2022-08-04T21:07:09.380Z'
+                    createdAt: '2022-07-13T14:32:50.697Z'
+                    organizationId: org_123456789
+                    metadata:
+                      color: blue
+                      size: '10'
+                      target:
+                      - abc
+                      - def
+                    defaultAccesses:
+                    - '*:write'
+                    groupsAccesses:
+                      marketing:
+                      - '*:write'
+                    usersAccesses:
+                      alice:
+                      - '*:write'
+                      vinod:
+                      - '*:write'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '422':
+          $ref: '#/components/responses/422'
+      operationId: update-room
+      description: 'This endpoint updates specific properties of a room. Corresponds to `liveblocks.updateRoom`.
+
+
+        It’s not necessary to provide the entire room’s information.
+
+        Setting a property to `null` means to delete this property. For example, if you want to remove access to a specific user without losing other users:
+
+        ``{
+
+        "usersAccesses": {
+
+        "john": null
+
+        }
+
+        }``
+
+        `defaultAccesses`, `metadata`, `usersAccesses`, `groupsAccesses` can be updated.
+
+
+        - `defaultAccesses` is the default room permission list, for example `[]`, `["*:read"]`, `["*:write"]`, or a more granular permission list.
+
+        - `metadata` could be key/value as `string` or `string[]`. `metadata` supports maximum 50 entries. Key length has a limit of 40 characters maximum. Value length has a limit of 256 characters maximum. `metadata` is optional field.
+
+        - `usersAccesses` contains user-specific permission lists. It can contain 1000 ids maximum. Id length has a limit of 256 characters. `usersAccesses` is optional field.
+
+        - `groupsAccesses` contains group-specific permission lists and is optional.'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateRoomRequestBody'
+            examples:
+              example:
+                value:
+                  defaultAccesses:
+                  - '*:write'
+                  usersAccesses:
+                    vinod:
+                    - '*:write'
+                    alice:
+                    - '*:write'
+                  groupsAccesses:
+                    marketing:
+                    - '*:write'
+                  metadata:
+                    color: blue
+    delete:
+      summary: Delete room
+      tags:
+      - Room
+      responses:
+        '204':
+          description: Success. The room was deleted
+        '401':
+          description: Missing or wrong credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                WRONG_KEY_USED:
+                  value:
+                    error: WRONG_KEY_USED
+                    message: Public key instead of the secret key.
+                    suggestion: 'Please use your secret key instead of the public key, the secret key is available in the dashboard: https://liveblocks.io/dashboard/apikeys.'
+                    docs: ''
+                MISSING_SECRET_KEY:
+                  value:
+                    error: MISSING_SECRET_KEY
+                    message: Missing secret key in authentication header
+                    suggestion: 'Please use a secret key, the secret key is available in the dashboard: https://liveblocks.io/dashboard/apikeys'
+                    docs: ''
+        '403':
+          description: Unauthorized access.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                INVALID_SECRET_KEY:
+                  value:
+                    error: INVALID_SECRET_KEY
+                    message: Invalid secret key.
+                    suggestion: 'Please use a valid secret key, the secret key is available in the dashboard: https://liveblocks.io/dashboard/apikeys.'
+                    docs: ''
+                INVALID_PUBLIC_KEY:
+                  value:
+                    error: INVALID_PUBLIC_KEY
+                    message: Invalid public key
+                    suggestion: 'Please use a valid public key, the public key is available in the dashboard: https://liveblocks.io/dashboard/apikeys'
+                    docs: ''
+                UNAUTHORIZED_ROOM_ACCESS:
+                  value:
+                    error: UNAUTHORIZED_ROOM_ACCESS
+                    message: The user does not have permission to access the room.
+                    suggestion: Please add the user’s ID or one of the user’s group IDs to the room first.
+                    docs: ''
+        '422':
+          description: Unprocessable entity.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                UNPROCESSABLE_ENTITY:
+                  value:
+                    error: UNPROCESSABLE_ENTITY
+                    message: 'Missing key: ''defaultAccesses''.'
+                    suggestion: Please ensure the data follows the correct format.
+                    docs: ''
+      parameters:
+      - schema:
+          type: string
+          description: ID of the room
+          example: my-room-id
+        name: roomId
+        in: path
+        required: true
+      operationId: delete-room
+      description: This endpoint deletes a room. A deleted room is no longer accessible from the API or the dashboard and it cannot be restored. Corresponds to `liveblocks.deleteRoom`.
+  /rooms/{roomId}/prewarm:
+    get:
+      summary: Prewarm room
+      tags:
+      - Room
+      operationId: prewarm-room
+      parameters:
+      - schema:
+          type: string
+          description: ID of the room
+          example: my-room-id
+        name: roomId
+        in: path
+        required: true
+      responses:
+        '204':
+          description: Success. Room has been prewarmed for faster connectivity.
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+      description: Speeds up connecting to a room for the next 10 seconds. Use this when you know a user will be connecting to a room with `RoomProvider` or `enterRoom` within 10 seconds, and the room will load quicker. Corresponds to `liveblocks.prewarmRoom`.
+  /rooms/{roomId}/upsert:
+    post:
+      summary: Upsert (update or create) room
+      tags:
+      - Room
+      parameters:
+      - schema:
+          type: string
+          description: ID of the room
+          example: my-room-id
+        name: roomId
+        in: path
+        required: true
+      responses:
+        '200':
+          description: Success. Returns the updated or created room.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Room'
+              examples:
+                example:
+                  value:
+                    type: room
+                    id: react-todo-list
+                    lastConnectionAt: '2022-08-04T21:07:09.380Z'
+                    createdAt: '2022-07-13T14:32:50.697Z'
+                    organizationId: org_123456789
+                    metadata:
+                      color: blue
+                      size: '10'
+                      target:
+                      - abc
+                      - def
+                    defaultAccesses:
+                    - '*:write'
+                    groupsAccesses:
+                      marketing:
+                      - '*:write'
+                    usersAccesses:
+                      alice:
+                      - '*:write'
+                      vinod:
+                      - '*:write'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '422':
+          $ref: '#/components/responses/422'
+      operationId: upsert-room
+      description: 'This endpoint updates specific properties of a room. Corresponds to `liveblocks.upsertRoom`.
+
+
+        It’s not necessary to provide the entire room’s information.
+
+        Setting a property to `null` means to delete this property. For example, if you want to remove access to a specific user without losing other users:
+
+        ``{
+
+        "usersAccesses": {
+
+        "john": null
+
+        }
+
+        }``
+
+        `defaultAccesses`, `metadata`, `usersAccesses`, `groupsAccesses` can be updated.
+
+
+        - `defaultAccesses` is the default room permission list, for example `[]`, `["*:read"]`, `["*:write"]`, or a more granular permission list.
+
+        - `metadata` could be key/value as `string` or `string[]`. `metadata` supports maximum 50 entries. Key length has a limit of 40 characters maximum. Value length has a limit of 256 characters maximum. `metadata` is optional field.
+
+        - `usersAccesses` contains user-specific permission lists. It can contain 1000 ids maximum. Id length has a limit of 256 characters. `usersAccesses` is optional field.
+
+        - `groupsAccesses` contains group-specific permission lists and is optional.'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpsertRoomRequestBody'
+            examples:
+              example:
+                value:
+                  update:
+                    usersAccesses:
+                      vinod:
+                      - '*:write'
+                      alice:
+                      - '*:write'
+                    groupsAccesses:
+                      marketing:
+                      - '*:write'
+                    metadata:
+                      color: blue
+                  create:
+                    defaultAccesses:
+                    - '*:write'
+  /rooms/{roomId}/update-room-id:
+    post:
+      summary: Update room ID
+      tags:
+      - Room
+      parameters:
+      - schema:
+          type: string
+          description: The new ID for the room
+          example: my-room-id
+        name: roomId
+        in: path
+        required: true
+      responses:
+        '200':
+          description: Success. Returns the updated room with the new ID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Room'
+              examples:
+                example:
+                  value:
+                    type: room
+                    id: react-todo-list
+                    lastConnectionAt: '2022-08-04T21:07:09.380Z'
+                    createdAt: '2022-07-13T14:32:50.697Z'
+                    organizationId: org_123456789
+                    metadata:
+                      color: blue
+                      size: '10'
+                      target:
+                      - abc
+                      - def
+                    defaultAccesses:
+                    - '*:write'
+                    groupsAccesses:
+                      marketing:
+                      - '*:write'
+                    usersAccesses:
+                      alice:
+                      - '*:write'
+                      vinod:
+                      - '*:write'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '422':
+          $ref: '#/components/responses/422'
+      operationId: update-room-id
+      description: This endpoint permanently updates the room’s ID. All existing references to the old room ID will need to be updated. Returns the updated room. Corresponds to `liveblocks.updateRoomId`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateRoomIdRequestBody'
+            examples:
+              example:
+                value:
+                  newRoomId: new-room-id
+  /rooms/{roomId}/update-organization-id:
+    post:
+      summary: Update room organization ID
+      tags:
+      - Room
+      parameters:
+      - schema:
+          type: string
+          description: The ID of the room
+          example: my-room-id
+        name: roomId
+        in: path
+        required: true
+      responses:
+        '200':
+          description: Success. Returns the updated room with the new organization ID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Room'
+              examples:
+                example:
+                  value:
+                    type: room
+                    id: react-todo-list
+                    lastConnectionAt: '2022-08-04T21:07:09.380Z'
+                    createdAt: '2022-07-13T14:32:50.697Z'
+                    organizationId: org_987654321
+                    metadata:
+                      color: blue
+                      size: '10'
+                      target:
+                      - abc
+                      - def
+                    defaultAccesses:
+                    - '*:write'
+                    groupsAccesses:
+                      marketing:
+                      - '*:write'
+                    usersAccesses:
+                      alice:
+                      - '*:write'
+                      vinod:
+                      - '*:write'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '422':
+          $ref: '#/components/responses/422'
+      operationId: update-room-organization-id
+      description: This endpoint updates the room's organization ID. The `fromOrganizationId` must match the room's current organization ID. Returns the updated room.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateRoomOrganizationIdRequestBody'
+            examples:
+              example:
+                value:
+                  fromOrganizationId: org_123456789
+                  toOrganizationId: org_987654321
+  /rooms/{roomId}/active-users:
+    get:
+      summary: Get active users
+      tags:
+      - Room
+      operationId: get-active-users
+      description: 'This endpoint returns a list of users currently present in the requested room. Corresponds to `liveblocks.getActiveUsers`.
+
+
+        For optimal performance, we recommend calling this endpoint no more than once every 10 seconds.
+
+        Duplicates can occur if a user is in the requested room with multiple browser tabs opened.'
+      parameters:
+      - schema:
+          type: string
+          description: ID of the room
+          example: my-room-id
+        name: roomId
+        in: path
+        required: true
+      responses:
+        '200':
+          description: Success. Returns the list of active users for the specified room.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActiveUsersResponse'
+              examples:
+                example:
+                  value:
+                    data:
+                    - type: user
+                      connectionId: 16
+                      id: alice
+                      info: {}
+                    - type: user
+                      connectionId: 20
+                      id: bob
+                      info: {}
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+  /rooms/{roomId}/presence:
+    post:
+      summary: Set ephemeral presence
+      description: This endpoint sets ephemeral presence for a user in a room without requiring a WebSocket connection. The presence data will automatically expire after the specified TTL (time-to-live). This is useful for scenarios like showing an AI agent's presence in a room. The presence will be broadcast to all connected users in the room. Corresponds to `liveblocks.setPresence`.
+      tags:
+      - Room
+      operationId: set-presence
+      parameters:
+      - schema:
+          type: string
+          description: ID of the room
+          example: my-room-id
+        name: roomId
+        in: path
+        required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SetPresenceRequestBody'
+            examples:
+              example:
+                value:
+                  userId: agent-123
+                  data:
+                    status: active
+                    cursor:
+                      x: 100
+                      y: 200
+                  userInfo:
+                    name: AI Assistant
+                    avatar: https://example.org/images/agent123.jpg
+                  ttl: 60
+      responses:
+        '204':
+          description: Success. Presence was set for the user in the room.
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '422':
+          $ref: '#/components/responses/422'
+  /rooms/{roomId}/broadcast-event:
+    post:
+      summary: Broadcast event to a room
+      description: This endpoint enables the broadcast of an event to a room without having to connect to it via the `client` from `@liveblocks/client`. It takes any valid JSON as a request body. The `connectionId` passed to event listeners is `-1` when using this API. Corresponds to `liveblocks.broadcastEvent`.
+      tags:
+      - Room
+      parameters:
+      - schema:
+          type: string
+          description: ID of the room
+          example: my-room-id
+        name: roomId
+        in: path
+        required: true
+      operationId: broadcast-event
+      responses:
+        '204':
+          description: Success. An event was broadcast to the room.
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '422':
+          $ref: '#/components/responses/422'
+      requestBody:
+        required: true
+        description: Any valid JSON.
+        content:
+          application/json:
+            schema: {}
+            examples:
+              example:
+                value:
+                  type: EMOJI
+                  emoji: 🔥
+components:
+  schemas:
+    UpsertRoomRequestBody:
+      type: object
+      title: UpsertRoomRequestBody
+      properties:
+        update:
+          $ref: '#/components/schemas/UpdateRoomRequestBody'
+        create:
+          type: object
+          description: Fields to use when creating the room if it does not exist. Unlike the create-room endpoint, `id` is not included here because it is provided in the URL path.
+          properties:
+            organizationId:
+              type: string
+              description: The organization ID to associate with the room. Defaults to "default" if not provided.
+            defaultAccesses:
+              $ref: '#/components/schemas/RoomPermission'
+            usersAccesses:
+              $ref: '#/components/schemas/RoomAccesses'
+            groupsAccesses:
+              $ref: '#/components/schemas/RoomAccesses'
+            metadata:
+              $ref: '#/components/schemas/RoomMetadata'
+          required:
+          - defaultAccesses
+          additionalProperties: false
+      required:
+      - update
+      additionalProperties: false
+      example:
+        update:
+          usersAccesses:
+            alice:
+            - '*:write'
+          groupsAccesses:
+            marketing:
+            - '*:write'
+          metadata:
+            color: blue
+        create:
+          defaultAccesses:
+          - '*:write'
+    Error:
+      title: Error
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error code
+        message:
+          type: string
+          description: Message explaining the error
+        suggestion:
+          type: string
+          description: A suggestion on how to fix the error
+        docs:
+          type: string
+          description: A link to the documentation
+    ActiveUsersResponse:
+      title: ActiveUsersResponse
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                const: user
+              id:
+                oneOf:
+                - type: string
+                - type: 'null'
+              info:
+                type: object
+                additionalProperties: true
+              connectionId:
+                type: integer
+            required:
+            - type
+            - id
+            - info
+            - connectionId
+      required:
+      - data
+      example:
+        data:
+        - type: user
+          connectionId: 16
+          id: alice
+          info: {}
+        - type: user
+          connectionId: 20
+          id: bob
+          info: {}
+    CreateRoomRequestBody:
+      title: CreateRoomRequestBody
+      type: object
+      properties:
+        id:
+          type: string
+        organizationId:
+          type: string
+          description: The organization ID to associate with the room. Defaults to "default" if not provided.
+        defaultAccesses:
+          $ref: '#/components/schemas/RoomPermission'
+        usersAccesses:
+          $ref: '#/components/schemas/RoomAccesses'
+        groupsAccesses:
+          $ref: '#/components/schemas/RoomAccesses'
+        metadata:
+          $ref: '#/components/schemas/RoomMetadata'
+        engine:
+          type: integer
+          enum:
+          - 1
+          - 2
+          description: Preferred storage engine version to use when creating new rooms. The v2 Storage engine supports larger documents, is more performant, has native streaming support, and will become the default in the future.
+      required:
+      - id
+      - defaultAccesses
+      additionalProperties: false
+      example:
+        id: my-room-id
+        defaultAccesses:
+        - '*:write'
+        metadata:
+          color: blue
+        usersAccesses:
+          alice:
+          - '*:write'
+        groupsAccesses:
+          product:
+          - '*:write'
+    RoomPermission:
+      type: array
+      items:
+        $ref: '#/components/schemas/RoomPermissionItem'
+      uniqueItems: true
+      example:
+      - '*:read'
+    RoomAccesses:
+      type: object
+      additionalProperties:
+        type: array
+        items:
+          $ref: '#/components/schemas/RoomPermissionItem'
+      example:
+        alice:
+        - '*:write'
+        bob:
+        - '*:read'
+    UpdateRoomIdRequestBody:
+      type: object
+      title: UpdateRoomIdRequestBody
+      additionalProperties: false
+      properties:
+        newRoomId:
+          type: string
+          description: The new room ID
+      required:
+      - newRoomId
+      example:
+        newRoomId: new-room-id
+    RoomPermissionItem:
+      title: RoomPermissionItem
+      type: string
+      enum:
+      - '*:read'
+      - '*:write'
+      - room:write
+      - room:read
+      - room:presence:write
+      - storage:read
+      - storage:write
+      - storage:none
+      - comments:read
+      - comments:write
+      - comments:none
+      - comments:public:read
+      - comments:public:write
+      - comments:public:none
+      - comments:private:read
+      - comments:private:write
+      - comments:private:none
+      - feeds:read
+      - feeds:write
+      - feeds:none
+    RoomMetadata:
+      title: RoomMetadata
+      type: object
+      additionalProperties:
+        oneOf:
+        - type: string
+        - type: array
+          items:
+            type: string
+      example:
+        color: blue
+        type: whiteboard
+    Room:
+      title: Room
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+          enum:
+          - room
+        organizationId:
+          type: string
+          description: The organization ID associated with this room.
+        lastConnectionAt:
+          type: string
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+        defaultAccesses:
+          $ref: '#/components/schemas/RoomPermission'
+        usersAccesses:
+          $ref: '#/components/schemas/RoomAccesses'
+        groupsAccesses:
+          $ref: '#/components/schemas/RoomAccesses'
+        metadata:
+          $ref: '#/components/schemas/RoomMetadata'
+      additionalProperties: false
+      required:
+      - id
+      - type
+      - createdAt
+      - defaultAccesses
+      - usersAccesses
+      - groupsAccesses
+      - metadata
+      - organizationId
+      example:
+        type: room
+        id: my-room-id
+        lastConnectionAt: '2022-08-04T21:07:09.380Z'
+        createdAt: '2022-07-13T14:32:50.697Z'
+        organizationId: org_123456789
+        metadata:
+          color: blue
+          type: whiteboard
+        defaultAccesses:
+        - '*:write'
+        groupsAccesses:
+          marketing:
+          - '*:write'
+        usersAccesses:
+          alice:
+          - '*:write'
+    UpdateRoomRequestBody:
+      type: object
+      title: UpdateRoomRequestBody
+      additionalProperties: false
+      properties:
+        defaultAccesses:
+          oneOf:
+          - $ref: '#/components/schemas/RoomPermission'
+          - type: 'null'
+        usersAccesses:
+          type: object
+          description: A map of user identifiers to permissions list. Setting the value as `null` will clear all users’ accesses. Setting one user identifier as `null` will clear this user’s accesses.
+          additionalProperties:
+            oneOf:
+            - type: array
+              items:
+                $ref: '#/components/schemas/RoomPermissionItem'
+            - type: 'null'
+        groupsAccesses:
+          type: object
+          description: A map of group identifiers to permissions list. Setting the value as `null` will clear all groups’ accesses. Setting one group identifier as `null` will clear this group’s accesses.
+          additionalProperties:
+            oneOf:
+            - type: array
+              items:
+                $ref: '#/components/schemas/RoomPermissionItem'
+            - type: 'null'
+        metadata:
+          type: object
+          additionalProperties:
+            oneOf:
+            - type: string
+            - type: array
+              items:
+                type: string
+            - type: 'null'
+      example:
+        defaultAccesses:
+        - '*:write'
+        usersAccesses:
+          alice:
+          - '*:write'
+        groupsAccesses:
+          marketing:
+          - '*:write'
+        metadata:
+          color: blue
+    UpdateRoomOrganizationIdRequestBody:
+      type: object
+      title: UpdateRoomOrganizationIdRequestBody
+      additionalProperties: false
+      properties:
+        fromOrganizationId:
+          type: string
+          description: The current organization ID of the room. Must match the room's current organization ID.
+        toOrganizationId:
+          type: string
+          description: The new organization ID to assign to the room.
+      required:
+      - fromOrganizationId
+      - toOrganizationId
+      example:
+        fromOrganizationId: org_123456789
+        toOrganizationId: org_987654321
+    GetRoomsResponse:
+      title: GetRoomsResponse
+      type: object
+      additionalProperties: false
+      required:
+      - nextCursor
+      - data
+      properties:
+        nextCursor:
+          oneOf:
+          - type: string
+          - type: 'null'
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Room'
+      example:
+        nextCursor: eyJjcmVhdGVkQXQiOjE2NjAwMDA5ODgxMzd9
+        data:
+        - type: room
+          id: my-room-id
+          lastConnectionAt: '2022-08-08T23:23:15.281Z'
+          createdAt: '2022-08-08T23:23:15.281Z'
+          organizationId: org_123456789
+          metadata:
+            color: blue
+          defaultAccesses:
+          - '*:write'
+          groupsAccesses:
+            product:
+            - '*:write'
+          usersAccesses:
+            alice:
+            - '*:write'
+    SetPresenceRequestBody:
+      title: SetPresenceRequestBody
+      type: object
+      properties:
+        userId:
+          type: string
+          description: ID of the user to set presence for
+        data:
+          type: object
+          description: Presence data as a JSON object
+          additionalProperties: true
+        userInfo:
+          type: object
+          properties:
+            name:
+              type: string
+              minLength: 1
+              description: Optional name for the user or agent
+            avatar:
+              type: string
+              format: uri
+              description: Optional avatar URL for the user
+            color:
+              type: string
+              description: Optional color for the user
+          description: Metadata about the user or agent
+          additionalProperties: true
+        ttl:
+          type: integer
+          minimum: 2
+          maximum: 3599
+          description: 'Time-to-live in seconds (minimum: 2, maximum: 3599). After this duration, the presence will automatically expire.'
+      required:
+      - userId
+      - data
+      - userInfo
+      additionalProperties: false
+      example:
+        userId: agent-123
+        data:
+          status: active
+          cursor:
+            x: 100
+            y: 200
+        userInfo:
+          name: AI Assistant
+          avatar: https://example.org/images/agent123.jpg
+        ttl: 60
+  responses:
+    '422':
+      description: Unprocessable entity.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            UNPROCESSABLE_ENTITY:
+              value:
+                error: UNPROCESSABLE_ENTITY
+                message: 'Missing key: ''defaultAccesses''.'
+                suggestion: Please ensure the data follows the correct format.
+                docs: ''
+    '401':
+      description: Missing or wrong credentials.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            WRONG_KEY_USED:
+              value:
+                error: WRONG_KEY_USED
+                message: Public key instead of the secret key.
+                suggestion: 'Please use your secret key instead of the public key, the secret key is available in the dashboard: https://liveblocks.io/dashboard/apikeys.'
+                docs: ''
+            MISSING_SECRET_KEY:
+              value:
+                error: MISSING_SECRET_KEY
+                message: Missing secret key in authentication header
+                suggestion: 'Please use a secret key, the secret key is available in the dashboard: https://liveblocks.io/dashboard/apikeys'
+                docs: ''
+            MISSING_MANAGEMENT_API_ACCESS_TOKEN:
+              value:
+                error: MISSING_MANAGEMENT_API_ACCESS_TOKEN
+                message: Missing management api access token in authentication header
+                suggestion: Please provide a management api access token in the authentication header
+                docs: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+            INVALID_MANAGEMENT_API_ACCESS_TOKEN:
+              value:
+                error: INVALID_MANAGEMENT_API_ACCESS_TOKEN
+                message: Invalid management api access token
+                suggestion: Please provide a valid management api access token in the authentication header
+                docs: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+            REVOKED_MANAGEMENT_API_ACCESS_TOKEN:
+              value:
+                error: REVOKED_MANAGEMENT_API_ACCESS_TOKEN
+                message: Revoked management api access token
+                suggestion: Please provide an active management api access token in the authentication header
+                docs: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+            EXPIRED_MANAGEMENT_API_ACCESS_TOKEN:
+              value:
+                error: EXPIRED_MANAGEMENT_API_ACCESS_TOKEN
+                message: Expired management api access token
+                suggestion: Please provide a not expired management api access token in the authentication header
+                docs: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+    '409':
+      description: Room already exists.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            ROOM_ALREADY_EXISTS:
+              value:
+                error: ROOM_ALREADY_EXISTS
+                message: The room already exists.
+                suggestion: Please use a different room ID or update the existing room.
+                docs: ''
+        application/xml:
+          schema:
+            type: object
+            properties: {}
+    '403':
+      description: Unauthorized access.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            INVALID_SECRET_KEY:
+              value:
+                error: INVALID_SECRET_KEY
+                message: Invalid secret key.
+                suggestion: 'Please use a valid secret key, the secret key is available in the dashboard: https://liveblocks.io/dashboard/apikeys.'
+                docs: ''
+            INVALID_PUBLIC_KEY:
+              value:
+                error: INVALID_PUBLIC_KEY
+                message: Invalid public key
+                suggestion: 'Please use a valid public key, the public key is available in the dashboard: https://liveblocks.io/dashboard/apikeys'
+                docs: ''
+            UNAUTHORIZED_ROOM_ACCESS:
+              value:
+                error: UNAUTHORIZED_ROOM_ACCESS
+                message: The user does not have permission to access the room.
+                suggestion: Please add the user’s ID or one of the user’s group IDs to the room first.
+                docs: ''
+            INVALID_MANAGEMENT_API_ACCESS_TOKEN_SCOPE:
+              value:
+                error: INVALID_MANAGEMENT_API_ACCESS_TOKEN_SCOPE
+                message: Invalid management api access token scope
+                suggestion: 'Please provide a management api access token with required scope: ''read:all''.'
+                docs: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+            FEATURE_NOT_ENABLED:
+              value:
+                error: FEATURE_NOT_ENABLED
+                message: The "Management API" feature is not enabled for this account.
+                suggestion: If you want access to this feature, please contact us at support@liveblocks.io
+                docs: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+            PUBLIC_KEY_NOT_ENABLED:
+              value:
+                error: PUBLIC_KEY_NOT_ENABLED
+                message: Public key not enabled
+                suggestion: Please enable the public key for the project
+                docs: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+    '404':
+      description: Resource not found.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            ROOM_NOT_FOUND:
+              value:
+                error: ROOM_NOT_FOUND
+                message: Room not found.
+                suggestion: 'Please use a valid room ID, room IDs are available in the dashboard: https://liveblocks.io/dashboard/rooms.'
+                docs: ''
+            WEBHOOK_NOT_FOUND:
+              value:
+                error: WEBHOOK_NOT_FOUND
+                message: Webhook "ep_xxx" not found.
+                suggestion: 'Please use a valid webhook ID, webhook IDs are available in the dashboard: https://liveblocks.io/dashboard/webhooks'
+                docs: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+            NOT_EXISTING_MANAGEMENT_API_ACCESS_TOKEN:
+              value:
+                error: NOT_EXISTING_MANAGEMENT_API_ACCESS_TOKEN
+                message: Not existing management api access token
+                suggestion: Please provide an existing management api access token in the authentication header
+                docs: https://liveblocks.io/docs/api-reference/rest-api-endpoints
+  securitySchemes:
+    Authorization:
+      name: Bearer sk_xxx
+      type: apiKey
+      in: header
+externalDocs:
+  description: Liveblocks REST API reference
+  url: https://liveblocks.io/docs/api-reference/rest-api-endpoints
