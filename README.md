@@ -1,4 +1,4 @@
-# Liveblocks (liveblocks)
+# Liveblocks
 
 <!-- API-EVANGELIST-PROVENANCE:BEGIN -->
 > ### About this repository
@@ -66,122 +66,156 @@
 
 Liveblocks is a real-time collaboration platform that provides ready-made building blocks for multiplayer experiences, including presence, broadcast events, shared storage (LiveObject/LiveList/LiveMap), comments and threads, notifications, and Yjs-based collaborative documents. It exposes a public authorization endpoint, a server-side private REST API, and SDKs for React, JavaScript, Node.js, Python, Redux, Zustand, and Yjs.
 
-**APIs.json:** [https://raw.githubusercontent.com/api-evangelist/liveblocks/refs/heads/main/apis.yml](https://raw.githubusercontent.com/api-evangelist/liveblocks/refs/heads/main/apis.yml)
+**Areas:** Real-Time · Collaboration · Multiplayer · Presence · CRDT · Yjs · Comments · Threads · Notification · WebSocket
 
-## Scope
+## Liveblocks on APIs.io
 
-- **Type:** Index
+Everything profiled for Liveblocks is published on APIs.io rather than in this repository. Start at the provider page — **[apis.io/providers/liveblocks/](https://apis.io/providers/liveblocks/)** — or go straight to one of the APIs or properties below.
 
-## Tags
+### APIs (12)
 
-- Real-Time
-- Collaboration
-- Multiplayer
-- Presence
-- CRDT
-- Yjs
-- Comments
-- Threads
-- Notifications
-- WebSockets
+- [Liveblocks REST API](https://apis.io/apis/liveblocks/rest-api/) — Server-side REST API for managing rooms, room access, storage, active users, broadcast events, comments and threads, notifications, Yjs documents, and…
+- [Liveblocks Authorization API](https://apis.io/apis/liveblocks/authorization-api/) — Public-facing authorization endpoint used by client SDKs to exchange a server-issued token for a Liveblocks session. Supports access token and ID token…
+- [Liveblocks Realtime Client API](https://apis.io/apis/liveblocks/realtime-client-api/) — WebSocket-based client API exposed through Liveblocks client SDKs for React, JavaScript, Redux, Zustand, Vue (community), and Yjs. Provides presence,…
+- [Liveblocks Active Users API](https://apis.io/apis/liveblocks/liveblocks-active-users-api/) — The Active Users API from Liveblocks — 2 operation(s) for active users.
+- [Liveblocks Comments API](https://apis.io/apis/liveblocks/liveblocks-comments-api/) — The Comments API from Liveblocks — 2 operation(s) for comments.
+- [Liveblocks Events API](https://apis.io/apis/liveblocks/liveblocks-events-api/) — The Events API from Liveblocks — 1 operation(s) for events.
+- [Liveblocks Reactions API](https://apis.io/apis/liveblocks/liveblocks-reactions-api/) — The Reactions API from Liveblocks — 2 operation(s) for reactions.
+- [Liveblocks Rooms API](https://apis.io/apis/liveblocks/liveblocks-rooms-api/) — The Rooms API from Liveblocks — 6 operation(s) for rooms.
+- [Liveblocks Storage API](https://apis.io/apis/liveblocks/liveblocks-storage-api/) — The Storage API from Liveblocks — 2 operation(s) for storage.
+- [Liveblocks Threads API](https://apis.io/apis/liveblocks/liveblocks-threads-api/) — The Threads API from Liveblocks — 9 operation(s) for threads.
+- [Liveblocks Versions API](https://apis.io/apis/liveblocks/liveblocks-versions-api/) — The Versions API from Liveblocks — 3 operation(s) for versions.
+- [Liveblocks Yjs API](https://apis.io/apis/liveblocks/liveblocks-yjs-api/) — The Yjs API from Liveblocks — 2 operation(s) for yjs.
 
-## Timestamps
+### Published properties
 
-- **Created:** 2026-05-23
-- **Modified:** 2026-05-23
+Each property below is a page on APIs.io carrying the machine-readable artifact and what it says.
 
-## APIs
+#### AsyncAPI (1)
 
-### Liveblocks REST API
+Event-driven and webhook contracts.
 
-Server-side REST API for managing rooms, room access, storage, active users, broadcast events, comments and threads, notifications, Yjs documents, and version history. Authenticated with a secret key via Bearer authorization.
+- [Review](https://apis.io/asyncapis/liveblocks/review/)
 
-- **Human URL:** [https://liveblocks.io/docs/api-reference/rest-api-endpoints](https://liveblocks.io/docs/api-reference/rest-api-endpoints)
-- **Base URL:** `https://api.liveblocks.io/v2`
+#### GraphQL (1)
 
-#### Tags
+GraphQL schemas.
 
-- REST
-- Rooms
-- Storage
-- Comments
-- Threads
-- Notifications
-- Yjs
-- Webhooks
+- [Moved to /providers/liveblocks/](https://apis.io/graphqls/liveblocks/liveblocks-graphql/)
 
-#### Properties
+#### Agentic access (1)
 
-- [Documentation](https://liveblocks.io/docs/api-reference/rest-api-endpoints)
-- [Authentication](https://liveblocks.io/docs/authentication)
-- [Webhooks](https://liveblocks.io/docs/platform/webhooks)
-- [Postman Collection](collections/liveblocks.postman_collection.json) — [Postman Collection 2.1](https://schema.getpostman.com/json/collection/v2.1.0/collection.json)
-- [Open Collection](collections/liveblocks.opencollection.json) — [Open Collection 1.0](https://schema.opencollection.com/opencollection/v1.0.0.json)
+Which operations an agent can call, which act, and which need a human in the loop.
 
-### Liveblocks Authorization API
+- [Liveblocks Agentic Access](https://apis.io/agentic-access/liveblocks/liveblocks-agentic-access/)
 
-Public-facing authorization endpoint used by client SDKs to exchange a server-issued token for a Liveblocks session. Supports access token and ID token authorization patterns.
+#### Collections (10)
 
-- **Human URL:** [https://liveblocks.io/docs/authentication](https://liveblocks.io/docs/authentication)
-- **Base URL:** `https://api.liveblocks.io/v2`
+Postman and Open Collection request collections.
 
-#### Tags
+- [Liveblocks REST API](https://apis.io/collections/liveblocks/open-liveblocks/)
+- [Liveblocks REST Active Users API](https://apis.io/collections/liveblocks/open-liveblocks-active-users-api/)
+- [Liveblocks REST Active Users Comments API](https://apis.io/collections/liveblocks/open-liveblocks-comments-api/)
+- [Liveblocks REST Active Users Events API](https://apis.io/collections/liveblocks/open-liveblocks-events-api/)
+- [Liveblocks REST Active Users Reactions API](https://apis.io/collections/liveblocks/open-liveblocks-reactions-api/)
+- [Liveblocks REST Active Users Rooms API](https://apis.io/collections/liveblocks/open-liveblocks-rooms-api/)
+- [Liveblocks REST Active Users Storage API](https://apis.io/collections/liveblocks/open-liveblocks-storage-api/)
+- [Liveblocks REST Active Users Threads API](https://apis.io/collections/liveblocks/open-liveblocks-threads-api/)
+- [Liveblocks REST Active Users Versions API](https://apis.io/collections/liveblocks/open-liveblocks-versions-api/)
+- [Liveblocks REST Active Users Yjs API](https://apis.io/collections/liveblocks/open-liveblocks-yjs-api/)
 
-- Auth
-- Tokens
-- Sessions
+#### Security (4)
 
-#### Properties
+Authentication, trust centre, and vulnerability disclosure.
 
-- [Documentation](https://liveblocks.io/docs/authentication)
-- [Postman Collection](collections/liveblocks.postman_collection.json) — [Postman Collection 2.1](https://schema.getpostman.com/json/collection/v2.1.0/collection.json)
-- [Open Collection](collections/liveblocks.opencollection.json) — [Open Collection 1.0](https://schema.opencollection.com/opencollection/v1.0.0.json)
+- [Liveblocks Authentication](https://apis.io/security/liveblocks/liveblocks-authentication/)
+- [Liveblocks Domain Security](https://apis.io/security/liveblocks/liveblocks-domain-security/)
+- [Liveblocks Trust Center](https://apis.io/security/liveblocks/liveblocks-trust-center/)
+- [Liveblocks Vulnerability Disclosure](https://apis.io/security/liveblocks/liveblocks-vulnerability-disclosure/)
 
-### Liveblocks Realtime Client API
+#### Plans and pricing (1)
 
-WebSocket-based client API exposed through Liveblocks client SDKs for React, JavaScript, Redux, Zustand, Vue (community), and Yjs. Provides presence, broadcast events, Live storage data structures, and threads.
+Published plans, tiers and prices.
 
-- **Human URL:** [https://liveblocks.io/docs](https://liveblocks.io/docs)
-- **Base URL:** `https://api.liveblocks.io/v7`
+- [Liveblocks Plans Pricing](https://apis.io/plans/liveblocks/liveblocks-plans-pricing/)
 
-#### Tags
+#### Rate limits (1)
 
-- WebSocket
-- Client SDK
-- Presence
-- Storage
-- Yjs
+Published request limits.
 
-#### Properties
+- [Liveblocks Rate Limits](https://apis.io/rate-limits/liveblocks/liveblocks-rate-limits/)
 
-- [Documentation](https://liveblocks.io/docs)
-- [SDK](https://www.npmjs.com/package/@liveblocks/client)
-- [SDK](https://www.npmjs.com/package/@liveblocks/react)
-- [SDK](https://www.npmjs.com/package/@liveblocks/node)
-- [SDK](https://www.npmjs.com/package/@liveblocks/yjs)
-- [Postman Collection](collections/liveblocks.postman_collection.json) — [Postman Collection 2.1](https://schema.getpostman.com/json/collection/v2.1.0/collection.json)
-- [Open Collection](collections/liveblocks.opencollection.json) — [Open Collection 1.0](https://schema.opencollection.com/opencollection/v1.0.0.json)
+#### FinOps (1)
 
-## Common Properties
+What the API costs to run, by operation.
+
+- [Liveblocks Finops](https://apis.io/finops/liveblocks/liveblocks-finops/)
+
+## Where to find this API
+
+Links to the company's own pages. This repository publishes no copy of their specifications — the canonical document is theirs and lives at the URLs below.
 
 - [Website](https://liveblocks.io)
-- [Portal](https://liveblocks.io/docs)
 - [Documentation](https://liveblocks.io/docs)
-- [Sign Up](https://liveblocks.io/signup)
-- [Login](https://liveblocks.io/dashboard)
 - [Pricing](https://liveblocks.io/pricing)
-- [Blog](https://liveblocks.io/blog)
-- [Git Hub](https://github.com/liveblocks/liveblocks)
-- [Examples](https://liveblocks.io/examples)
-- [Changelog](https://liveblocks.io/changelog)
-- [Status Page](https://status.liveblocks.io)
-- [Terms of Service](https://liveblocks.io/terms)
-- [Privacy Policy](https://liveblocks.io/privacy)
 - [Support](https://liveblocks.io/support)
-- [Community](https://liveblocks.io/discord)
-- [L L Ms Txt](https://liveblocks.io/llms.txt)
+- [Changelog](https://liveblocks.io/changelog)
+- [Blog](https://liveblocks.io/blog)
+- [Terms of service](https://liveblocks.io/terms)
+- [Privacy policy](https://liveblocks.io/privacy)
+- [Status](https://status.liveblocks.io)
 
-## Maintainers
+## API Evangelist rating
 
-**FN:** Kin Lane
-**Email:** kinlane@gmail.com
+**Kin Score 55.5** — strong · rubric 0.25.0 · scored 2026-10-23
+
+| Facet | Score |
+|---|---|
+| Discoverability | 73.2 |
+| Contract quality | 63.2 |
+| Contract governance | 0.0 |
+| Operational transparency | 60.5 |
+| Developer ergonomics | 52.4 |
+| Access clarity | 51.3 |
+
+**Agent readiness 29.5** — agent-ready
+
+| Agent-readiness dimension | Result |
+|---|---|
+| Spec Presence | yes |
+| Agentic Access | derived (partial credit) |
+| Reversibility Documented | — |
+| MCP Server | — |
+| Auth Clarity | bearer (partial credit) |
+| Idempotency | — |
+| Error Semantics | verified |
+| OpenAPI Examples | partial |
+| Rate Limit Signal | derived (partial credit) |
+| Event Surface Described | derived (partial credit) |
+| Agent Skills | — |
+| Well Known Catalog | — |
+| Consent Identity | — |
+| Agent Card | — |
+| Dry Run Mode | — |
+| Delegated Identity | — |
+| Protected Resource Metadata | — |
+| Dynamic Client Registration | — |
+| Agentic Commerce | — |
+| Pagination Ratio | partial |
+| Operation Distinctiveness | distinct |
+
+**Regulatory alignment 30.4** — Horizontal (data, software, accessibility, platform)
+
+The rubric is published at [github.com/api-evangelist/kin-score](https://github.com/api-evangelist/kin-score). The per-check breakdown behind these numbers — which checks were earned, partial or missed — along with score history and how this provider compares to its peers, is available at [apis.io/providers/liveblocks/](https://apis.io/providers/liveblocks/).
+
+## How this profile is made
+
+API Evangelist profiles a company's public API surface the way a developer would find it: the website, developer portal and documentation, the specifications it publishes, its public repositories, and its pricing, status and changelog pages. From that it derives the properties above — contracts split per API, workflows, schemas, collections, governance rules, plans and rate limits — and scores them against the published [Kin Score rubric](https://github.com/api-evangelist/kin-score).
+
+The artifacts are published on [APIs.io](https://apis.io), not in this repository. This repository is the public record for Liveblocks: the place to say something is wrong, missing or out of date, and to ask for a re-score or a removal.
+
+## Open an issue
+
+- **Something about this listing** — a wrong description, a missing API, a stale artifact or a question about the rating: [open an issue on this repository](https://github.com/api-evangelist/liveblocks/issues/new).
+- **A new API, or one that is not in the catalog yet** — [submit it on APIs.io](https://apis.io/add/).
+- **Anything else** — [the APIs.io inbox](https://github.com/api-search/inbox/issues/new) or [info@apievangelist.com](mailto:info@apievangelist.com).
